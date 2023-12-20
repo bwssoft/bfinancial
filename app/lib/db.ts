@@ -1,4 +1,4 @@
-import { Client, Payment } from "./definitions"
+import { Payment } from "./definitions"
 
 
 export async function listPayment() {
@@ -15,7 +15,7 @@ export async function createOnePayment(payment: Payment) {
 }
 
 
-const payemnts: (Payment & { client: Client })[] = [
+const payemnts: Payment[] = [
   {
     uuid: "0",
     client_id: "0",
@@ -24,10 +24,6 @@ const payemnts: (Payment & { client: Client })[] = [
     bws_enterprise_id: "0",
     offer_uuid: "0",
     status: "pending",
-    client: {
-      id: "0",
-      name: "Client#00"
-    },
     created_at: new Date()
   },
   {
@@ -38,10 +34,6 @@ const payemnts: (Payment & { client: Client })[] = [
     bws_enterprise_id: "0",
     offer_uuid: "0",
     status: "pending",
-    client: {
-      id: "0",
-      name: "Client#00"
-    },
     created_at: new Date()
   }
 ]

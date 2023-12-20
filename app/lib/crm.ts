@@ -18,7 +18,7 @@ export async function listOfferById(id: string) {
   return offers.find(offer => offer.id === id)
 }
 
-const clients: Client[] = [
+export const clients: Client[] = [
   {
     id: "0",
     name: "client#00",
@@ -28,17 +28,29 @@ const clients: Client[] = [
     name: "client#01",
   }
 ]
-const offers: Offer[] = [
+export const offers: Offer[] = [
   {
     id: "0",
     client_id: "0",
     bws_enterprise_id: "0",
-    price: 100000
+    price: 100000,
+    status: "failed",
+    created_at: new Date()
   },
   {
     id: "1",
     client_id: "0",
     bws_enterprise_id: "1",
-    price: 210000
+    price: 210000,
+    status: "pending",
+    created_at: new Date()
+  },
+  {
+    id: "3",
+    client_id: "0",
+    bws_enterprise_id: "1",
+    price: 6521000,
+    status: "paid",
+    created_at: new Date()
   }
 ]

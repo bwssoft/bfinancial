@@ -3,6 +3,7 @@
 import { createPix } from "./bwpay"
 import * as crm from "./crm"
 import * as db from "./db"
+import { Client, Offer, Payment } from "./definitions"
 
 export async function fetchClients() {
   return await crm.listClient()
@@ -11,15 +12,15 @@ export async function fetchClientById(id: string) {
   return await crm.listClientById(id)
 }
 
-export async function fetchOffers() {
-  return await crm.listOffer()
+export async function fetchOffers(): Promise<(Offer & { client: Client })[]> {
+  return (await crm.listOffer()).map(offer => ({ ...offer, client: crm.clients[0] }))
 }
 export async function fetchOfferById(id: string) {
   return await crm.listOfferById(id)
 }
 
-export async function fetchPayments() {
-  return await db.listPayment()
+export async function fetchPayments(): Promise<(Payment & { client: Client })[]> {
+  return (await db.listPayment()).map(payment => ({ ...payment, client: crm.clients[0] }))
 }
 export async function fetchPaymentById(id: string) {
   return await db.listPaymentById(id)

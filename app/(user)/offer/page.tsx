@@ -1,62 +1,21 @@
-"use client";
-import { ScaleIcon } from "@heroicons/react/24/outline";
 import { BanknotesIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { TableFooter } from "@/app/ui/table-footer";
+import Link from "next/link";
+import { Table } from "@/app/ui/table";
+import { fetchOffers } from "@/app/lib/actions";
+import { formatPriceFromCents, formatShortDate } from "@/app/utils/formatters";
 
-const cards = [
-  { name: "Account balance", href: "#", icon: ScaleIcon, amount: "$30,659.45" },
-];
-const transactions = [
-  {
-    id: 1,
-    name: "Payment to Molly Sanders",
-    href: "#",
-    amount: "$20,000",
-    currency: "USD",
-    status: "success",
-    date: "July 11, 2020",
-    datetime: "2020-07-11",
-  },
-  {
-    id: 1,
-    name: "Payment to Molly Sanders",
-    href: "#",
-    amount: "$20,000",
-    currency: "USD",
-    status: "success",
-    date: "July 11, 2020",
-    datetime: "2020-07-11",
-  },
-  {
-    id: 1,
-    name: "Payment to Molly Sanders",
-    href: "#",
-    amount: "$20,000",
-    currency: "USD",
-    status: "success",
-    date: "July 11, 2020",
-    datetime: "2020-07-11",
-  },
-  {
-    id: 1,
-    name: "Payment to Molly Sanders",
-    href: "#",
-    amount: "$20,000",
-    currency: "USD",
-    status: "success",
-    date: "July 11, 2020",
-    datetime: "2020-07-11",
-  },
-  // More transactions...
-];
 const statusStyles = {
-  success: "bg-green-100 text-green-800",
-  processing: "bg-yellow-100 text-yellow-800",
+  paid: "bg-green-100 text-green-800",
+  pending: "bg-yellow-100 text-yellow-800",
   failed: "bg-gray-100 text-gray-800",
+  canceled: "bg-red-100 text-red-800",
 };
 
-export default function Example() {
+export default async function Example() {
+  const offers = await fetchOffers();
+
   return (
     <>
       <div className="min-h-full">
@@ -94,63 +53,14 @@ export default function Example() {
           </div>
 
           <div className="mt-8">
-            {/* <div className="w-full">
-              <h2 className="text-lg font-medium leading-6 text-gray-900">
-                Overview
-              </h2>
-              <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {cards.map((card) => (
-                  <div
-                    key={card.name}
-                    className="overflow-hidden rounded-lg bg-white shadow"
-                  >
-                    <div className="p-5">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <card.icon
-                            className="h-6 w-6 text-gray-400"
-                            aria-hidden="true"
-                          />
-                        </div>
-                        <div className="ml-5 w-0 flex-1">
-                          <dl>
-                            <dt className="truncate text-sm font-medium text-gray-500">
-                              {card.name}
-                            </dt>
-                            <dd>
-                              <div className="text-lg font-medium text-gray-900">
-                                {card.amount}
-                              </div>
-                            </dd>
-                          </dl>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 px-5 py-3">
-                      <div className="text-sm">
-                        <a
-                          href={card.href}
-                          className="font-medium text-cyan-700 hover:text-cyan-900"
-                        >
-                          View all
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div> */}
-
             {/* Activity list (smallest breakpoint only) */}
             <div className="shadow sm:hidden">
-              <ul
-                role="list"
-                className="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden"
-              >
-                {transactions.map((transaction) => (
-                  <li key={transaction.id}>
-                    <a
-                      href={transaction.href}
+              <Table.Mobile
+                data={offers}
+                lineRender={(d) => (
+                  <>
+                    <Link
+                      href={`/offer/${d.id}`}
                       className="block bg-white px-4 py-4 hover:bg-gray-50"
                     >
                       <span className="flex items-center space-x-4">
@@ -160,15 +70,15 @@ export default function Example() {
                             aria-hidden="true"
                           />
                           <span className="flex flex-col truncate text-sm text-gray-500">
-                            <span className="truncate">{transaction.name}</span>
+                            <span className="truncate">{d.client.name}</span>
                             <span>
                               <span className="font-medium text-gray-900">
-                                {transaction.amount}
+                                {formatPriceFromCents(d.price)}
                               </span>{" "}
-                              {transaction.currency}
+                              BRL
                             </span>
-                            <time dateTime={transaction.datetime}>
-                              {transaction.date}
+                            <time dateTime={d.created_at.toString()}>
+                              {formatShortDate(d.created_at)}
                             </time>
                           </span>
                         </span>
@@ -177,11 +87,11 @@ export default function Example() {
                           aria-hidden="true"
                         />
                       </span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-
+                    </Link>
+                  </>
+                )}
+                keyExtractor={(d) => d.id}
+              />
               <TableFooter.Mobile />
             </div>
 
@@ -190,81 +100,83 @@ export default function Example() {
               <div className="w-full">
                 <div className="mt-2 flex flex-col">
                   <div className="min-w-full overflow-hidden overflow-x-auto align-middle shadow sm:rounded-lg">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead>
-                        <tr>
-                          <th
-                            className="bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900"
-                            scope="col"
-                          >
-                            Transaction
-                          </th>
-                          <th
-                            className="bg-gray-50 px-6 py-3 text-right text-sm font-semibold text-gray-900"
-                            scope="col"
-                          >
-                            Amount
-                          </th>
-                          <th
-                            className="hidden bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900 md:block"
-                            scope="col"
-                          >
-                            Status
-                          </th>
-                          <th
-                            className="bg-gray-50 px-6 py-3 text-right text-sm font-semibold text-gray-900"
-                            scope="col"
-                          >
-                            Date
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200 bg-white">
-                        {transactions.map((transaction) => (
-                          <tr key={transaction.id} className="bg-white">
-                            <td className="w-full max-w-0 whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                              <div className="flex">
-                                <a
-                                  href={transaction.href}
-                                  className="group inline-flex space-x-2 truncate text-sm"
-                                >
-                                  <BanknotesIcon
-                                    className="h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                                    aria-hidden="true"
-                                  />
-                                  <p className="truncate text-gray-500 group-hover:text-gray-900">
-                                    {transaction.name}
-                                  </p>
-                                </a>
-                              </div>
-                            </td>
-                            <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
-                              <span className="font-medium text-gray-900">
-                                {transaction.amount}
-                              </span>
-                              {transaction.currency}
-                            </td>
-                            <td className="hidden whitespace-nowrap px-6 py-4 text-sm text-gray-500 md:block">
-                              <span
-                                className={clsx(
-                                  statusStyles[
-                                    transaction.status as keyof typeof statusStyles
-                                  ],
-                                  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize"
-                                )}
-                              >
-                                {transaction.status}
-                              </span>
-                            </td>
-                            <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
-                              <time dateTime={transaction.datetime}>
-                                {transaction.date}
-                              </time>
-                            </td>
+                    <Table.Desktop
+                      header={
+                        <thead>
+                          <tr>
+                            <th
+                              className="bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900"
+                              scope="col"
+                            >
+                              Cliente
+                            </th>
+                            <th
+                              className="bg-gray-50 px-6 py-3 text-right text-sm font-semibold text-gray-900"
+                              scope="col"
+                            >
+                              Preço
+                            </th>
+                            <th
+                              className="hidden bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900 md:block"
+                              scope="col"
+                            >
+                              Status
+                            </th>
+                            <th
+                              className="bg-gray-50 px-6 py-3 text-right text-sm font-semibold text-gray-900"
+                              scope="col"
+                            >
+                              Data
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                      }
+                      lineRender={(d) => (
+                        <>
+                          <td className="w-full max-w-0 whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                            <div className="flex">
+                              <Link
+                                href={`/offer/${d.id}`}
+                                className="group inline-flex space-x-2 truncate text-sm"
+                              >
+                                <BanknotesIcon
+                                  className="h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                                  aria-hidden="true"
+                                />
+                                <p className="truncate text-gray-500 group-hover:text-gray-900">
+                                  {d.client.name}
+                                </p>
+                              </Link>
+                            </div>
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
+                            <span className="font-medium text-gray-900">
+                              {formatPriceFromCents(d.price)}
+                            </span>
+                            BRL
+                          </td>
+                          <td className="hidden whitespace-nowrap px-6 py-4 text-sm text-gray-500 md:block">
+                            <span
+                              className={clsx(
+                                statusStyles[
+                                  d.status as keyof typeof statusStyles
+                                ],
+                                "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize"
+                              )}
+                            >
+                              {d.status}
+                            </span>
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
+                            <time dateTime={d.created_at.toString()}>
+                              {formatShortDate(d.created_at)}
+                            </time>
+                          </td>
+                        </>
+                      )}
+                      data={offers}
+                      keyExtractor={(d) => d.id}
+                    />
                     <TableFooter.Desktop />
                   </div>
                 </div>

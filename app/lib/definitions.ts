@@ -22,6 +22,8 @@ export type Offer = {
   client_id: string
   bws_enterprise_id: string
   price: Cents
+  status: "pending" | "paid" | "canceled" | "failed"
+  created_at: Date
 }
 
 export type Client = {
