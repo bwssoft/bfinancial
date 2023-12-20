@@ -1,16 +1,20 @@
-type Cents = Number
+type Cents = number
 type Pix = {
   code: string
 }
 type Invoice = any
 
 export type Payment = {
+  uuid: string
   user_uuid: string
+  client_id: string
   price: Cents
   bws_enterprise_id: string
   offer_uuid?: string
   pix?: Pix
   invoice?: Invoice
+  status: "pending" | "paid" | "canceled" | "failed"
+  created_at: Date
 }
 
 export type Offer = {
@@ -22,4 +26,5 @@ export type Offer = {
 
 export type Client = {
   id: string
+  name: string
 }
