@@ -5,6 +5,7 @@ import { fetchPayments } from "@/app/lib/actions";
 import { Table } from "@/app/ui/table";
 import { formatPriceFromCents, formatShortDate } from "@/app/utils/formatters";
 import Link from "next/link";
+import { Breadcrumbs } from "@/app/ui/breadcrumbs";
 
 const statusStyles = {
   paid: "bg-green-100 text-green-800",
@@ -19,8 +20,17 @@ export default async function Example() {
     <>
       <div className="min-h-full">
         <main className="flex-1 pb-8">
+          <Breadcrumbs
+            linkRoot="/"
+            breadcrumbs={[
+              {
+                name: "Pagamentos",
+                href: "/payment",
+              },
+            ]}
+          />
           {/* Page header */}
-          <div className="bg-white shadow">
+          <div className="mt-8 bg-white shadow">
             <div className="px-4 sm:px-6 lg:mx-auto lg:max-w-6xl lg:px-8">
               <div className="py-6 md:flex md:items-center md:justify-between lg:border-t lg:border-gray-200">
                 <div className="min-w-0 flex-1">
