@@ -1,0 +1,355 @@
+syntax = "proto3";
+package payment;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+
+
+service OmieService {
+  rpc create(google.protobuf.Any) returns (OmieResult);
+  rpc cancel(CancelParams) returns (OmieResult);
+  rpc getClients(GetClientsParams) returns (GetClientsResult);
+}
+
+service TransactionService {
+	rpc get(GetOrdersParams) returns (GetTransactionsResult);
+	rpc boleto(BoletoParams) returns (google.protobuf.Any);
+	rpc pix(PixParams) returns (google.protobuf.Any);
+	rpc pixDetached(PixDetachedParams) returns (google.protobuf.Any);
+	rpc pay(PayParams) returns (google.protobuf.Any);
+}
+
+service RecipientService {
+	rpc register(RecipientRegisterParams) returns (Recipient);
+	rpc update(RecipientUpdateParams) returns (google.protobuf.BoolValue);
+}
+
+service CustomerService {
+	rpc registerOmie(OmieCustomerRegisterParams) returns (Customer);
+	rpc register(CustomerRegisterParams) returns (Customer);
+	rpc update(CustomerUpdateParams) returns (google.protobuf.BoolValue);
+}
+
+message OmieCustomerRegisterParams {
+  string _id = 1;
+  string name = 2;
+  Contact contact = 3;
+  string document = 4;
+  Address address = 7;
+  Source source = 8;
+  Banking banking = 10;
+  AccountTypeEnum accountType = 11;
+  OmieInfo omieInfo = 14;
+  int32 orders = 15;
+}
+
+message CancelParams {
+  string _id = 1;
+  int32 nCodOS = 2;
+  string cNumOS = 3;
+  optional string despesasReembolsaveis = 4;
+}  
+
+message OmieResult {
+  string cCodIntOS = 1;
+  int32 nCodOS = 2;
+  string cNumOS = 3;
+  string cCodStatus = 4;
+  string cDescStatus = 5;
+}  
+
+message despesasReembolsaveis {
+  string cCodCategReemb = 1;
+}
+message GetTransactionsResult {
+  int32 count = 1;
+  repeated Transaction items = 2;
+}  
+
+message GetClientsParams {
+  optional google.protobuf.Timestamp since = 1;
+  optional google.protobuf.Timestamp until = 2;
+  optional int32 page = 3;
+  optional int32 size = 4;
+  optional google.protobuf.Any params = 5;
+}
+
+message GetClientsResult {
+  int32 count = 1;
+  repeated google.protobuf.Any items = 2;
+}  
+
+message Transaction {
+  optional string _id = 1;
+  optional double amount = 2;
+  optional QRCode qrCode = 3;
+  optional string url = 4;
+  optional Method method = 5;
+  optional Status status = 6;
+  optional bool finish = 7;
+  optional string refPath = 8;
+  optional Receiver receiver = 9;
+  optional string payer = 10;
+}
+
+message Receiver {
+    string id = 1;
+    int32 numeroConvenio = 2;
+}  
+
+message QRCode {
+    string url = 1;
+    string txId = 2;
+    string emv = 3;
+}
+
+enum Method {
+    PIX = 0;
+    BOLETO = 1;
+    OMIE = 2;
+}
+enum Status {
+    PENDENTE = 0;
+    DEFERIDO = 1;
+    PROCESSANDO = 2;
+    CANCELADO = 3;
+    FALHO = 4;
+}
+message PayParams {
+  string _id = 1;
+  int32 paymentType = 2;
+  repeated Item items = 3;
+}
+
+message Item {
+  string receiver = 1;
+  double valor = 2;
+  int64 data = 3;
+  optional int32 documentoDebito = 4;
+  optional int32 documentoCredito = 5;
+  optional string descricaoPagamento = 6;
+  optional string descricaoPagamentoInstantaneo = 7;
+}
+
+message BoletoParams {
+	int32 codigoTipoTitulo = 1;
+    string dataVencimento = 2;
+    string descricaoTipoTitulo = 3;
+    string indicadorAceiteTituloVencido = 4;
+    string indicadorPermissaoRecebimentoParcial = 5;
+    int32 numeroDiasLimiteRecebimento = 6;
+    double valorOriginal = 7;
+    string _id = 8;
+    string receiver = 9;
+    string codigoAceite = 10;
+}
+
+message GetOrdersParams {
+  optional google.protobuf.Timestamp since = 1;
+  optional google.protobuf.Timestamp until = 2;
+  optional int32 page = 3;
+  optional int32 size = 4;
+  optional Transaction params = 5;
+}
+
+message PixParams {
+	string _id = 1;
+	string receiver = 2;
+	string valor = 3;
+	string solicitacaoPagador = 4;
+	repeated InfoAdicional infoAdicionais = 5;
+}
+
+message PixDetachedParams {
+  double price = 1;
+  PayerDetached payer = 2;
+  ReceiverDetached receiver = 3;
+}
+
+message PayerDetached {
+  string email = 1;
+  string name = 2;
+  Document document = 3;
+}
+
+message ReceiverDetached {
+  string name = 1;
+  string pix = 2;
+  Document document = 3;
+}
+
+message InfoAdicional {
+    string nome = 1;
+    string valor = 2;
+}
+
+enum StatusEnum {
+  PENDENTE = 0;
+  DEFERIDO = 1;
+  PROCESSANDO = 2;
+  CANCELADO = 3;
+  FALHO = 4;
+}
+
+message Empty {}
+
+
+enum PixType {
+  PHONE = 1;
+  EMAIL = 2;
+  CPF_CNPJ = 3;
+  RANDOM_KEY = 4;
+  BANK_ACCOUNT = 5;
+}
+
+
+message Recipient {
+  string _id = 1;
+  string name = 2;
+  Contact contact = 3;
+  Document document = 4;
+  Address address = 7;
+  Source source = 8;
+  Banking banking = 10;
+}
+
+message RecipientRegisterParams {
+  string _id = 1;
+  string name = 2;
+  Contact contact = 3;
+  string document = 4;
+  Address address = 7;
+  Source source = 8;
+  Banking banking = 10;
+}
+
+
+message RecipientUpdateParams {
+  string _id = 1;
+  optional string name = 2;
+  optional Contact contact = 3;
+  optional string document = 4;
+  optional Address address = 7;
+  optional Source source = 8;
+  optional Banking banking = 10;
+  int32 orders = 11;
+}
+
+message Customer {
+  string _id = 1;
+  string name = 2;
+  Contact contact = 3;
+  Document document = 4;
+  Address address = 7;
+  Source source = 8;
+  Banking banking = 10;
+  AccountTypeEnum accountType = 11;
+  PayerInfo payerInfo = 12;
+  ReceiverInfo receiverInfo = 13;
+  optional OmieInfo omieInfo = 14;
+  int32 orders = 15;
+  int32 transfers = 16;
+}
+
+enum AccountTypeEnum {
+  CLIENT = 0;
+  PR = 1;
+  TERTENANT = 2;
+  OWNER = 3;
+  TENANT = 4;
+  SUBTENANT_RECIPIENT = 5;
+} 
+
+message ApplicationKeys {
+  string clientSecret = 1;
+  string clientId = 2;
+  string key = 3;
+  string scope = 4;
+}
+
+message PayerInfo {
+  ApplicationKeys applicationKeys = 1;
+  int32 convenio = 2;
+} 
+message ReceiverInfo {
+  ApplicationKeys applicationKeys = 1;
+  int32 convenio = 2;
+  int32 wallet = 3;
+  int32 walletVariation = 4;
+} 
+message OmieInfo {
+  string key = 1;
+  string secret = 2;
+} 
+
+message CustomerRegisterParams {
+  string _id = 1;
+  string name = 2;
+  Contact contact = 3;
+  string document = 4;
+  Address address = 7;
+  Source source = 8;
+  Banking banking = 10;
+  AccountTypeEnum accountType = 11;
+  PayerInfo payerInfo = 12;
+  ReceiverInfo receiverInfo = 13;
+  int32 orders = 14;
+}
+
+message CustomerUpdateParams {
+  string _id = 1;
+  optional string name = 2;
+  optional Contact contact = 3;
+  optional string document = 4;
+  optional Address address = 7;
+  optional Source source = 8;
+  optional Banking banking = 10;
+  optional AccountTypeEnum accountType = 11;
+  optional PayerInfo payerInfo = 12;
+  optional ReceiverInfo receiverInfo = 13;
+  optional OmieInfo omieInfo = 14;
+  int32 orders = 15;
+}
+
+
+message Document {
+  string type = 1;
+  string value = 2;
+}
+
+message Contact {
+  string phone = 1;
+  string email = 2;
+}
+
+message Address {
+  string street = 1;
+  string postalcode = 2;
+  string city = 3;
+  string district = 4;
+  string uf = 5;
+  string number = 6;
+}
+
+enum Source {
+  VEON = 0;
+  PRAST = 1;
+}
+
+message Banking {
+  string ispb = 1;
+  string name = 2;
+  int32 code = 3;
+  string fullName = 4;
+  int32 agency = 5;
+  int32 account = 6;
+  string digit = 7;
+  AccountTypeEnum type = 8;
+  Pix pix = 9;
+}
+
+message Pix {
+  PixType type = 1;
+  string value = 2;
+}

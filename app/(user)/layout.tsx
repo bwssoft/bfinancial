@@ -13,11 +13,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <html lang="en" className="h-full bg-gray-100">
+      {modal}
       <body className={`${inter.className} h-full`}>
         <SideBar />
         <div className="lg:pl-72">

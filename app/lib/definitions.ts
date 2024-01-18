@@ -1,7 +1,9 @@
 type Cents = number
+
 type Pix = {
   code: string
 }
+
 type Invoice = any
 
 export type Payment = {
