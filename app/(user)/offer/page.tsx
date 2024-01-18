@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Table } from "@/app/ui/table";
 import { fetchOffers } from "@/app/lib/actions";
 import { formatPriceFromCents, formatShortDate } from "@/app/utils/formatters";
-import { ClientContextProvider } from "@/app/@shared/context/ClientContext/ClientContext";
 
 const statusStyles = {
     paid: "bg-green-100 text-green-800",
@@ -18,7 +17,7 @@ export default async function Example() {
     const offers = await fetchOffers();
 
     return (
-        <ClientContextProvider>
+        <>
             <div className="min-h-full">
                 <main className="flex-1 pb-8">
                     {/* Page header */}
@@ -203,6 +202,6 @@ export default async function Example() {
                     </div>
                 </main>
             </div>
-        </ClientContextProvider>
+        </>
     );
 }
