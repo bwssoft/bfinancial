@@ -2,6 +2,7 @@ import { fetchOffers } from "@/app/lib/actions";
 import { OfferTable } from "@/app/ui/tables/OfferTable";
 import { Pagination } from "@/app/ui/pagination";
 import { OmieDefaultParams } from "@/app/lib/definitions/OmieApi";
+import { PageHeader } from "@/app/ui/navigation/page-header";
 
 const statusStyles = {
     paid: "bg-green-100 text-green-800",
@@ -20,11 +21,9 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
     return (
         <div className="min-h-full">
             <main className="flex-1 pb-8">
-                <div className="flex justify-between bg-white shadow rounded-lg p-4 sm:p-6 lg:p-8">
-                    <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
-                        Propostas
-                    </h1>
-
+                <PageHeader 
+                    pageTitle="Propostas"
+                >
                     <div className="mt-6 flex space-x-3 md:ml-4 md:mt-0">
                         <button
                             type="button"
@@ -39,7 +38,7 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
                             Nova Proposta
                         </button>
                     </div>
-                </div>
+                </PageHeader>
 
                 <div className="mt-8 rounded-lg shadow">
                     <OfferTable offers={offers} />

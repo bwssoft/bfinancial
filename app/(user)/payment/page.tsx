@@ -7,6 +7,7 @@ import { formatPriceFromCents, formatShortDate } from "@/app/utils/formatters";
 import Link from "next/link";
 import { Breadcrumbs } from "@/app/ui/breadcrumbs";
 import { PaymentTable } from "@/app/ui/tables/PaymentTable";
+import { PageHeader } from "@/app/ui/navigation/page-header";
 
 const statusStyles = {
   paid: "bg-green-100 text-green-800",
@@ -22,29 +23,10 @@ export default async function Example() {
     <>
       <div className="min-h-full">
         <main className="flex-1 pb-8">
-          <Breadcrumbs
-            linkRoot="/"
-            breadcrumbs={[
-              {
-                name: "Pagamentos",
-                href: "/payment",
-              },
-            ]}
-          />
           {/* Page header */}
-          <div className="mt-8 bg-white shadow">
-            <div className="px-4 sm:px-6 lg:mx-auto lg:max-w-6xl lg:px-8">
-              <div className="py-6 md:flex md:items-center md:justify-between lg:border-t lg:border-gray-200">
-                <div className="min-w-0 flex-1">
-                  {/* Profile */}
-                  <div className="flex items-center">
-                    <div className="flex items-center">
-                      <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
-                        Pagamentos
-                      </h1>
-                    </div>
-                  </div>
-                </div>
+          <PageHeader 
+              pageTitle="Pagamentos"
+            >
                 <div className="mt-6 flex space-x-3 md:ml-4 md:mt-0">
                   <button
                     type="button"
@@ -59,9 +41,7 @@ export default async function Example() {
                     Novo Pagamento
                   </Link>
                 </div>
-              </div>
-            </div>
-          </div>
+          </PageHeader>
 
           <div className="mt-8">
             <PaymentTable 
