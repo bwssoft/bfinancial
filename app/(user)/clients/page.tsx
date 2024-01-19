@@ -1,10 +1,11 @@
 import { BanknotesIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
-import { TableFooter } from "@/app/ui/table-footer";
+import { Desktop, Mobile } from "@/app/ui/table-footer";
 import Link from "next/link";
 import { Table } from "@/app/ui/table";
-import { fetchOffers } from "@/app/lib/actions";
+import { fetchClients } from "@/app/lib/actions";
 import { formatPriceFromCents, formatShortDate } from "@/app/utils/formatters";
+import { OmieDefaultParams } from "@/app/@shared/interfaces/services/@shared";
 
 const statusStyles = {
     paid: "bg-green-100 text-green-800",
@@ -13,12 +14,17 @@ const statusStyles = {
     canceled: "bg-red-100 text-red-800",
 };
 
-export default async function Example() {
-    const offers = await fetchOffers();
+export default async function Example({
+    searchParams,
+}: {
+    searchParams: Omit<OmieDefaultParams, "apenas_importado_api">;
+}) {
+    const clients = await fetchClients(searchParams);
 
     return (
         <>
             <div className="min-h-full">
+             
                 <main className="flex-1 pb-8">
                     {/* Page header */}
                     <div className="bg-white shadow">
@@ -29,7 +35,7 @@ export default async function Example() {
                                     <div className="flex items-center">
                                         <div className="flex items-center">
                                             <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
-                                                Propostas
+                                                Clientes
                                             </h1>
                                         </div>
                                     </div>
@@ -53,14 +59,13 @@ export default async function Example() {
                     </div>
 
                     <div className="mt-8">
-                        {/* Activity list (smallest breakpoint only) */}
                         <div className="shadow sm:hidden">
                             <Table.Mobile
-                                data={offers}
+                                data={clients.clientes_cadastro}
                                 lineRender={(d) => (
                                     <>
                                         <Link
-                                            href={`/offer/${d.id}`}
+                                            href={`/offer/${d.codigo_cliente_omie}`}
                                             className="block bg-white px-4 py-4 hover:bg-gray-50"
                                         >
                                             <span className="flex items-center space-x-4">
@@ -71,23 +76,8 @@ export default async function Example() {
                                                     />
                                                     <span className="flex flex-col truncate text-sm text-gray-500">
                                                         <span className="truncate">
-                                                            {d.client.name}
+                                                            {d.razao_social}
                                                         </span>
-                                                        <span>
-                                                            <span className="font-medium text-gray-900">
-                                                                {formatPriceFromCents(
-                                                                    d.price
-                                                                )}
-                                                            </span>{" "}
-                                                            BRL
-                                                        </span>
-                                                        <time
-                                                            dateTime={d.created_at.toString()}
-                                                        >
-                                                            {formatShortDate(
-                                                                d.created_at
-                                                            )}
-                                                        </time>
                                                     </span>
                                                 </span>
                                                 <ChevronRightIcon
@@ -98,9 +88,14 @@ export default async function Example() {
                                         </Link>
                                     </>
                                 )}
-                                keyExtractor={(d) => d.id}
+                                keyExtractor={(d) =>
+                                    d.codigo_cliente_omie.toString()
+                                }
                             />
-                            <TableFooter.Mobile />
+                            <Mobile
+                                totalRegister={clients.total_de_registros}
+                                totalPage={clients.total_de_paginas}
+                            />
                         </div>
 
                         {/* Activity table (small breakpoint and up) */}
@@ -108,9 +103,9 @@ export default async function Example() {
                             <div className="w-full">
                                 <div className="mt-2 flex flex-col">
                                     <div className="min-w-full overflow-hidden overflow-x-auto align-middle shadow sm:rounded-lg">
-                                        <Table.Desktop
+                                        <Table.Desktop 
                                             header={
-                                                <thead>
+                                                <thead >
                                                     <tr>
                                                         <th
                                                             className="bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900"
@@ -119,32 +114,39 @@ export default async function Example() {
                                                             Cliente
                                                         </th>
                                                         <th
-                                                            className="bg-gray-50 px-6 py-3 text-right text-sm font-semibold text-gray-900"
+                                                            className="bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900"
                                                             scope="col"
                                                         >
-                                                            Preço
+                                                            Razão Social
                                                         </th>
                                                         <th
-                                                            className="hidden bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900 md:block"
+                                                            className="  bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900 "
                                                             scope="col"
                                                         >
-                                                            Status
+                                                            Email
                                                         </th>
                                                         <th
-                                                            className="bg-gray-50 px-6 py-3 text-right text-sm font-semibold text-gray-900"
+                                                            className=" bg-gray-50  px-6 py-3 text-left text-sm font-semibold text-gray-900 "
                                                             scope="col"
                                                         >
-                                                            Data
+                                                            CNPJ
                                                         </th>
+                                                        
                                                     </tr>
                                                 </thead>
                                             }
                                             lineRender={(d) => (
                                                 <>
+                                                <td className="whitespace-nowrap px-6 py-4 text-left text-sm text-gray-500">
+                                                        {
+                                                            d.nome_fantasia
+                                                        }
+                                                    </td>
+
                                                     <td className="w-full max-w-0 whitespace-nowrap px-6 py-4 text-sm text-gray-900">
                                                         <div className="flex">
                                                             <Link
-                                                                href={`/offer/${d.id}`}
+                                                                href={`/offer/${d.codigo_cliente_omie.toString()}`}
                                                                 className="group inline-flex space-x-2 truncate text-sm"
                                                             >
                                                                 <BanknotesIcon
@@ -153,48 +155,43 @@ export default async function Example() {
                                                                 />
                                                                 <p className="truncate text-gray-500 group-hover:text-gray-900">
                                                                     {
-                                                                        d.client
-                                                                            .name
+                                                                        d.razao_social
                                                                     }
                                                                 </p>
                                                             </Link>
                                                         </div>
                                                     </td>
+                                                    
+                                                    {/* Razão social */}
+                                                    <td className="whitespace-nowrap px-6 py-4 text-left text-sm text-gray-500">
+                                                        {
+                                                            d.email
+                                                        }
+                                                    </td>
+
+                                                    {/* CNPJ */}
                                                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
-                                                        <span className="font-medium text-gray-900">
-                                                            {formatPriceFromCents(
-                                                                d.price
-                                                            )}
-                                                        </span>
-                                                        BRL
+                                                        {
+                                                            d.cnpj_cpf
+                                                        }
                                                     </td>
-                                                    <td className="hidden whitespace-nowrap px-6 py-4 text-sm text-gray-500 md:block">
-                                                        <span
-                                                            className={clsx(
-                                                                statusStyles[
-                                                                    d.status as keyof typeof statusStyles
-                                                                ],
-                                                                "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize"
-                                                            )}
-                                                        >
-                                                            {d.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
-                                                        <time
-                                                            dateTime={d.created_at.toString()}
-                                                        >
-                                                            {formatShortDate(
-                                                                d.created_at
-                                                            )}
-                                                        </time>
-                                                    </td>
+
+                                                    
+
+                                                   
                                                 </>
                                             )}
-                                            data={offers}
-                                            keyExtractor={(d) => d.id}
+                                            data={clients.clientes_cadastro}
+                                            keyExtractor={(d) =>
+                                                d.codigo_cliente_omie.toString()
+                                            }
                                         />
-                                        <TableFooter.Desktop />
+                                        <Desktop
+                                            totalRegister={
+                                                clients.total_de_registros
+                                            }
+                                            totalPage={clients.total_de_paginas}
+                                        />
                                     </div>
                                 </div>
                             </div>

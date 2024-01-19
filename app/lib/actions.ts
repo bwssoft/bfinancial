@@ -1,5 +1,10 @@
 "use server"
 
+
+import { OmieDefaultParams } from "../@shared/interfaces/services/@shared"
+import { OmieService } from "../@shared/services"
+import { createPix } from "./bwspay/bwpay"
+
 import * as crm from "./crm"
 import * as db from "./db"
 import { Client, Offer, Payment } from "./definitions"
@@ -7,9 +12,12 @@ import { paymentRepo, CreatePayment } from "./mongodb/repositories/payment.mongo
 
 import { v4 as uuidv4 } from 'uuid';
 
-export async function fetchClients() {
-  return await crm.listClient()
+const omieservice = new OmieService();
+
+export async function fetchClients(data?: Omit<OmieDefaultParams, 'apenas_importado_api'>) {
+  return await omieservice.findAllClients(data);
 }
+
 export async function fetchClientById(id: string) {
   return await crm.listClientById(id)
 }
