@@ -24,7 +24,7 @@ export default async function Example({
     return (
         <>
             <div className="min-h-full">
-                offers
+             
                 <main className="flex-1 pb-8">
                     {/* Page header */}
                     <div className="bg-white shadow">
@@ -103,9 +103,9 @@ export default async function Example({
                             <div className="w-full">
                                 <div className="mt-2 flex flex-col">
                                     <div className="min-w-full overflow-hidden overflow-x-auto align-middle shadow sm:rounded-lg">
-                                        <Table.Desktop
+                                        <Table.Desktop 
                                             header={
-                                                <thead>
+                                                <thead >
                                                     <tr>
                                                         <th
                                                             className="bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900"
@@ -114,22 +114,35 @@ export default async function Example({
                                                             Cliente
                                                         </th>
                                                         <th
-                                                            className="bg-gray-50 px-6 py-3 text-right text-sm font-semibold text-gray-900"
+                                                            className="bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900"
                                                             scope="col"
                                                         >
-                                                            Razão social
+                                                            Razão Social
                                                         </th>
                                                         <th
-                                                            className="hidden bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900 md:block"
+                                                            className="  bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900 "
+                                                            scope="col"
+                                                        >
+                                                            Email
+                                                        </th>
+                                                        <th
+                                                            className=" bg-gray-50  px-6 py-3 text-left text-sm font-semibold text-gray-900 "
                                                             scope="col"
                                                         >
                                                             CNPJ
                                                         </th>
+                                                        
                                                     </tr>
                                                 </thead>
                                             }
                                             lineRender={(d) => (
                                                 <>
+                                                <td className="whitespace-nowrap px-6 py-4 text-left text-sm text-gray-500">
+                                                        {
+                                                            d.nome_fantasia
+                                                        }
+                                                    </td>
+
                                                     <td className="w-full max-w-0 whitespace-nowrap px-6 py-4 text-sm text-gray-900">
                                                         <div className="flex">
                                                             <Link
@@ -148,15 +161,24 @@ export default async function Example({
                                                             </Link>
                                                         </div>
                                                     </td>
+                                                    
                                                     {/* Razão social */}
-                                                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
-                                                        Cleitons
+                                                    <td className="whitespace-nowrap px-6 py-4 text-left text-sm text-gray-500">
+                                                        {
+                                                            d.email
+                                                        }
                                                     </td>
 
                                                     {/* CNPJ */}
                                                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
-                                                        Cleiton
+                                                        {
+                                                            d.cnpj_cpf
+                                                        }
                                                     </td>
+
+                                                    
+
+                                                   
                                                 </>
                                             )}
                                             data={clients.clientes_cadastro}
