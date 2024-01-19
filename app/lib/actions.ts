@@ -1,31 +1,29 @@
 "use server"
 
-import { OmieDefaultParams } from "../@shared/interfaces/services/@shared"
-import { OmieService } from "../@shared/services"
-import { createPix } from "./bwspay/bwpay"
+import { OmieClientService } from "@/app/lib/omie/client.omie"
 import * as crm from "./crm"
 import * as db from "./db"
 import { Client, Offer, Payment } from "./definitions"
 import { paymentRepo, CreatePayment } from "./mongodb/repositories/payment.mongo"
 
 import { v4 as uuidv4 } from 'uuid';
-
-const omieservice = new OmieService();
+import { OmieDefaultParams, OmieSearchParams } from "./definitions/OmieApi"
+import { OmieOrderService } from "./omie/order.omie"
 
 export async function fetchClients(data?: Omit<OmieDefaultParams, 'apenas_importado_api'>) {
-  return await omieservice.findAllClients(data);
+  return await OmieClientService.findAll(data);
 }
 
 export async function fetchClientById(id: string) {
   return await crm.listClientById(id)
 }
 
-export async function fetchOffers(): Promise<(Offer & { client: Client })[]> {
-  return (await crm.listOffer()).map(offer => ({ ...offer, client: crm.clients[0] }))
+export async function fetchOffers(data?: OmieSearchParams) {
+  return await OmieOrderService.findAll(data);
 }
 
-export async function fetchOfferById(id: string) {
-  return await crm.listOfferById(id)
+export async function fetchOfferById(id: number) {
+  return await OmieOrderService.find(id);
 }
 
 export async function fetchPayments(): Promise<(Payment & { client: Client })[]> {
