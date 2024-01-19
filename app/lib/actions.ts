@@ -26,8 +26,8 @@ export async function fetchOfferById(id: number) {
   return await OmieOrderService.find(id);
 }
 
-export async function fetchPayments(): Promise<(Payment & { client: Client })[]> {
-  return (await db.listPayment()).map(payment => ({ ...payment, client: crm.clients[0] }))
+export async function fetchPayments() {
+  return await paymentRepo.list();
 }
 
 export async function fetchPaymentById(id: string) {
