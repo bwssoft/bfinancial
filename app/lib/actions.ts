@@ -9,6 +9,7 @@ import { paymentRepo, CreatePayment } from "./mongodb/repositories/payment.mongo
 import { v4 as uuidv4 } from 'uuid';
 import { OmieOrderService } from "./omie/order.omie"
 import { OmieClientListParams } from "./definitions/OmieClient"
+import { OmieListOfferParams } from "./definitions/OmieOffer"
 
 export async function fetchClients(data?: Omit<OmieClientListParams, 'apenas_importado_api'>) {
   return await OmieClientService.findAll(data);
@@ -18,7 +19,7 @@ export async function fetchClientById(id: string) {
   return await crm.listClientById(id)
 }
 
-export async function fetchOffers(data?: any) {
+export async function fetchOffers(data?: Omit<OmieListOfferParams, 'apenas_importado_api'>) {
   return await OmieOrderService.findAll(data);
 }
 
