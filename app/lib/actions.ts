@@ -1,6 +1,8 @@
 "use server"
 
 import { OmieClientService } from "@/app/lib/omie/client.omie"
+import { createPix } from "./bwspay/bwpay"
+
 import * as crm from "./crm"
 import * as db from "./db"
 import { Client, Offer, Payment } from "./definitions"
