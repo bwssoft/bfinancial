@@ -35,7 +35,7 @@ const SingleValue = (props: SingleValueProps) => (
 )
 
 const Input = (props: InputProps) => (
-  <components.Input {...props} className="!border-0 !border-transparent" />
+  <components.Input {...props} className="autocomplete-input" />
 )
 
 export function Autocomplete<T>({ label, options, ...rest }: AutocompleteProp<T>) {
@@ -51,7 +51,7 @@ export function Autocomplete<T>({ label, options, ...rest }: AutocompleteProp<T>
             ValueContainer, 
             Option, 
             SingleValue,
-            Input
+            Input,
           }}
           {...rest} 
         />
