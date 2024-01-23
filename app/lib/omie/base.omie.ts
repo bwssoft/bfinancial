@@ -46,4 +46,13 @@ export class OmieBaseService {
       param: [params]
     }
   }
+
+  formatBody<T>(call: OmieCallFunctions, params?: T) {
+    return {
+      call,
+      app_key: this._apiKey,
+      app_secret: this._apiSecret,
+      param: [params]
+    }
+  }
 }

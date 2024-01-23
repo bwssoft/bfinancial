@@ -12,7 +12,7 @@ class OrderService extends OmieBaseService {
   }
 
   async findAll(params?: OmieSearchParams) {
-    const data = this.formatOmieBodyRequest('ListarPedidos', params);
+    const data = this.formatBody('ListarPedidos', params)
     const response = await this._httpProvider.post<OmieListOfferResponse>('/produtos/pedido/', data)
     return response.data;
   }
