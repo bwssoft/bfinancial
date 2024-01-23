@@ -1,24 +1,78 @@
-"use client"
 import React from 'react';
-import { createPayment } from "@/app/lib/actions";
-import { Autocomplete } from '../../autocomplete';
+import { useDebouncedCallback } from 'use-debounce';
+
+import { createPayment, fetchClients, fetchOffers } from "@/app/lib/actions";
+import { Autocomplete } from '@/app/ui/autocomplete';
+import { usePaymentCreateForm } from './form-provider';
 
 export function PaymentCreateForm() {
-  const [formType, setFormType] = React.useState<'subclient' | 'client'>('subclient');
+  const {
+    clients,
+    offers,
+    formType,
+    clientId,
+    offerId,
+    clientQuery,
+    setClientId,
+    setClients,
+    setFormType,
+    setOfferId,
+    setOffers,
+    isFetchingOffers,
+    setIsFetchingOffers,
+    isFetchingClients,
+    setIsFetchingClients,
+    setClientQuery
+  } = usePaymentCreateForm();
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const handleAutocompleteSearch = useDebouncedCallback((query: string) => {
+    listClients(query);
+    setClientQuery(query);
+  }, 500);
 
-    try {
-      const formData = new FormData(event.currentTarget);
-      await createPayment(formData);
-    } catch (error) {
-      console.log(error)
+  async function handleAction(formData: FormData) {
+    if (clientId) {
+      formData.append('client_id', clientId);
     }
+
+    if (offerId) {
+      formData.append('offer_id', offerId)
+    }
+
+    await createPayment(formData);
+  }
+
+  async function listClients(query: string) {
+    if (query === "") return;
+
+    setIsFetchingClients(true);
+    const data = await fetchClients({
+      pagina: 1,
+      registros_por_pagina: 1000,
+      clientesFiltro: {
+        nome_fantasia: query
+      },
+    })
+
+    setClients(data.clientes_cadastro)
+    setIsFetchingClients(false);
+  }
+
+  async function listClientOffers(clientId: string) {
+    setIsFetchingOffers(true);
+    const data = await fetchOffers({
+      pagina: 1,
+      registros_por_pagina: 100,
+      filtrar_por_cliente: parseInt(clientId ?? '')
+    })
+
+    setClientId(clientId);
+    setOffers(data.pedido_venda_produto)
+    setIsFetchingOffers(false);
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-8 py-4">
+    <form action={handleAction} className="space-y-8 py-4">
       <section className="space-y-4">
         <div>
           <label className="text-base font-medium text-gray-900">Pagante</label>
@@ -75,23 +129,29 @@ export function PaymentCreateForm() {
             <Autocomplete 
               label="Cliente"
               placeholder="Selecione um cliente"
-              options={[
-                { label: 'Cliente 1', value: { id: 1, name: 'Cliente 1' }},
-                { label: 'Empresa', value: { id: 1, name: 'Empresa' }},
-                { label: 'Companhia', value: { id: 1, name: 'Companhia' }},
-                { label: 'Estabelecimento', value: { id: 1, name: 'Estabelecimento' }},
-                { label: 'Lojinha', value: { id: 1, name: 'Lojinha' }},
-              ]}
+              defaultInputValue={clientQuery}
+              onInputChange={handleAutocompleteSearch}
+              isLoading={isFetchingClients}
+              options={clients?.map((client) => ({
+                label: client.nome_fantasia,
+                value: client
+              }))}
+              onChange={(option: any) => {
+                listClientOffers(option.value.codigo_cliente_omie);
+              }}
             />
 
             <Autocomplete 
               label="Proposta (opcional)"
               placeholder="Selecione uma proposta para vincular"
-              options={[
-                { label: 'Proposta 1', value: { id: 1, name: 'Proposta 1' }},
-                { label: 'Proposta 2', value: { id: 1, name: 'Proposta 2' }},
-                { label: 'Proposta 3', value: { id: 1, name: 'Proposta 3' }},
-              ]}
+              isLoading={isFetchingOffers}
+              options={offers?.map((offer) => ({
+                label: `Código da proposta: ${offer.cabecalho.codigo_pedido}`,
+                value: offer
+              }))}
+              onChange={(option: any) => {
+                setOfferId(option.value.cabecalho.codigo_pedido);
+              }}
             />
           </fieldset>
         )}
