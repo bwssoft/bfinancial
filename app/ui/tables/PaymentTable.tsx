@@ -1,6 +1,6 @@
 "use client"
 
-import { useMediaQuery } from "@/app/utils/use-media-query";
+import { useMediaQuery } from "@/app/hook/use-media-query";
 import { useRouter } from "next/navigation";
 import { DataTableDesktop, DataTableMobile } from "../data-table";
 

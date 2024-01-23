@@ -5,7 +5,7 @@ import { DataTableDesktop, DataTableMobile } from "../data-table";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { useRouter } from 'next/navigation'
-import { useMediaQuery } from "@/app/utils/use-media-query";
+import { useMediaQuery } from "@/app/hook/use-media-query";
 
 type OfferTableProps = {
   offers: OmieListOfferResponse;
