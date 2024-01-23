@@ -3,14 +3,14 @@
 import { OmieClientService } from "@/app/lib/omie/client.omie"
 import * as crm from "./crm"
 import * as db from "./db"
-import { Client, Offer, Payment } from "./definitions"
+
 import { paymentRepo, CreatePayment } from "./mongodb/repositories/payment.mongo"
 
 import { v4 as uuidv4 } from 'uuid';
-import { OmieDefaultParams, OmieSearchParams } from "./definitions/OmieApi"
 import { OmieOrderService } from "./omie/order.omie"
+import { OmieClientListParams } from "./definitions/OmieClient"
 
-export async function fetchClients(data?: Omit<OmieDefaultParams, 'apenas_importado_api'>) {
+export async function fetchClients(data?: Omit<OmieClientListParams, 'apenas_importado_api'>) {
   return await OmieClientService.findAll(data);
 }
 
@@ -18,7 +18,7 @@ export async function fetchClientById(id: string) {
   return await crm.listClientById(id)
 }
 
-export async function fetchOffers(data?: OmieSearchParams) {
+export async function fetchOffers(data?: any) {
   return await OmieOrderService.findAll(data);
 }
 
@@ -47,7 +47,7 @@ export async function createPayment(formData: FormData) {
     omie_metadata: {
       client_id: clientType === 'subclient' ? null : _formData.client_id,
       enterprise_id: _formData.enterprise_id,
-      offer_id: _formData.proposal
+      offer_id: _formData.offer_id
     }
   }
   
