@@ -23,12 +23,11 @@
     "nextjs-toploader": "^1.6.4",
     "react": "^18",
     "react-dom": "^18",
+    "zod": "^3.22.4",
     "react-select": "^5.8.0",
     "tailwind-merge": "^2.2.0",
     "use-debounce": "^10.0.0",
-    "uuid": "^9.0.1",
-    "yup": "^1.3.3",
-    "zod": "^3.22.4"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20",
