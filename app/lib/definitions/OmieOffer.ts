@@ -1,4 +1,4 @@
-import { OmieResponse, OmieBoolean } from "./OmieApi";
+import { OmieResponse, OmieBoolean, OmieSearchParams } from "./OmieApi";
 
 type OmieOfferHeader = {
   bloqueado: OmieBoolean;
@@ -68,6 +68,10 @@ export type OmieOffer = {
     valor_mercadorias: number;
     valor_total_pedido: number;
   }
+}
+
+export type OmieListOfferParams = OmieSearchParams & {
+  filtrar_por_cliente?: number;
 }
 
 export type OmieListOfferResponse = OmieResponse & {
