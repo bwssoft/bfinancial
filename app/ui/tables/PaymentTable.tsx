@@ -42,14 +42,14 @@ export function PaymentTable({ payments }: OfferTableProps) {
       mobileKeyExtractor={(data) => data.uuid}
       mobileDisplayValue={(data) => (
         <div className="flex flex-col">
-          <ul>
-            <li className="flex items-center gap-2">
+          <ul className="space-y-2">
+            <li className="flex flex-col">
               <span className="text-gray-500">Código do pagamento</span>
               <span>{data.uuid}</span>
             </li>
-            <li className="flex items-center gap-2">
+            <li className="flex flex-col">
               <span className="text-gray-500">Registrado por</span>
-              <span>{data.user_uuid}</span>
+              <span className="truncate">{data.user_uuid}</span>
             </li>
           </ul>
         </div>
