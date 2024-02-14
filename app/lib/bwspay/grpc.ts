@@ -25,7 +25,7 @@ const target = 'bpay-grpc-api.bwsoft.app';
 
 export class BwPay extends TransactionService {
   constructor() {
-    super(target, grpc.credentials.createSsl(fs.readFileSync("C:\\Users\\user\\Documents\\Develop\\Work\\bws-financial\\app\\lib\\bwspay\\ca.crt")));
+    super(target, grpc.credentials.createSsl(fs.readFileSync("C:\\Users\\Natha\\OneDrive\\Documentos\\Development\\bws-financial\\app\\lib\\bwspay\\ca.crt")));
   }
 
   public async creactePixDetached(params: any) {

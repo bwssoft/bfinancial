@@ -43,7 +43,7 @@ type OmieOfferRegisterInfo = {
   uInc: string
 }
 
-type OmieOfferInstallment = {
+export type OmieOfferInstallment = {
   data_vencimento: string;
   numero_parcela: number;
   percentual: number;

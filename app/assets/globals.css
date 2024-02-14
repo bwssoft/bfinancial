@@ -5,3 +5,15 @@
 .autocomplete-input input {
   @apply focus:ring-offset-0 focus:ring-0;
 }
+
+.scroll-slim::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background-color: #334155;
+  background-clip: padding-box;
+}
+
+.scroll-slim::-webkit-scrollbar {
+  border-radius: 20px;
+  background-color: #94a3b8;
+  width: 4px;
+}
