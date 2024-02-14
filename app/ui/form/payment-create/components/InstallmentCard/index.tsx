@@ -1,9 +1,15 @@
 import { OmieOfferInstallment } from "@/app/lib/definitions/OmieOffer";
 import React from "react";
+import { useInstallmentCard } from "./useInstallmentCard";
 
 const InstallmentCard: React.FC<OmieOfferInstallment> = (props) => {
+    const { onHandleClick } = useInstallmentCard();
+
     return (
-        <div className="flex flex-col gap-2 bg-white rounded-md px-4 py-5 sm:p-6">
+        <div
+            onClick={() => onHandleClick(props)}
+            className="flex flex-col gap-2 cursor-pointer hover:scale-[102%] transition-all bg-white rounded-md px-4 py-5 sm:p-6"
+        >
             <div className="text-sm font-medium">
                 Parcela Nº
                 <span className="text-indigo-600 ml-1 font-semibold">

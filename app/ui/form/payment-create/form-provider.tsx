@@ -9,6 +9,15 @@ import {
     OmieOffer,
     OmieOfferInstallment,
 } from "@/app/lib/definitions/OmieOffer";
+import { z } from "zod";
+import { UseFormRegister, UseFormSetValue, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = z.object({
+    price: z.coerce.number().optional(),
+});
+
+export type IPaymentFormData = z.infer<typeof schema>;
 
 interface ContextValues {
     formType: "subclient" | "client";
@@ -31,6 +40,8 @@ interface ContextValues {
     setClientQuery: React.Dispatch<React.SetStateAction<string | undefined>>;
     offerPortions: () => Array<OmieOfferInstallment>;
     currentOffer: OmieOffer | undefined;
+    register: UseFormRegister<IPaymentFormData>;
+    setValue: UseFormSetValue<IPaymentFormData>;
 }
 
 export const PaymentCreateFormContext = React.createContext(
@@ -75,6 +86,10 @@ export function PaymentCreateFormProvider() {
         return data;
     }, [offerId]);
 
+    const { register, setValue } = useForm<IPaymentFormData>({
+        resolver: zodResolver(schema),
+    });
+
     return (
         <PaymentCreateFormContext.Provider
             value={{
@@ -96,6 +111,8 @@ export function PaymentCreateFormProvider() {
                 setClientQuery,
                 offerPortions,
                 currentOffer,
+                register,
+                setValue,
             }}
         >
             <PaymentCreateForm />

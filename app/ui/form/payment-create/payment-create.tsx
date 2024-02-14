@@ -33,6 +33,7 @@ export function PaymentCreateForm() {
         setClientQuery,
         offerPortions,
         currentOffer,
+        register,
     } = usePaymentCreateForm();
 
     const handleAutocompleteSearch = useDebouncedCallback((query: string) => {
@@ -239,7 +240,7 @@ export function PaymentCreateForm() {
             </section>
             {currentOffer && (
                 <section className="space-y-4 w-full">
-                    <Disclosure>
+                    <Disclosure defaultOpen={true}>
                         {({ open }) => (
                             <Fragment>
                                 <Disclosure.Button className="py-2 w-full bg-gray-100 flex flex-row text-sm leading-5 font-medium justify-center rounded">
@@ -252,7 +253,7 @@ export function PaymentCreateForm() {
                                         )}
                                     />
                                 </Disclosure.Button>
-                                <Disclosure.Panel className="flex flex-col gap-4 border-4 border-transparent scroll-slim bg-gray-100 px-6 max-h-[280px] overflow-y-auto py-4 rounded-md">
+                                <Disclosure.Panel className="flex flex-col gap-4 border-4 border-transparent scroll-slim bg-gray-100 overflow-x-hidden px-6 max-h-[280px] overflow-y-auto py-4 rounded-md">
                                     {offerPortions().map((props, key) => (
                                         <InstallmentCard key={key} {...props} />
                                     ))}
@@ -286,11 +287,10 @@ export function PaymentCreateForm() {
                             </div>
                             <input
                                 type="text"
-                                name="price"
-                                id="price"
                                 autoComplete="price"
                                 className="block flex-1 border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                                 placeholder="0.00"
+                                {...register("price")}
                             />
                             <div className="pointer-events-none inset-y-0 right-0 flex items-center pr-3">
                                 <span
