@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { OmieResponse } from "./OmieApi";
+import { OmieDefaultParams, OmieResponse } from "./OmieApi";
 
 export const OmieClientSchema = z.object({
   "bairro": z.string(),
@@ -51,4 +51,8 @@ export type OmieClientModel = z.infer<typeof OmieClientSchema>;
 
 export type OmieClientResponse = OmieResponse & {
   clientes_cadastro: Array<OmieClientModel>
+}
+
+export type OmieClientListParams = OmieDefaultParams & {
+  clientesFiltro?: Partial<OmieClientModel>
 }

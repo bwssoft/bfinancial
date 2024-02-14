@@ -16,7 +16,10 @@ interface OfferPageParams {
 }
 
 export default async function OfferPage({ searchParams }: OfferPageParams) {
-    const offers = await fetchOffers(searchParams);
+    const offers = await fetchOffers({
+        pagina: searchParams.pagina ?? 1,
+        registros_por_pagina: searchParams.registros_por_pagina ?? 10,
+    }); 
 
     return (
         <div className="min-h-full">

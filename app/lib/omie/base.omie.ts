@@ -28,7 +28,7 @@ export class OmieBaseService {
       registros_por_pagina: params.registros_por_pagina ?? 10
     } as OmieDefaultParams;
   }
-  
+
   formatOmieBodyRequest(call: OmieCallFunctions, params?: Omit<OmieDefaultParams, 'apenas_importado_api'>) {
     return {
       call,
@@ -39,6 +39,15 @@ export class OmieBaseService {
   }
 
   formatSingleBodyRequest<T>(call: OmieSingleCallFunctions, params?: T) {
+    return {
+      call,
+      app_key: this._apiKey,
+      app_secret: this._apiSecret,
+      param: [params]
+    }
+  }
+
+  formatBody<T>(call: OmieCallFunctions, params?: T) {
     return {
       call,
       app_key: this._apiKey,

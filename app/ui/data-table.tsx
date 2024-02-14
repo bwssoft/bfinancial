@@ -9,7 +9,7 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table"
 import { ReactNode } from "react";
-import { useMediaQuery } from "../utils/use-media-query";
+import { useMediaQuery } from "@/app/hook/use-media-query";
  
 interface DataTableDesktopProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
