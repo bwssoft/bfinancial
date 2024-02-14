@@ -14,6 +14,11 @@ type AutocompleteProp<T> = SelectProps & {
   label?: string;
 }
 
+export type AutocompleteResponse<T> = {
+  label: string;
+  value: T;
+}
+
 const Control = ({ children, ...props }: ControlProps) => (
   <components.Control {...props} className="block w-full !rounded-md text-gray-900 ring-gray-300 bg-red-100 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
     {children}
@@ -41,9 +46,9 @@ const Input = (props: InputProps) => (
 export function Autocomplete<T>({ label, options, ...rest }: AutocompleteProp<T>) {
   return (
     <div>
-      {label && <label className="text-sm font-medium text-gray-900">{label}</label>}
+      {label && <label className="text-sm font-medium text-gray-900 mb-1">{label}</label>}
 
-      <div className="mt-1">
+      <div>
         <Select 
           options={options} 
           components={{ 
