@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import React from "react"
+import React from "react";
 
-import { PaymentCreateForm } from './payment-create';
+import { PaymentCreateForm } from "./payment-create";
 
-import { OmieClientModel } from '@/app/lib/definitions/OmieClient';
-import { OmieOffer } from '@/app/lib/definitions/OmieOffer';
+import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
+import { OmieOffer } from "@/app/lib/definitions/OmieOffer";
 
 interface ContextValues {
-  formType: 'subclient' | 'client';
+  formType: "subclient" | "client";
   setFormType: React.Dispatch<React.SetStateAction<"subclient" | "client">>;
-  clientId?: string;
-  setClientId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  client?: OmieClientModel;
+  setClient: React.Dispatch<React.SetStateAction<OmieClientModel | undefined>>;
   offerId?: string;
   clientQuery?: string;
   setOfferId: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -26,20 +26,26 @@ interface ContextValues {
   setClientQuery: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-export const PaymentCreateFormContext = React.createContext({} as ContextValues);
+export const PaymentCreateFormContext = React.createContext(
+  {} as ContextValues
+);
 
 export function PaymentCreateFormProvider() {
-  const [formType, setFormType] = React.useState<'subclient' | 'client'>('subclient');
+  const [formType, setFormType] = React.useState<"subclient" | "client">(
+    "subclient"
+  );
 
   const [clientQuery, setClientQuery] = React.useState<string>();
-  const [clientId, setClientId] = React.useState<string>();
+  const [client, setClient] = React.useState<OmieClientModel>();
 
-  const [isFetchingClients, setIsFetchingClients] = React.useState<boolean>(false);
+  const [isFetchingClients, setIsFetchingClients] =
+    React.useState<boolean>(false);
   const [clients, setClients] = React.useState<OmieClientModel[]>([]);
 
   const [offerId, setOfferId] = React.useState<string>();
 
-  const [isFetchingOffers, setIsFetchingOffers] = React.useState<boolean>(false);
+  const [isFetchingOffers, setIsFetchingOffers] =
+    React.useState<boolean>(false);
   const [offers, setOffers] = React.useState<OmieOffer[]>([]);
 
   return (
@@ -51,23 +57,23 @@ export function PaymentCreateFormProvider() {
         setOffers,
         formType,
         setFormType,
-        clientId,
-        setClientId,
+        client,
+        setClient,
         offerId,
         setOfferId,
-        isFetchingOffers, 
+        isFetchingOffers,
         setIsFetchingOffers,
         isFetchingClients,
         setIsFetchingClients,
         clientQuery,
-        setClientQuery
+        setClientQuery,
       }}
     >
       <PaymentCreateForm />
     </PaymentCreateFormContext.Provider>
-  )
+  );
 }
 
 export const usePaymentCreateForm = () => {
-  return React.useContext(PaymentCreateFormContext)
-}
+  return React.useContext(PaymentCreateFormContext);
+};

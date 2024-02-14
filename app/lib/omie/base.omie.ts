@@ -28,7 +28,7 @@ export class OmieBaseService {
       registros_por_pagina: params.registros_por_pagina ?? 10
     } as OmieDefaultParams;
   }
-  
+
   formatOmieBodyRequest(call: OmieCallFunctions, params?: Omit<OmieDefaultParams, 'apenas_importado_api'>) {
     return {
       call,

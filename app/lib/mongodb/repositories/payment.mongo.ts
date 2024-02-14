@@ -22,13 +22,13 @@ async function list() {
   }
 }
 
-export type CreatePayment = Partial<Payment>; 
+export type CreatePayment = Partial<Payment>;
 
 async function create(data: CreatePayment) {
   try {
     const db = await connect();
     return await db.collection('payment').insertOne(data);
-  } catch (error: any)  {
+  } catch (error: any) {
     console.log('[error/payment-repo] (create)', error.toString())
     throw new Error();
   }

@@ -2,7 +2,7 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import path from 'path';
 import { promisify } from 'util';
-
+import fs from 'fs'
 const PROTO_PATH = path.join(process.cwd(), './app/lib/bwspay/payment.proto');
 
 // suggested options for similarity to loading grpc.load behavior
@@ -20,12 +20,12 @@ const { TransactionService } = payServer;
 
 
 
-const target = 'payment.bwsoft.app:3000';
+const target = 'bpay-grpc-api.bwsoft.app';
 // const target = 'localhost:3333';
 
 export class BwPay extends TransactionService {
   constructor() {
-    super(target, grpc.credentials.createInsecure());
+    super(target, grpc.credentials.createSsl(fs.readFileSync("C:\\Users\\user\\Documents\\Develop\\Work\\bws-financial\\app\\lib\\bwspay\\ca.crt")));
   }
 
   public async creactePixDetached(params: any) {
