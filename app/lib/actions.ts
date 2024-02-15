@@ -71,7 +71,8 @@ export async function createClientPayment(client: OmieClientModel, formData: For
     omie_metadata: {
       client_id: clientType === 'subclient' ? null : _formData.client_id,
       enterprise_id: _formData.enterprise_id,
-      offer_id: _formData.offer_id
+      offer_id: _formData.offer_id,
+      installment_number: _formData.installment_number
     },
     bws_pay: {
       client_name: client.pessoa_fisica,

@@ -12,6 +12,8 @@ import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";
 import { cn } from "@/app/utils/cn";
 import InstallmentCard from "./components/InstallmentCard";
+import { createOnePayment } from "@/app/lib/db";
+import { Payment } from "@/app/lib/definitions";
 
 export function PaymentCreateForm() {
     const {
@@ -34,6 +36,7 @@ export function PaymentCreateForm() {
         offerPortions,
         currentOffer,
         register,
+        currentInstallment,
     } = usePaymentCreateForm();
 
     const handleAutocompleteSearch = useDebouncedCallback((query: string) => {
@@ -45,6 +48,13 @@ export function PaymentCreateForm() {
         if (offerId) {
             formData.append("offer_id", offerId);
         }
+        console.log("current installment", currentInstallment);
+        if (currentInstallment && currentInstallment?.numero_parcela) {
+            formData.append(
+                "installment_number",
+                String(currentInstallment.numero_parcela)
+            );
+        }
 
         if (client) {
             const binded = createClientPayment.bind(
@@ -53,8 +63,6 @@ export function PaymentCreateForm() {
             );
             await binded(formData);
         }
-
-        // await createPayment(formData);
     }
 
     async function listClients(query: string) {
@@ -83,7 +91,7 @@ export function PaymentCreateForm() {
         });
 
         setClient(client);
-        setOffers(data.pedido_venda_produto);
+        setOffers(data?.pedido_venda_produto || []);
         setIsFetchingOffers(false);
     }
 

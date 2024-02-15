@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { PaymentCreateForm } from "./payment-create";
 
@@ -42,6 +42,10 @@ interface ContextValues {
     currentOffer: OmieOffer | undefined;
     register: UseFormRegister<IPaymentFormData>;
     setValue: UseFormSetValue<IPaymentFormData>;
+    currentInstallment: OmieOfferInstallment | undefined;
+    setCurrentInstallment: React.Dispatch<
+        React.SetStateAction<OmieOfferInstallment | undefined>
+    >;
 }
 
 export const PaymentCreateFormContext = React.createContext(
@@ -78,11 +82,13 @@ export function PaymentCreateFormProvider() {
         return offerContent?.lista_parcelas.parcela || [];
     }, [offerId]);
 
+    const [currentInstallment, setCurrentInstallment] =
+        useState<OmieOfferInstallment>();
+
     const currentOffer = useMemo(() => {
         const data = offers.find(
             (props) => props.cabecalho.codigo_pedido === Number(offerId)
         );
-        console.log(data);
         return data;
     }, [offerId]);
 
@@ -113,6 +119,8 @@ export function PaymentCreateFormProvider() {
                 currentOffer,
                 register,
                 setValue,
+                currentInstallment,
+                setCurrentInstallment,
             }}
         >
             <PaymentCreateForm />
