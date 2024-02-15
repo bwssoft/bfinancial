@@ -1,20 +1,7 @@
-import { BanknotesIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
-import clsx from "clsx";
-import { TableFooter } from "@/app/ui/table-footer";
 import { fetchPayments } from "@/app/lib/actions";
-import { Table } from "@/app/ui/table";
-import { formatPriceFromCents, formatShortDate } from "@/app/utils/formatters";
 import Link from "next/link";
-import { Breadcrumbs } from "@/app/ui/breadcrumbs";
-import { PaymentTable } from "@/app/ui/tables/PaymentTable";
+import { PaymentTable } from "@/app/ui/tables/payments";
 import { PageHeader } from "@/app/ui/navigation/page-header";
-
-const statusStyles = {
-  paid: "bg-green-100 text-green-800",
-  pending: "bg-yellow-100 text-yellow-800",
-  failed: "bg-gray-100 text-gray-800",
-  canceled: "bg-red-100 text-red-800",
-};
 
 export default async function Example() {
   const payments = await fetchPayments();
