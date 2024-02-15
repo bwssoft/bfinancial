@@ -41,3 +41,11 @@ export type Client = {
   id: string
   name: string
 }
+
+export type Note = {
+  uuid: string
+  author:{img:string, name:string, id:string}
+  createdAt: Date,
+  note:string
+  payment:string
+}

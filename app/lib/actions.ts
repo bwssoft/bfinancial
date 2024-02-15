@@ -1,10 +1,8 @@
 "use server"
 
 import { OmieClientService } from "@/app/lib/omie/client.omie"
-
 import * as crm from "./crm"
 import * as db from "./db"
-
 import { paymentRepo, CreatePayment } from "./mongodb/repositories/payment.mongo"
 
 import { v4 as uuidv4 } from 'uuid';
@@ -12,6 +10,7 @@ import { OmieOrderService } from "./omie/order.omie"
 import { OmieClientListParams, OmieClientModel } from "./definitions/OmieClient"
 import { OmieListOfferParams } from "./definitions/OmieOffer"
 import { createPix } from "./bwspay/bwpay"
+import { noteRepo } from "./mongodb/repositories/note.mongo"
 
 export async function fetchClients(data?: Omit<OmieClientListParams, 'apenas_importado_api'>) {
   return await OmieClientService.findAll(data);
@@ -82,4 +81,25 @@ export async function createClientPayment(client: OmieClientModel, formData: For
   }
 
   return await paymentRepo.create(data);
+}
+
+export async function fetchNote(payment:string){
+  return await noteRepo.list(payment);
+}
+
+export async function createNote(author:User,formData: FormData, ){
+  const _formData = Object.fromEntries(formData.entries()) as any;
+  return await noteRepo.create({
+    uuid: uuidv4(),
+    createdAt: new Date(),
+    author,
+    note:_formData.comment,
+    payment:_formData.payment
+  })
+}
+
+interface User {
+    img: string;
+    name: string;
+    id: string;
 }

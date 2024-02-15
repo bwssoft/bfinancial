@@ -1,3 +1,5 @@
+import { fetchNote } from "@/app/lib/actions";
+import { NoteCreateFrom } from "@/app/ui/form/note-create";
 import {
   CheckIcon,
   HandThumbUpIcon,
@@ -80,38 +82,17 @@ const timeline = [
     datetime: "2020-10-04",
   },
 ];
-const comments = [
-  {
-    id: 1,
-    name: "Leslie Alexander",
-    date: "4d ago",
-    imageId: "1494790108377-be9c29b29330",
-    body: "Ducimus quas delectus ad maxime totam doloribus reiciendis ex. Tempore dolorem maiores. Similique voluptatibus tempore non ut.",
-  },
-  {
-    id: 2,
-    name: "Michael Foster",
-    date: "4d ago",
-    imageId: "1519244703995-f4e0f30006d5",
-    body: "Et ut autem. Voluptatem eum dolores sint necessitatibus quos. Quis eum qui dolorem accusantium voluptas voluptatem ipsum. Quo facere iusto quia accusamus veniam id explicabo et aut.",
-  },
-  {
-    id: 3,
-    name: "Dries Vincent",
-    date: "4d ago",
-    imageId: "1506794778202-cad84cf45f1d",
-    body: "Expedita consequatur sit ea voluptas quo ipsam recusandae. Ab sint et voluptatem repudiandae voluptatem et eveniet. Nihil quas consequatur autem. Perferendis rerum et.",
-  },
-];
 
-export default function Example({
+export default async function Example({
   params,
 }: {
   params: {
     uuid: string;
   };
 }) {
-  return (
+const comments = await fetchNote(params.uuid)
+
+return (
     <>
       {/*
         This example requires updating your template:
@@ -246,12 +227,12 @@ export default function Example({
                   <div className="px-4 py-6 sm:px-6">
                     <ul role="list" className="space-y-8">
                       {comments.map((comment) => (
-                        <li key={comment.id}>
+                        <li key={comment.uuid}>
                           <div className="flex space-x-3">
                             <div className="flex-shrink-0">
                               <img
                                 className="h-10 w-10 rounded-full"
-                                src={`https://images.unsplash.com/photo-${comment.imageId}?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80`}
+                                src={comment.author.img}
                                 alt=""
                               />
                             </div>
@@ -261,15 +242,21 @@ export default function Example({
                                   href="#"
                                   className="font-medium text-gray-900"
                                 >
-                                  {comment.name}
+                                  {comment.author.name}
                                 </a>
                               </div>
                               <div className="mt-1 text-sm text-gray-700">
-                                <p>{comment.body}</p>
+                                <p>{comment.note}</p>
                               </div>
                               <div className="mt-2 space-x-2 text-sm">
                                 <span className="font-medium text-gray-500">
-                                  {comment.date}
+                                  {comment.createdAt.toLocaleDateString(`pt-BR`,{
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric',
+                                      hour:'numeric',
+                                      minute:"numeric"
+                                  })}
                                 </span>{" "}
                                 <span className="font-medium text-gray-500">
                                   &middot;
@@ -298,39 +285,13 @@ export default function Example({
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <form action="#">
-                        <div>
-                          <label htmlFor="comment" className="sr-only">
-                            About
-                          </label>
-                          <textarea
-                            id="comment"
-                            name="comment"
-                            rows={3}
-                            className="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                            placeholder="Add a note"
-                            defaultValue={""}
-                          />
-                        </div>
-                        <div className="mt-3 flex items-center justify-between">
-                          <a
-                            href="#"
-                            className="group inline-flex items-start space-x-2 text-sm text-gray-500 hover:text-gray-900"
-                          >
-                            <QuestionMarkCircleIcon
-                              className="h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                              aria-hidden="true"
-                            />
-                            <span>Some HTML is okay.</span>
-                          </a>
-                          <button
-                            type="submit"
-                            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                          >
-                            Comment
-                          </button>
-                        </div>
-                      </form>
+                      <NoteCreateFrom
+                      user={{
+                        id:user.name,
+                        imageUrl:user.imageUrl,
+                        name:user.name}}
+                        uuid={params.uuid}
+                      />
                     </div>
                   </div>
                 </div>
