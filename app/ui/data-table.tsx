@@ -31,7 +31,7 @@ export function DataTableDesktop<TData, TValue>({
  
   return (
     <div>
-      <div className="rounded-lg border-b">
+      <div className="rounded-lg border shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -70,7 +70,7 @@ export function DataTableDesktop<TData, TValue>({
             ) : (
               <tr>
                 <td colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  Nenhum resultado encontrado
                 </td>
               </tr>
             )}
