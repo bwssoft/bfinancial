@@ -1,14 +1,25 @@
 import { OmieOfferInstallment } from "@/app/lib/definitions/OmieOffer";
 import React from "react";
 import { useInstallmentCard } from "./useInstallmentCard";
+import { cn } from "@/app/utils/cn";
 
-const InstallmentCard: React.FC<OmieOfferInstallment> = (props) => {
+export type IInstallmentCardType = OmieOfferInstallment & {
+    className?: string;
+};
+
+const InstallmentCard: React.FC<IInstallmentCardType> = ({
+    className,
+    ...props
+}) => {
     const { onHandleClick } = useInstallmentCard();
 
     return (
         <div
             onClick={() => onHandleClick(props)}
-            className="flex flex-col gap-2 cursor-pointer hover:scale-[102%] transition-all bg-white rounded-md px-4 py-5 sm:p-6"
+            className={cn(
+                "flex flex-col gap-2 cursor-pointer hover:scale-[102%] transition-all bg-white rounded-md px-4 py-5 sm:p-6",
+                className
+            )}
         >
             <div className="text-sm font-medium">
                 Parcela Nº

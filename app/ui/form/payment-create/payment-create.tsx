@@ -253,9 +253,13 @@ export function PaymentCreateForm() {
                                         )}
                                     />
                                 </Disclosure.Button>
-                                <Disclosure.Panel className="flex flex-col gap-4 border-4 border-transparent scroll-slim bg-gray-100 overflow-x-hidden px-6 max-h-[280px] overflow-y-auto py-4 rounded-md">
+                                <Disclosure.Panel className="flex flex-wrap gap-4 justify-center border-4 border-transparent scroll-slim bg-gray-100 overflow-x-hidden px-6 max-h-[280px] overflow-y-auto py-4 rounded-md">
                                     {offerPortions().map((props, key) => (
-                                        <InstallmentCard key={key} {...props} />
+                                        <InstallmentCard
+                                            className="w-full md:w-[calc(50%-16px)] lg:w-[calc(33%-16px)] xl:w-[calc(25%-16px)]"
+                                            key={key}
+                                            {...props}
+                                        />
                                     ))}
                                 </Disclosure.Panel>
                             </Fragment>
