@@ -18,7 +18,7 @@ export async function fetchClients(data?: Omit<OmieClientListParams, 'apenas_imp
 }
 
 export async function fetchClientById(id: string) {
-  return await crm.listClientById(id)
+  return await OmieClientService.find(id)
 }
 
 export async function fetchOffers(data?: Omit<OmieListOfferParams, 'apenas_importado_api'>) {
