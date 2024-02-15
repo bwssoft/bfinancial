@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.autocomplete-input input {
+  @apply focus:ring-offset-0 focus:ring-0;
+}

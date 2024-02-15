@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Table } from "@/app/ui/table";
 import { fetchClients } from "@/app/lib/actions";
 import { formatPriceFromCents, formatShortDate } from "@/app/utils/formatters";
-import { OmieDefaultParams } from "@/app/@shared/interfaces/services/@shared";
+
+import { OmieSearchParams } from "@/app/lib/definitions/OmieApi";
 
 const statusStyles = {
     paid: "bg-green-100 text-green-800",
@@ -17,7 +18,7 @@ const statusStyles = {
 export default async function Example({
     searchParams,
 }: {
-    searchParams: Omit<OmieDefaultParams, "apenas_importado_api">;
+    searchParams: OmieSearchParams;
 }) {
     const clients = await fetchClients(searchParams);
 

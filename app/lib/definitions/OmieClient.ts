@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { OmieDefaultParams, OmieResponse } from "./OmieApi";
 
-export const ClientSchema = z.object({
+export const OmieClientSchema = z.object({
   "bairro": z.string(),
   "bloquear_faturamento": z.string(),
   "cep": z.string(),
@@ -46,4 +47,12 @@ export const ClientSchema = z.object({
   "telefone2_numero": z.string()
 })
 
-export type ClientModel = z.infer<typeof ClientSchema>;
+export type OmieClientModel = z.infer<typeof OmieClientSchema>;
+
+export type OmieClientResponse = OmieResponse & {
+  clientes_cadastro: Array<OmieClientModel>
+}
+
+export type OmieClientListParams = OmieDefaultParams & {
+  clientesFiltro?: Partial<OmieClientModel>
+}

@@ -10,7 +10,9 @@ export type Payment = {
   uuid: string
   user_uuid: string
   price: Cents
-  // invoice?: Invoice
+  installment_uuid: string
+  installment_qt: number
+  installment_index: number
   status: "pending" | "paid" | "canceled" | "failed"
   created_at: string
   omie_metadata?: {
@@ -20,6 +22,9 @@ export type Payment = {
   },
   bws_pay?: {
     transaction_id: string;
+    client_name: string
+    enterprise_name: string
+    enterprise_doc: string
   }
 }
 
