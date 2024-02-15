@@ -6,6 +6,7 @@ import {
   Cog6ToothIcon,
   DocumentDuplicateIcon,
   HomeIcon,
+  UserCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
@@ -24,7 +25,7 @@ const navigation = [
   {
     name: "Clientes",
     href: "/clients",
-    icon: DocumentDuplicateIcon,
+    icon: UserCircleIcon,
     current: false,
   },
 ];
