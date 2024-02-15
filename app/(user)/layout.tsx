@@ -21,7 +21,7 @@ export default function RootLayout({
     modal: React.ReactNode;
 }) {
     return (
-        <html lang="en" className="h-full bg-gray-100">
+        <html lang="en" className="h-full bg-gray-50">
             {modal}
             <body className={`${inter.className} h-full`}>
                 <NextTopLoader 
@@ -31,8 +31,8 @@ export default function RootLayout({
                 <div className="lg:pl-72">
                     <NavBar />
 
-                    <main className="py-10">
-                        <div className="px-4 sm:px-6 lg:px-8">
+                    <main>
+                        <div className="p-4 sm:p-6 lg:p-8">
                             {children}
                         </div>
                     </main>

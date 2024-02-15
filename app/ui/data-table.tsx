@@ -30,15 +30,15 @@ export function DataTableDesktop<TData, TValue>({
   })
  
   return (
-    <div>
-      <div className="rounded-lg border-b">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead>
+    <div className="rounded-md border shadow-sm bg-white">
+      <div className="relative w-full overflow-auto">
+        <table className="w-full caption-bottom text-sm">
+          <thead className="[&_tr]:border-b bg-gray-100/80">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <th key={header.id} className="bg-gray-50 px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                    <th key={header.id} className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -51,17 +51,17 @@ export function DataTableDesktop<TData, TValue>({
               </tr>
             ))}
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
+          <tbody className="[&_tr:last-child]:border-0">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={`bg-white ${onRowPress !== undefined && 'hover:bg-gray-100 cursor-pointer'}`}
+                  className={`${onRowPress !== undefined && 'border-b transition-colors hover:bg-gray-100 cursor-pointer'}`}
                   onClick={() => onRowPress && onRowPress(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                    <td key={cell.id} className="whitespace-nowrap align-middle px-6 py-4 text-sm text-gray-500">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
@@ -70,7 +70,7 @@ export function DataTableDesktop<TData, TValue>({
             ) : (
               <tr>
                 <td colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  Nenhum resultado encontrado
                 </td>
               </tr>
             )}

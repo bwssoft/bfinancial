@@ -1,56 +1,44 @@
 import { fetchOffers } from "@/app/lib/actions";
-import { OfferTable } from "@/app/ui/tables/OfferTable";
-import { Pagination } from "@/app/ui/pagination";
+import { OfferTable } from "@/app/ui/tables/offers";
 import { OmieDefaultParams } from "@/app/lib/definitions/OmieApi";
 import { PageHeader } from "@/app/ui/navigation/page-header";
-
-const statusStyles = {
-    paid: "bg-green-100 text-green-800",
-    pending: "bg-yellow-100 text-yellow-800",
-    failed: "bg-gray-100 text-gray-800",
-    canceled: "bg-red-100 text-red-800",
-};
+import { Button } from "@/app/ui/button";
+import { Pagination } from "@/app/ui/pagination";
 
 interface OfferPageParams {
-    searchParams: Omit<OmieDefaultParams, "apenas_importado_api">
+    searchParams: Omit<OmieDefaultParams, "apenas_importado_api"> & {
+        enterprise_id?: string;
+        client?: string;
+    }
 }
 
 export default async function OfferPage({ searchParams }: OfferPageParams) {
-    const offers = await fetchOffers({
+    const offers = searchParams.client ? await fetchOffers({
         pagina: searchParams.pagina ?? 1,
         registros_por_pagina: searchParams.registros_por_pagina ?? 10,
-    }); 
+        filtrar_por_cliente: parseInt(searchParams.client),
+    }) : null;
 
     return (
-        <div className="min-h-full">
-            <main className="flex-1 pb-8">
-                <PageHeader 
-                    pageTitle="Propostas"
-                >
-                    <div className="mt-6 flex space-x-3 md:ml-4 md:mt-0">
-                        <button
-                            type="button"
-                            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                        >
-                            Exportar
-                        </button>
-                        <button
-                            type="button"
-                            className="inline-flex items-center rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
-                        >
-                            Nova Proposta
-                        </button>
-                    </div>
-                </PageHeader>
-
-                <div className="mt-8 rounded-lg shadow">
-                    <OfferTable offers={offers} />
-                    <Pagination 
-                        totalRegister={offers.total_de_registros}
-                        totalPage={offers.total_de_paginas} 
-                    />
+        <main className="flex-1 pb-8 min-h-full">
+            <PageHeader 
+                pageTitle="Propostas"
+                description="⚠️ Insira o cliente e a empresa para buscar e exibir as propostas."
+            >
+                <div className="flex space-x-3 md:ml-4 md:mt-0">
+                    <Button variant="outline">Exportar</Button>
+                    <Button>Nova proposta</Button>
                 </div>
-            </main>
-        </div>
+            </PageHeader>
+            
+            <section>
+                <OfferTable offers={offers} clientId={searchParams.client} />
+                <Pagination 
+                    className="px-0 sm:px-0 bg-transparent"
+                    totalRegister={offers?.total_de_registros}
+                    totalPage={offers?.total_de_paginas} 
+                />
+            </section>
+        </main>
     );
 }
