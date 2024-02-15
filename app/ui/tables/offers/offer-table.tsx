@@ -10,12 +10,14 @@ import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
 
 import { OfferTableFilter } from "./offer-table-filter";
 import { orderOfferColumns } from './columns';
+import { fetchClientById } from '@/app/lib/actions';
 
 type OfferTableProps = {
   offers: OmieListOfferResponse | null;
+  clientId?: string;
 }
 
-export function OfferTable({ offers }: OfferTableProps) {
+export function OfferTable({ offers, clientId }: OfferTableProps) {
   const router = useRouter();
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
@@ -29,6 +31,15 @@ export function OfferTable({ offers }: OfferTableProps) {
     client: onOfferChange(),
   })) ?? [];
 
+  if (clientId && !client) {
+    fetchClient();
+  }
+
+  async function fetchClient() {
+    const data = await fetchClientById(clientId ?? '');
+    if (data) onClientChange(data)
+  }
+
   function handleRowPress(data: OmieOffer) {
     router.push(`/offer/${data.cabecalho.codigo_pedido}`)
   }
@@ -41,10 +52,6 @@ export function OfferTable({ offers }: OfferTableProps) {
             client={client} 
             onClientChange={onClientChange} 
           />
-
-          <div className="mt-6 flex space-x-3 md:ml-4 md:mt-0">
-            {/* <Button variant="outline">Visualizar</Button> */}
-          </div>
         </div>
 
         <DataTableDesktop
