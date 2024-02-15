@@ -10,6 +10,9 @@ import { fetchClients } from '@/app/lib/actions';
 import { Button } from '@/app/ui/button';
 import { useDebouncedCallback } from 'use-debounce';
 
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+
+
 const enterprises = [
   { id: 'wfc', name: 'WFC Technology' },
   { id: 'bws', name: 'BWS IoT' },
@@ -80,6 +83,7 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
       </div>
 
       <Button type="submit">
+        <MagnifyingGlassIcon className="h-4 w-4" />
         Buscar
       </Button>
     </form>
