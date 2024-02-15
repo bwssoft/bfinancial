@@ -2,10 +2,12 @@
 
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
+import { cn } from "../lib/cn";
 
 type PaginationDesktopProps = {
   totalPage?: number;
   totalRegister?: number;
+  className?: string;
 }
 
 type PaginationActions = "previous" | "next";
@@ -14,7 +16,11 @@ type PaginationActionFunction = {
   [key in PaginationActions]: () => void;
 };
 
-export function Pagination({ totalPage, totalRegister }: PaginationDesktopProps) {
+export function Pagination({ 
+  totalPage = 0, 
+  totalRegister = 0, 
+  className 
+}: PaginationDesktopProps) {
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -51,7 +57,9 @@ export function Pagination({ totalPage, totalRegister }: PaginationDesktopProps)
 
   return (
     <nav
-      className="flex items-center rounded-b-lg justify-between border-gray-200 bg-white px-4 py-3 sm:px-6"
+      className={
+        cn("flex items-center rounded-b-lg justify-between border-gray-200 bg-white px-4 py-3 sm:px-6", className)
+      }
       aria-label="Pagination"
     >
       <div className="hidden sm:block">
