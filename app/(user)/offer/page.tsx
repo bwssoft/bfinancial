@@ -1,9 +1,8 @@
 import { fetchOffers } from "@/app/lib/actions";
-import { OfferTable } from "@/app/ui/tables/OfferTable";
+import { OfferTable } from "@/app/ui/tables/offers";
 import { OmieDefaultParams } from "@/app/lib/definitions/OmieApi";
 import { PageHeader } from "@/app/ui/navigation/page-header";
 import { Button } from "@/app/ui/button";
-import { OfferFilter } from "./filter";
 import { Pagination } from "@/app/ui/pagination";
 
 interface OfferPageParams {
@@ -31,18 +30,11 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
                     <Button>Nova proposta</Button>
                 </div>
             </PageHeader>
-
-            <section className="inline-flex justify-between w-full items-center">
-                <OfferFilter />
-
-                <div className="mt-6 flex space-x-3 md:ml-4 md:mt-0">
-                    <Button variant="outline">Visualizar</Button>
-                </div>
-            </section>
             
             <section>
                 <OfferTable offers={offers} />
                 <Pagination 
+                    className="px-0 sm:px-0"
                     totalRegister={offers?.total_de_registros}
                     totalPage={offers?.total_de_paginas} 
                 />
