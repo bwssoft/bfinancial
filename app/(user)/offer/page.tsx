@@ -32,9 +32,9 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
             </PageHeader>
             
             <section>
-                <OfferTable offers={offers} />
+                <OfferTable offers={offers} clientId={searchParams.client} />
                 <Pagination 
-                    className="px-0 sm:px-0"
+                    className="px-0 sm:px-0 bg-transparent"
                     totalRegister={offers?.total_de_registros}
                     totalPage={offers?.total_de_paginas} 
                 />
