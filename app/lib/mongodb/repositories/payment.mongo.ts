@@ -24,7 +24,7 @@ async function list() {
 
 export type CreatePayment = Partial<Payment>;
 
-async function create(data: CreatePayment) {
+export async function create(data: CreatePayment) {
   try {
     const db = await connect();
     return await db.collection('payment').insertOne(data);

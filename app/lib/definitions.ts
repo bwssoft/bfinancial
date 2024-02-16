@@ -19,6 +19,7 @@ export type Payment = {
     client_id?: string;
     offer_id?: string;
     enterprise_id?: string;
+    installment_number?: number;
   },
   bws_pay?: {
     transaction_id: string;

@@ -1,4 +1,5 @@
 import { Payment } from "./definitions"
+import { create } from "./mongodb/repositories/payment.mongo"
 
 
 export async function listPayment() {
@@ -11,7 +12,7 @@ export async function listPaymentById(id: string) {
 }
 
 export async function createOnePayment(payment: Payment) {
-  await new Promise((resolve) => setTimeout(resolve, 700))
+  await create(payment);
 }
 
 
