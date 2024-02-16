@@ -1,11 +1,11 @@
+"use client";
+
 import { userAuthenticate } from "@/app/lib/authenticate";
-import { RedirectType, redirect } from "next/navigation";
+import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
+import { useFormState } from "react-dom";
 
 export default function Example() {
-    const onHandleSubmit = async (formData: FormData) => {
-        // const response = userAuthenticate.bind(formData);
-        // redirect("/", RedirectType.replace);
-    };
+    const [errorMessage, dispatch] = useFormState(userAuthenticate, undefined);
 
     return (
         <>
@@ -17,14 +17,14 @@ export default function Example() {
                         alt="Your Company"
                     />
                     <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                        Sign in to your account
+                        Entre com sua conta
                     </h2>
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                     <form
                         className="space-y-6"
-                        action={userAuthenticate}
+                        action={dispatch}
                         method="POST"
                         encType="multipart/form-data"
                     >
@@ -33,7 +33,7 @@ export default function Example() {
                                 htmlFor="email"
                                 className="block text-sm font-medium leading-6 text-gray-900"
                             >
-                                Email address
+                                Usuario
                             </label>
                             <div className="mt-2">
                                 <input
@@ -52,14 +52,14 @@ export default function Example() {
                                     htmlFor="password"
                                     className="block text-sm font-medium leading-6 text-gray-900"
                                 >
-                                    Password
+                                    Senha
                                 </label>
                                 <div className="text-sm">
                                     <a
                                         href="#"
                                         className="font-semibold text-indigo-600 hover:text-indigo-500"
                                     >
-                                        Forgot password?
+                                        Esqueceu sua senha?
                                     </a>
                                 </div>
                             </div>
@@ -80,20 +80,24 @@ export default function Example() {
                                 type="submit"
                                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                             >
-                                Sign in
+                                Login
                             </button>
+                            <div
+                                className="flex h-8 items-end space-x-1"
+                                aria-live="polite"
+                                aria-atomic="true"
+                            >
+                                {errorMessage && (
+                                    <>
+                                        <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+                                        <p className="text-sm text-red-500">
+                                            {errorMessage}
+                                        </p>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </form>
-
-                    <p className="mt-10 text-center text-sm text-gray-500">
-                        Not a member?{" "}
-                        <a
-                            href="#"
-                            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-                        >
-                            Start a 14 day free trial
-                        </a>
-                    </p>
                 </div>
             </div>
         </>
