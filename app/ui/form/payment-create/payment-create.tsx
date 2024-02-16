@@ -95,6 +95,22 @@ export function PaymentCreateForm() {
         setIsFetchingOffers(false);
     }
 
+    const enterpriseSecrets = {
+        "wfc_tech": "837084162915b5ddd3a52d0aea76e9c8c965143c6045",
+        "bws_iot": "8370688295976335bf0d53b177a0adabd5a6c08dd996",
+        "icb": "9721476945185fea0562905506173f8ac94e527704c0"
+    };
+
+
+    function handleChange(event) {
+        const selectedEnterprise = event.target.value;
+        const secret = enterpriseSecrets[selectedEnterprise];
+
+    
+        listClients(secret);
+        console.log(client);
+    }
+
     return (
         <form
             action={handleAction}
@@ -183,6 +199,7 @@ export function PaymentCreateForm() {
                     <select
                         id="enterprise_id"
                         name="enterprise_id"
+                        onChange={handleChange} // Adicione este manipulador de eventos
                         className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     >
                         <option value="default">Selecione uma empresa</option>
