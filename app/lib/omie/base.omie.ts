@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 
 import { env } from '@/app/lib/enviroment'
-import { OmieCallFunctions, OmieDefaultParams, OmieSingleCallFunctions } from "@/app/lib/definitions/OmieApi";
+import { OmieCallFunctions, OmieCredentials, OmieDefaultParams, OmieSingleCallFunctions } from "@/app/lib/definitions/OmieApi";
 
 export class OmieBaseService {
   private _apiSecret: string
@@ -29,12 +29,13 @@ export class OmieBaseService {
     } as OmieDefaultParams;
   }
 
-  formatOmieBodyRequest(call: OmieCallFunctions, params?: Omit<OmieDefaultParams, 'apenas_importado_api'>) {
+  formatOmieBodyRequest(call: OmieCallFunctions, params?: Omit<OmieDefaultParams, 'apenas_importado_api'>, secrets?: Partial<OmieCredentials>) {
     return {
       call,
       app_key: this._apiKey,
       app_secret: this._apiSecret,
-      param: [this.handlePagination(params)]
+      param: [this.handlePagination(params)],
+      ...secrets
     }
   }
 

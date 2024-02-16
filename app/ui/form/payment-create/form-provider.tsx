@@ -12,6 +12,8 @@ import {
 import { z } from "zod";
 import { UseFormRegister, UseFormSetValue, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ICompanySecrets } from "@/app/utils/enterpriseSecrets";
+import { fetchClients } from "@/app/lib/actions";
 
 const schema = z.object({
     price: z.coerce.number().optional(),
@@ -46,6 +48,12 @@ interface ContextValues {
     setCurrentInstallment: React.Dispatch<
         React.SetStateAction<OmieOfferInstallment | undefined>
     >;
+    enterpriseSelected?: ICompanySecrets;
+    setEnterpriseSelected: React.Dispatch<
+        React.SetStateAction<ICompanySecrets | undefined>
+    >;
+    clientSearch?: string;
+    setClientSearch: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 export const PaymentCreateFormContext = React.createContext(
@@ -63,8 +71,11 @@ export function PaymentCreateFormProvider() {
     const [isFetchingClients, setIsFetchingClients] =
         React.useState<boolean>(false);
     const [clients, setClients] = React.useState<OmieClientModel[]>([]);
+    const [enterpriseSelected, setEnterpriseSelected] =
+        useState<ICompanySecrets>();
 
     const [offerId, setOfferId] = React.useState<string>();
+    const [clientSearch, setClientSearch] = React.useState<string>();
 
     const [isFetchingOffers, setIsFetchingOffers] =
         React.useState<boolean>(false);
@@ -96,6 +107,26 @@ export function PaymentCreateFormProvider() {
         resolver: zodResolver(schema),
     });
 
+    useMemo(async () => {
+        setIsFetchingClients(true);
+        const data = await fetchClients(
+            {
+                pagina: 1,
+                registros_por_pagina: 1000,
+                clientesFiltro: {
+                    nome_fantasia: clientSearch,
+                },
+            },
+            {
+                app_key: enterpriseSelected?.apiKey,
+                app_secret: enterpriseSelected?.apiSecret,
+            }
+        );
+
+        setClients(data.clientes_cadastro);
+        setIsFetchingClients(false);
+    }, [enterpriseSelected, clientSearch]);
+
     return (
         <PaymentCreateFormContext.Provider
             value={{
@@ -121,6 +152,10 @@ export function PaymentCreateFormProvider() {
                 setValue,
                 currentInstallment,
                 setCurrentInstallment,
+                enterpriseSelected,
+                setEnterpriseSelected,
+                setClientSearch,
+                clientSearch,
             }}
         >
             <PaymentCreateForm />

@@ -1,9 +1,10 @@
 export type CompaniesOmie = 'MGC' | 'BWS' | 'ICB' | 'ICB_SP_FILIAL' | 'WFC'
+export type ICompanySecrets = {
+  apiKey: string;
+  apiSecret: string;
+}
 export type CredentialsRequest = {
-  [key in CompaniesOmie]: {
-    apiKey: string;
-    apiSecret: string;
-  }
+  [key in CompaniesOmie]: ICompanySecrets
 }
 
 export const CompaniesSecrets: CredentialsRequest = {

@@ -38,10 +38,13 @@ export function PaymentCreateForm() {
         currentOffer,
         register,
         currentInstallment,
+        setEnterpriseSelected,
+        enterpriseSelected,
+        setClientSearch,
     } = usePaymentCreateForm();
 
     const handleAutocompleteSearch = useDebouncedCallback((query: string) => {
-        listClients(query);
+        setClientSearch(query);
         setClientQuery(query);
     }, 500);
 
@@ -66,22 +69,6 @@ export function PaymentCreateForm() {
         }
     }
 
-    async function listClients(query: string) {
-        if (query === "") return;
-
-        setIsFetchingClients(true);
-        const data = await fetchClients({
-            pagina: 1,
-            registros_por_pagina: 1000,
-            clientesFiltro: {
-                nome_fantasia: query,
-            },
-        });
-
-        setClients(data.clientes_cadastro);
-        setIsFetchingClients(false);
-    }
-
     async function listClientOffers(client: OmieClientModel) {
         const clientId = client.codigo_cliente_omie;
         setIsFetchingOffers(true);
@@ -96,9 +83,11 @@ export function PaymentCreateForm() {
         setIsFetchingOffers(false);
     }
 
-
-    function handleChange(event) {
-       
+    function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
+        const currentValue = event.target.value;
+        setEnterpriseSelected(
+            CompaniesSecrets[currentValue as keyof typeof CompaniesSecrets]
+        );
     }
 
     return (
@@ -198,7 +187,6 @@ export function PaymentCreateForm() {
                         <option value="ICB">ICB</option>
                         <option value="ICB_SP_FILIAL">ICB Filial SP</option>
                         <option value="MGC">MGC</option>
-    
                     </select>
                 </fieldset>
 
