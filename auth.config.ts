@@ -21,6 +21,30 @@ export const authConfig = {
         if (isLoggedIn && isLoginPage) return Response.redirect(new URL("/", nextUrl))
         return true;
     },
+    jwt({ user, token }) {
+      if(user) {
+        token = {
+          ...token,
+          uuid: user.uuid,
+          name: user.username,
+          email: user.email
+        }
+      }
+      return token;
+    },
+    session({ session, token }) {
+      session.user.uuid = String(token.uuid)
+      session.user.name = token.name
+      session.user.email = String(token.email)
+
+      
+      return session;
+    }
   },
+  secret: 'BWSKKKKKKKKKKKKK',
   providers: [], // Add providers with an empty array for now
+  session: {
+    strategy: 'jwt',
+    maxAge: 60 * 60,
+  }
 } satisfies NextAuthConfig;
