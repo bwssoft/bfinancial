@@ -14,6 +14,11 @@ export type OmieDefaultParams = {
   "apenas_importado_api": "N"
 }
 
+export type OmieCredentials = {
+  app_key: string
+  app_secret: string
+}
+
 export type OmieSearchParams = Omit<OmieDefaultParams, 'apenas_importado_api'>;
 
 export type OmieCallFunctions = 

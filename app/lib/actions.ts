@@ -11,9 +11,10 @@ import { OmieClientListParams, OmieClientModel } from "./definitions/OmieClient"
 import { OmieListOfferParams } from "./definitions/OmieOffer"
 import { createPix } from "./bwspay/bwpay"
 import { noteRepo } from "./mongodb/repositories/note.mongo"
+import { OmieCredentials } from "./definitions/OmieApi"
 
-export async function fetchClients(data?: Omit<OmieClientListParams, 'apenas_importado_api'>) {
-  return await OmieClientService.findAll(data);
+export async function fetchClients(data?: Omit<OmieClientListParams, 'apenas_importado_api'>, secrets?: Partial<OmieCredentials>) {
+  return await OmieClientService.findAll(data, secrets);
 }
 
 export async function fetchClientById(id: string) {

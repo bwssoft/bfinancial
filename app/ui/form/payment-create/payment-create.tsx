@@ -14,6 +14,7 @@ import { cn } from "@/app/utils/cn";
 import InstallmentCard from "./components/InstallmentCard";
 import { createOnePayment } from "@/app/lib/db";
 import { Payment } from "@/app/lib/definitions";
+import { CompaniesSecrets } from "@/app/utils/enterpriseSecrets";
 
 export function PaymentCreateForm() {
     const {
@@ -37,10 +38,13 @@ export function PaymentCreateForm() {
         currentOffer,
         register,
         currentInstallment,
+        setEnterpriseSelected,
+        enterpriseSelected,
+        setClientSearch,
     } = usePaymentCreateForm();
 
     const handleAutocompleteSearch = useDebouncedCallback((query: string) => {
-        listClients(query);
+        setClientSearch(query);
         setClientQuery(query);
     }, 500);
 
@@ -65,22 +69,6 @@ export function PaymentCreateForm() {
         }
     }
 
-    async function listClients(query: string) {
-        if (query === "") return;
-
-        setIsFetchingClients(true);
-        const data = await fetchClients({
-            pagina: 1,
-            registros_por_pagina: 1000,
-            clientesFiltro: {
-                nome_fantasia: query,
-            },
-        });
-
-        setClients(data.clientes_cadastro);
-        setIsFetchingClients(false);
-    }
-
     async function listClientOffers(client: OmieClientModel) {
         const clientId = client.codigo_cliente_omie;
         setIsFetchingOffers(true);
@@ -93,6 +81,13 @@ export function PaymentCreateForm() {
         setClient(client);
         setOffers(data?.pedido_venda_produto || []);
         setIsFetchingOffers(false);
+    }
+
+    function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
+        const currentValue = event.target.value;
+        setEnterpriseSelected(
+            CompaniesSecrets[currentValue as keyof typeof CompaniesSecrets]
+        );
     }
 
     return (
@@ -183,12 +178,15 @@ export function PaymentCreateForm() {
                     <select
                         id="enterprise_id"
                         name="enterprise_id"
+                        onChange={handleChange} // Adicione este manipulador de eventos
                         className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     >
                         <option value="default">Selecione uma empresa</option>
-                        <option value="wfc_tech">WFC Technology</option>
-                        <option value="bws_iot">BWS IoT</option>
-                        <option value="icb">ICB</option>
+                        <option value="WFC">WFC Technology</option>
+                        <option value="BWS">BWS IoT</option>
+                        <option value="ICB">ICB</option>
+                        <option value="ICB_SP_FILIAL">ICB Filial SP</option>
+                        <option value="MGC">MGC</option>
                     </select>
                 </fieldset>
 
