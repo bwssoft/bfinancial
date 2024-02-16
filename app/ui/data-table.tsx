@@ -8,10 +8,11 @@ import {
   useReactTable,
   getPaginationRowModel,
 } from "@tanstack/react-table"
-import { ReactNode } from "react";
+import { ComponentProps, ReactNode } from "react";
 import { useMediaQuery } from "@/app/hook/use-media-query";
+import { cn } from "../lib/cn";
  
-interface DataTableDesktopProps<TData, TValue> {
+interface DataTableDesktopProps<TData, TValue> extends ComponentProps<'div'> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   onRowPress?(data: TData): void;
@@ -20,7 +21,9 @@ interface DataTableDesktopProps<TData, TValue> {
 export function DataTableDesktop<TData, TValue>({
   columns,
   data,
-  onRowPress = undefined
+  onRowPress = undefined,
+  className,
+  ...rest
 }: DataTableDesktopProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -30,7 +33,7 @@ export function DataTableDesktop<TData, TValue>({
   })
  
   return (
-    <div className="rounded-md border shadow-sm bg-white">
+    <div {...rest} className={cn("rounded-md border shadow-sm bg-white", className)}>
       <div className="relative w-full overflow-auto">
         <table className="w-full caption-bottom text-sm">
           <thead className="[&_tr]:border-b bg-gray-100/80">
