@@ -7,6 +7,8 @@ import { fetchClients } from "@/app/lib/actions";
 import { formatPriceFromCents, formatShortDate } from "@/app/utils/formatters";
 
 import { OmieSearchParams } from "@/app/lib/definitions/OmieApi";
+import { PageHeader } from "@/app/ui/navigation/page-header";
+import { Button } from "@/app/ui/button";
 
 const statusStyles = {
     paid: "bg-green-100 text-green-800",
@@ -28,11 +30,18 @@ export default async function Example({
              
                 <main className="flex-1 pb-8">
                     {/* Page header */}
-                    <div className="bg-white shadow">
+                    <PageHeader
+                        pageTitle="Clientes"
+                    >
+                        <div className="inline-flex items-center gap-2">
+                            <Button>Exportar</Button>
+                        </div>
+                    </PageHeader>
+
+                    {/* <div className="bg-white shadow">
                         <div className="px-4 sm:px-6 lg:mx-auto lg:max-w-6xl lg:px-8">
                             <div className="py-6 md:flex md:items-center md:justify-between lg:border-t lg:border-gray-200">
                                 <div className="min-w-0 flex-1">
-                                    {/* Profile */}
                                     <div className="flex items-center">
                                         <div className="flex items-center">
                                             <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
@@ -57,7 +66,7 @@ export default async function Example({
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="mt-8">
                         <div className="shadow sm:hidden">
@@ -66,7 +75,7 @@ export default async function Example({
                                 lineRender={(d) => (
                                     <>
                                         <Link
-                                            href={`/offer/${d.codigo_cliente_omie}`}
+                                            href={`/clients/${d.codigo_cliente_omie}`}
                                             className="block bg-white px-4 py-4 hover:bg-gray-50"
                                         >
                                             <span className="flex items-center space-x-4">
@@ -147,7 +156,7 @@ export default async function Example({
                                                     <td className="w-full max-w-0 whitespace-nowrap px-6 py-4 text-sm text-gray-900">
                                                         <div className="flex">
                                                             <Link
-                                                                href={`/offer/${d.codigo_cliente_omie.toString()}`}
+                                                                href={`/clients/${d.codigo_cliente_omie}`}
                                                                 className="group inline-flex space-x-2 truncate text-sm"
                                                             >
                                                                 <BanknotesIcon
