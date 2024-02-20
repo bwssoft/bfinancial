@@ -1,17 +1,15 @@
 import axios, { AxiosInstance } from "axios";
 
 import { env } from '@/app/lib/enviroment'
-import { OmieCallFunctions, OmieCredentials, OmieDefaultParams, OmieSingleCallFunctions } from "@/app/lib/definitions/OmieApi";
+import { OmieCallFunctions, OmieCredentials, OmieDefaultParams, OmieEnterpriseEnum, OmieSingleCallFunctions } from "@/app/lib/definitions/OmieApi";
 
 export class OmieBaseService {
-  private _apiSecret: string
-  private _apiKey: string
+  private _apiSecret: string = ""
+  private _apiKey: string = ""
   private _baseUrl: string
   public _httpProvider: AxiosInstance;
 
   constructor() {
-    this._apiKey = env.OMIE_API_KEY;
-    this._apiSecret = env.OMIE_API_SECRET;
     this._baseUrl = env.OMIE_URL;
     this._httpProvider = axios.create({
       baseURL: this._baseUrl,
@@ -34,8 +32,8 @@ export class OmieBaseService {
       call,
       app_key: this._apiKey,
       app_secret: this._apiSecret,
-      param: [this.handlePagination(params)],
-      ...secrets
+      // param: [this.handlePagination(params)] ### não estava passando os paramentros?
+      param: [{ ...params, ...this.handlePagination(params) }]
     }
   }
 
@@ -55,5 +53,10 @@ export class OmieBaseService {
       app_secret: this._apiSecret,
       param: [params]
     }
+  }
+
+  setSecrets(params: OmieEnterpriseEnum) {
+    this._apiKey = env.OMIE_SECRETS[params].key;
+    this._apiSecret = env.OMIE_SECRETS[params].secret;
   }
 }

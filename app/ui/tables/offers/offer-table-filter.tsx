@@ -1,22 +1,18 @@
-"use client"
+"use client";
 
-import React from 'react';
-import { usePathname, useRouter } from 'next/navigation'
+import React from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
-import { Autocomplete, AutocompleteResponse } from "@/app/ui/autocomplete"
+import { Autocomplete, AutocompleteResponse } from "@/app/ui/autocomplete";
 
-import { fetchClients } from '@/app/lib/actions';
-import { Button } from '@/app/ui/button';
-import { useDebouncedCallback } from 'use-debounce';
+import { fetchClients } from "@/app/lib/actions";
+import { Button } from "@/app/ui/button";
+import { useDebouncedCallback } from "use-debounce";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-
-
-const enterprises = [
-  { id: 'wfc', name: 'WFC Technology' },
-  { id: 'bws', name: 'BWS IoT' },
-]
+import { enterprises } from "../clients/filter";
+import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 
 interface OfferFilterProps {
   client?: OmieClientModel;
@@ -25,25 +21,27 @@ interface OfferFilterProps {
 
 export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
   const [clients, setClients] = React.useState<OmieClientModel[]>([]);
-  const [enterprise, setEnterprise] = React.useState<string>();
+  const [enterprise, setEnterprise] = React.useState<OmieEnterpriseEnum>();
 
   const pathname = usePathname();
   const router = useRouter();
 
   const onAction = () => {
-    router.push(`${pathname}?enterprise_id=${enterprise}&client=${client?.codigo_cliente_omie}`)
-  }
+    router.push(
+      `${pathname}?omie_enterprise=${enterprise}&codigo_cliente_omie=${client?.codigo_cliente_omie}`
+    );
+  };
 
   const handleClientsSearch = useDebouncedCallback((query: string) => {
     listClients(query);
-  }, 500)
+  }, 500);
 
   async function listClients(query: string) {
-    if (query === "") return;
+    if (query === "" || !enterprise) return;
 
-    const data = await fetchClients({
+    const data = await fetchClients(enterprise, {
       pagina: 1,
-      registros_por_pagina: 100,
+      registros_por_pagina: 20,
       clientesFiltro: {
         nome_fantasia: query,
       },
@@ -58,12 +56,12 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
         <Autocomplete
           placeholder="Filtrar empresa"
           options={enterprises.map((enterprise) => ({
-              label: enterprise.name,
-              value: enterprise.id
+            label: enterprise.name,
+            value: enterprise.id,
           }))}
           onChange={(newValue) => {
             const option = newValue as AutocompleteResponse<string>;
-            setEnterprise(option?.value)
+            setEnterprise(option?.value as OmieEnterpriseEnum);
           }}
         />
       </div>
@@ -72,7 +70,7 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
           placeholder="Filtrar cliente"
           options={clients?.map((client) => ({
             label: client.nome_fantasia,
-            value: client
+            value: client,
           }))}
           onInputChange={handleClientsSearch}
           onChange={(newValue) => {
@@ -87,5 +85,5 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
         Buscar
       </Button>
     </form>
-  )
+  );
 }

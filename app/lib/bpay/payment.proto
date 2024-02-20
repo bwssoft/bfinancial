@@ -14,9 +14,10 @@ service OmieService {
 
 service TransactionService {
 	rpc get(GetOrdersParams) returns (GetTransactionsResult);
+	rpc getManyById(GetManyOrdersByIdParams) returns (GetManyOrdersByIdResult);
 	rpc boleto(BoletoParams) returns (google.protobuf.Any);
 	rpc pix(PixParams) returns (google.protobuf.Any);
-	rpc pixDetached(PixDetachedParams) returns (google.protobuf.Any);
+	rpc pixWithoutRecipient(PixWithoutRecipientParams) returns (PixWithoutRecipientResult);
 	rpc pay(PayParams) returns (google.protobuf.Any);
 }
 
@@ -91,7 +92,16 @@ message Transaction {
   optional string refPath = 8;
   optional Receiver receiver = 9;
   optional string payer = 10;
+  optional TransactionBB bb = 11;
 }
+
+message TransactionBB {
+  string txid = 1;
+  string pixCopyPaste = 2;
+  string status = 3;
+  string location = 4;
+  string key = 5;
+} 
 
 message Receiver {
     string id = 1;
@@ -153,6 +163,16 @@ message GetOrdersParams {
   optional Transaction params = 5;
 }
 
+message GetManyOrdersByIdParams {
+  repeated string id = 1;
+}
+
+message GetManyOrdersByIdResult {
+  bool status = 1;
+  repeated Transaction transactions = 2;
+  optional google.protobuf.Any error = 3;
+}
+
 message PixParams {
 	string _id = 1;
 	string receiver = 2;
@@ -161,22 +181,26 @@ message PixParams {
 	repeated InfoAdicional infoAdicionais = 5;
 }
 
-message PixDetachedParams {
+message PixWithoutRecipientParams {
   double price = 1;
-  PayerDetached payer = 2;
-  ReceiverDetached receiver = 3;
+  PayerWithoutRecipient payer = 2;
+  ReceiverWithoutRecipient receiver = 3;
 }
 
-message PayerDetached {
+message PixWithoutRecipientResult {
+  bool status = 1;
+  optional Transaction transaction = 2;
+  optional google.protobuf.Any error = 3;
+}
+
+message PayerWithoutRecipient {
   string email = 1;
   string name = 2;
   Document document = 3;
 }
 
-message ReceiverDetached {
+message ReceiverWithoutRecipient {
   string name = 1;
-  string pix = 2;
-  Document document = 3;
 }
 
 message InfoAdicional {

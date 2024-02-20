@@ -1,4 +1,4 @@
-import { Collection } from "mongodb";
+import { Collection, Filter, FindCursor, WithId } from "mongodb";
 import { Payment } from "../../definitions";
 import clientPromise from "../config";
 
@@ -8,14 +8,13 @@ async function connect() {
   return db;
 }
 
-async function list() {
+async function list(params: Filter<Payment> = {}) {
   try {
     const db = await connect();
 
     const payments: Collection<Payment> = db.collection("payment");
-    const data = await payments.find().toArray();
-
-    return data
+    const data = await payments.find(params).toArray();
+    return data as Payment[]
   } catch (error: any) {
     console.log('[error/payment-repo] (list)', error.toString())
     throw new Error();

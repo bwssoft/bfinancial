@@ -1,70 +1,82 @@
-"use client"
-
-import React from 'react';
-import { useRouter } from 'next/navigation'
-
-import { OmieOffer, OmieListOfferResponse } from "@/app/lib/definitions/OmieOffer"
+"use client";
+import React from "react";
+import { useRouter } from "next/navigation";
+import {
+  OmieListOfferResponse,
+  OmieOffer,
+} from "@/app/lib/definitions/OmieOffer";
 import { DataTableDesktop, DataTableMobile } from "@/app/ui/data-table";
 import { useMediaQuery } from "@/app/hook/use-media-query";
 import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
-
 import { OfferTableFilter } from "./offer-table-filter";
-import { orderOfferColumns } from './columns';
-import { fetchClientById } from '@/app/lib/actions';
+import { orderOfferColumns } from "./columns";
+import { fetchClientById } from "@/app/lib/actions";
+import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 
 type OfferTableProps = {
   offers: OmieListOfferResponse | null;
-  clientId?: string;
-}
+  codigo_cliente_omie?: string;
+  omie_enterprise?: OmieEnterpriseEnum;
+};
 
-export function OfferTable({ offers, clientId }: OfferTableProps) {
+export function OfferTable({
+  offers,
+  codigo_cliente_omie,
+  omie_enterprise,
+}: OfferTableProps) {
   const router = useRouter();
-  const isDesktop = useMediaQuery("(min-width: 768px)")
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const [client, setClient] = React.useState<OmieClientModel>();
 
-  const onClientChange = React.useCallback((client: OmieClientModel) => setClient(client), []);
+  const onClientChange = React.useCallback(
+    (client: OmieClientModel) => setClient(client),
+    []
+  );
   const onOfferChange = React.useCallback(() => client, [offers]);
 
-  const data = offers?.pedido_venda_produto.map((offer) => ({
-    ...offer,
-    client: onOfferChange(),
-  })) ?? [];
+  const data =
+    offers?.pedido_venda_produto.map((offer) => ({
+      ...offer,
+      client: onOfferChange(),
+    })) ?? [];
 
-  if (clientId && !client) {
-    fetchClient();
+  if (codigo_cliente_omie && omie_enterprise && !client) {
+    fetchClient(omie_enterprise);
   }
 
-  async function fetchClient() {
-    const data = await fetchClientById(clientId ?? '');
-    if (data) onClientChange(data)
+  async function fetchClient(omie_enterprise: OmieEnterpriseEnum) {
+    const data = await fetchClientById(
+      omie_enterprise,
+      codigo_cliente_omie ?? ""
+    );
+    if (data) onClientChange(data);
   }
 
   function handleRowPress(data: OmieOffer) {
-    router.push(`/offer/${data.cabecalho.codigo_pedido}`)
+    router.push(
+      `/offer/${omie_enterprise}/${codigo_cliente_omie}/${data.cabecalho.codigo_pedido}`
+    );
   }
 
   if (isDesktop) {
     return (
       <section>
         <div className="inline-flex justify-between w-full items-center">
-          <OfferTableFilter 
-            client={client} 
-            onClientChange={onClientChange} 
-          />
+          <OfferTableFilter client={client} onClientChange={onClientChange} />
         </div>
 
         <DataTableDesktop
           data={data}
-          columns={orderOfferColumns} 
+          columns={orderOfferColumns}
           onRowPress={handleRowPress}
         />
       </section>
-    )
+    );
   }
 
   return (
-    <DataTableMobile 
+    <DataTableMobile
       data={data}
       mobileKeyExtractor={(data) => data.cabecalho.codigo_pedido.toString()}
       mobileDisplayValue={(data) => (
@@ -75,5 +87,5 @@ export function OfferTable({ offers, clientId }: OfferTableProps) {
       )}
       onRowPress={handleRowPress}
     />
-  )
+  );
 }

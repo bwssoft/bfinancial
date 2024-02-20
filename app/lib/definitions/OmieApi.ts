@@ -21,12 +21,21 @@ export type OmieCredentials = {
 
 export type OmieSearchParams = Omit<OmieDefaultParams, 'apenas_importado_api'>;
 
-export type OmieCallFunctions = 
+export type OmieCallFunctions =
   | 'ListarClientes'
   | 'ListarPedidos'
   | 'ConsultarCliente'
   | 'ConsultarPedido';
 
-export type OmieSingleCallFunctions = 
+export type OmieSingleCallFunctions =
   | 'ConsultarCliente'
   | 'ConsultarPedido'
+
+
+export enum OmieEnterpriseEnum {
+  MGC = 'MGC',
+  BWS = 'BWS',
+  ICB = 'ICB',
+  ICBFILIAL = 'ICBFILIAL',
+  WFC = 'WFC'
+}

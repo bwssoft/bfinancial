@@ -2,6 +2,7 @@ import { OmieSearchParams } from "../definitions/OmieApi";
 import { OmieFindOfferResponse, OmieListOfferResponse } from "../definitions/OmieOffer";
 import { OmieBaseService } from "./base.omie";
 
+
 class OrderService extends OmieBaseService {
   async find(codigo_pedido: number) {
     try {

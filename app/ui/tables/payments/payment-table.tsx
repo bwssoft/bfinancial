@@ -1,36 +1,42 @@
-"use client"
+"use client";
 
 import { useMediaQuery } from "@/app/hook/use-media-query";
 import { useRouter } from "next/navigation";
 import { DataTableDesktop, DataTableMobile } from "@/app/ui/data-table";
 
-import { Payment } from "@/app/lib/definitions/Payment";
-import { paymentColumns } from './columns'
+import { paymentColumns } from "./columns";
+import { PaymentTableFilter } from "./filter";
+import { Payment } from "@/app/lib/definitions";
 
 type OfferTableProps = {
   payments: Payment[];
-}
+};
 
 export function PaymentTable({ payments }: OfferTableProps) {
   const router = useRouter();
-  const isDesktop = useMediaQuery("(min-width: 768px)")
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   function handleRowPress(data: Payment) {
-    router.push(`/payment/${data.uuid}}`)
+    router.push(`/payment/${data.uuid}}`);
   }
 
   if (isDesktop) {
     return (
-      <DataTableDesktop
-        data={payments}
-        columns={paymentColumns} 
-        onRowPress={handleRowPress}
-      />
-    )
+      <section>
+        <div className="inline-flex justify-between w-full items-center">
+          <PaymentTableFilter />
+        </div>
+        <DataTableDesktop
+          data={payments}
+          columns={paymentColumns}
+          onRowPress={handleRowPress}
+        />
+      </section>
+    );
   }
 
   return (
-    <DataTableMobile 
+    <DataTableMobile
       data={payments}
       mobileKeyExtractor={(data) => data.uuid}
       mobileDisplayValue={(data) => (
@@ -49,5 +55,5 @@ export function PaymentTable({ payments }: OfferTableProps) {
       )}
       onRowPress={handleRowPress}
     />
-  )
+  );
 }

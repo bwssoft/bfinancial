@@ -3,7 +3,7 @@ import { OmieClientModel, OmieClientResponse } from "../definitions/OmieClient";
 import { OmieBaseService } from "./base.omie";
 
 class ClientService extends OmieBaseService {
-  
+
   async find(codigo_cliente_omie: string) {
     try {
       const data = this.formatSingleBodyRequest('ConsultarCliente', {

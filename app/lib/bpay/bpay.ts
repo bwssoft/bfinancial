@@ -1,21 +1,27 @@
-import { BwPay } from "./grpc"
+import { BwPay } from "./grpc-client"
 
 const bwpay = new BwPay()
 
-export async function createPix({
+export async function createPixTransaction({
   payer,
   receiver,
   price
 }: {
   payer: Payer
   receiver: Receiver
-  price: number
+  price: string
 }) {
-  return await bwpay.creactePixDetached({
+  return await bwpay.creactePixWithoutRecipient({
     payer,
     receiver,
     price
   })
+}
+
+export async function getTransactionById(params: {
+  id: string[]
+}) {
+  return await bwpay.getManyTransactionById(params)
 }
 
 
@@ -30,19 +36,17 @@ type Payer = {
    */
   /** documento do pagador  */
   document: {
-    type: 'CPF' | 'CNPJ'
+    type: DocumentEnum
     value: string
   }
+}
+
+export enum DocumentEnum {
+  CPF = "CPF",
+  CNPJ = "CNPJ"
 }
 
 type Receiver = {
   /** nome do recebedor  */
   name: string
-  /** chave pix do recebedor  */
-  pix: string
-  /** documento do recebedor  */
-  document: {
-    type: 'CPF' | 'CNPJ'
-    value: string
-  }
 }

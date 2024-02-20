@@ -22,10 +22,14 @@ function formatShortDate(date: Date) {
   });
 }
 
-function formatPriceFromCents(price: number) {
-  return (price / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+type FormatPriceOptions = {
+  from: "cents"
+}
+function formatPrice(price: number, options?: FormatPriceOptions) {
+  const divider = options?.from === "cents" ? 100 : 1
+  return (price / divider).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 export {
-  formatDate, formatTime, formatShortDate, formatPriceFromCents
+  formatDate, formatTime, formatShortDate, formatPrice
 }
