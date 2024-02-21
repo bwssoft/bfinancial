@@ -3,54 +3,61 @@
 import { cn } from "@/app/lib/cn";
 import { BPayTransaction } from "@/app/lib/definitions/BPayTransaction";
 import { Button } from "@/app/ui/button";
-import { XMarkIcon, MinusIcon, CalendarIcon } from "@heroicons/react/20/solid";
+import { XMarkIcon, MinusIcon, CalendarIcon, CheckIcon } from "@heroicons/react/20/solid";
+import { ReactNode } from "react";
 
 interface TransactionFeedProps {
   transactions: BPayTransaction[];
 }
 
+interface TransactionStatus {
+  text: string;
+  icon: any;
+  iconBackground: string;
+}
+
 const transactionStatus = {
-  LIQUIDADO: {
+  0: {
     text: "Transação liquidada",
     icon: MinusIcon,
     iconBackground: "bg-gray-500",
   },
-  VENCIDO: {
+  1: {
     text: "Transação expirou",
     icon: XMarkIcon,
     iconBackground: "bg-gray-500",
   },
-  PENDENTE: {
+  2: {
     text: "Transação pendente",
     icon: MinusIcon,
-    iconBackground: "bg-gray-500",
+    iconBackground: "bg-yellow-500",
   },
-  PROCESSANDO: {
+  3: {
     text: "Processando transação",
     icon: MinusIcon,
     iconBackground: "bg-yellow-500",
   },
-  CANCELADO: {
+  4: {
     text: "Cancelada",
     icon: XMarkIcon,
     iconBackground: "bg-red-500",
   },
-  CARTORIO: {
+  5: {
     text: "Cartorio",
     icon: MinusIcon,
     iconBackground: "bg-gray-500",
   },
-  AGENDADO: {
+  6: {
     text: "Agendada para",
     icon: CalendarIcon,
     iconBackground: "bg-blue-500",
   },
-  CREDITADO: {
+  7: {
     text: "Creditada",
     icon: MinusIcon,
     iconBackground: "bg-gray-500",
   },
-  "PARCIALMENTE CREDITADO": {
+  8: {
     text: "Parcialmente creditada",
     icon: MinusIcon,
     iconBackground: "bg-gray-500",
@@ -68,14 +75,22 @@ export function TransactionFeed({ transactions }: TransactionFeedProps) {
       {transactions.map((transaction, index) => {
         const status = transaction.status;
 
-        const badge = {
-          icon: transactionStatus?.[status]?.icon ?? MinusIcon,
-          iconBackground:
-            transactionStatus?.[status]?.iconBackground ?? "bg-gray-500",
-        };
+        let badge: TransactionStatus;
 
-        const description =
-          transactionStatus?.[status]?.text ?? "Status não identificado";
+        if (transaction.finish) {
+          badge = {
+            text: 'Pagamento efetuado',
+            icon: CheckIcon,
+            iconBackground: 'bg-green-500'
+          }
+        } else {
+          badge = {
+            text: transactionStatus?.[status]?.text,
+            icon: transactionStatus?.[status]?.icon ?? MinusIcon,
+            iconBackground:
+              transactionStatus?.[status]?.iconBackground ?? "bg-gray-500",
+          }
+        }
 
         return (
           <li key={transaction._id}>
@@ -107,9 +122,9 @@ export function TransactionFeed({ transactions }: TransactionFeedProps) {
                 >
                   <div>
                     <p className="text-sm text-gray-500 flex items-center gap-2">
-                      {description}
+                      {badge.text}
 
-                      {status === "PENDENTE" && (
+                      {status === 2 && !transaction.finish && (
                         <Button
                           onClick={() => handlePixCodeCopy(transaction)}
                           size="sm"

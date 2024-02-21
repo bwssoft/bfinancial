@@ -34,6 +34,8 @@ export default async function PaymentDetailsPage({
     id: [payment?.bpay_transaction_id ?? ""],
   });
 
+  const currentTransaction = transactions?.[0] ?? null;
+
   return (
     <div className="min-h-full">
       <header className="mb-4">
@@ -113,9 +115,7 @@ export default async function PaymentDetailsPage({
         </div>
 
         <section className="space-y-6">
-          <CurrentTransaction
-            pixCopyPaste={transactions?.[0]?.bb?.pixCopyPaste}
-          />
+          <CurrentTransaction transaction={currentTransaction} />
 
           <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
             <div className="divide-y divide-gray-200">

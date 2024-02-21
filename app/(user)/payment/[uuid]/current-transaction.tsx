@@ -1,22 +1,23 @@
 "use client"
 
 import { cn } from "@/app/lib/cn";
+import { BPayTransaction } from "@/app/lib/definitions/BPayTransaction";
 import { Button } from "@/app/ui/button";
 
 interface CurrentTransactionProps {
-  pixCopyPaste?: string;
+  transaction: BPayTransaction | null;
 }
 
-export function CurrentTransaction({ pixCopyPaste }: CurrentTransactionProps) {
+export function CurrentTransaction({ transaction }: CurrentTransactionProps) {
 
   const handlePixCodeCopy = () => {
-    if (pixCopyPaste) {
-      navigator.clipboard.writeText(pixCopyPaste);
+    if (transaction) {
+      navigator.clipboard.writeText(transaction?.bb?.pixCopyPaste);
       alert('Pix copiado com sucesso!')
     }
   }
 
-  if (!pixCopyPaste) return null;
+  if (!transaction || transaction.finish) return null;
 
   return (
     <div className={
@@ -36,7 +37,7 @@ export function CurrentTransaction({ pixCopyPaste }: CurrentTransactionProps) {
       </div>
       <div className="border-t text-sm gap-2 inline-flex items-center justify-between p-4 w-full">
         <span className="flex-1 truncate">
-          {pixCopyPaste}
+          {transaction?.bb?.pixCopyPaste}
         </span>
         <Button onClick={handlePixCodeCopy} variant="outline">
           Copiar

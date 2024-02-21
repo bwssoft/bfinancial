@@ -17,6 +17,8 @@ export type BPayStatusUnion =
   | "CREDITADO"
   | "PARCIALMENTE CREDITADO";
 
+export type BPayStatusEnum = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+
 export interface BPayTransactionReceiverInfo {
   id: string;
   numeroConvenio: number;
@@ -30,7 +32,7 @@ export interface BPayTransaction {
   refPath?: string;
   omieId?: string;
 
-  status: BPayStatusUnion;
+  status: BPayStatusEnum;
   method: BPayMethodUnion;
   finish: boolean;
   receiver: BPayTransactionReceiverInfo;
