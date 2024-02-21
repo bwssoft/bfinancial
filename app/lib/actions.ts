@@ -52,6 +52,12 @@ export async function fetchPaymentById(id: string) {
   });
 }
 
+export async function fetchPaymentByGroup(group: string) {
+  return await paymentRepo.list({
+    group,
+  });
+}
+
 
 export async function createClientPayment(
   client: OmieClientModel,
@@ -159,7 +165,7 @@ export async function createPaymentFromOfferPage(
 }
 
 export async function getTransactionByPaymentId(id: string) {
-  return 
+  return
 }
 
 export async function getManyTransactionById(params: { id: string[] }) {

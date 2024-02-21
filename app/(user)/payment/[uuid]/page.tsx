@@ -1,6 +1,6 @@
 import {
   fetchNote,
-  fetchPaymentById,
+  fetchPaymentByGroup,
   getManyTransactionById,
 } from "@/app/lib/actions";
 import { NoteCreateFrom } from "@/app/ui/form/note-create";
@@ -10,6 +10,7 @@ import { TransactionFeed } from "./transaction-feed";
 import { BackButton } from "@/app/ui/back-button";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { CurrentTransaction } from "./current-transaction";
+import { generateQR } from "@/app/utils/qrCode";
 
 const user = {
   name: "Whitney Francis",
@@ -27,14 +28,16 @@ export default async function PaymentDetailsPage({
 }) {
   const [comments, payment] = await Promise.all([
     fetchNote(params.uuid),
-    fetchPaymentById(params.uuid),
+    fetchPaymentByGroup(params.uuid),
   ]);
-
   const { transactions } = await getManyTransactionById({
-    id: [payment?.bpay_transaction_id ?? ""],
+    id: payment?.map((pay) => pay.bpay_transaction_id),
   });
-
+  const paymentData = payment[0];
   const currentTransaction = transactions?.[0] ?? null;
+  const currentTransactionQrcode = currentTransaction
+    ? await generateQR(currentTransaction?.bb.pixCopyPaste as string)
+    : undefined;
 
   return (
     <div className="min-h-full">
@@ -47,7 +50,6 @@ export default async function PaymentDetailsPage({
           Visualizando um pagamento
         </h1>
       </header>
-
       <div className="grid grid-cols-2 w-full gap-6">
         <div className="space-y-6">
           {/* Description list*/}
@@ -59,18 +61,22 @@ export default async function PaymentDetailsPage({
                 </div>
               </div>
               <div className="grid grid-cols-2 p-4 gap-2 gap-y-4">
-                <LabelValue label="Protocolo" value={payment?.uuid} />
+                {/* <LabelValue label="Protocolo" value={currentPayment?.uuid} /> */}
                 <LabelValue
                   label="Valor total"
-                  value={`R$${payment?.price.toString()}`}
+                  value={`R$${paymentData?.price.toString()}`}
                 />
                 <LabelValue
                   label="(OMIE) Cód. cliente"
-                  value={payment?.omie_metadata.codigo_cliente?.toString()}
+                  value={paymentData?.omie_metadata.codigo_cliente?.toString()}
                 />
                 <LabelValue
                   label="(OMIE) Cód. pediddo"
-                  value={payment?.omie_metadata.codigo_pedido?.toString()}
+                  value={paymentData?.omie_metadata.codigo_pedido?.toString()}
+                />
+                <LabelValue
+                  label="(OMIE) N. parcela"
+                  value={paymentData?.omie_metadata.numero_parcela?.toString()}
                 />
               </div>
             </div>
@@ -115,7 +121,10 @@ export default async function PaymentDetailsPage({
         </div>
 
         <section className="space-y-6">
-          <CurrentTransaction transaction={currentTransaction} />
+          <CurrentTransaction
+            transaction={currentTransaction}
+            qrCodeUrl={currentTransactionQrcode}
+          />
 
           <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
             <div className="divide-y divide-gray-200">
