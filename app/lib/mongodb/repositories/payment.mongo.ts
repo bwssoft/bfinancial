@@ -21,6 +21,16 @@ async function list(params: Filter<Payment> = {}) {
   }
 }
 
+export async function findOne(params: Partial<WithId<Payment>>) {
+  try {
+    const db = await connect();
+    return await db.collection<Payment>('payment').findOne(params);
+  } catch (error: any) {
+    console.log('[error/payment-repo] (findOne)', error.toString())
+    throw new Error();
+  }
+}
+
 export type CreatePayment = Partial<Payment>;
 
 export async function create(data: CreatePayment) {
@@ -36,4 +46,5 @@ export async function create(data: CreatePayment) {
 export const paymentRepo = {
   list,
   create,
+  findOne,
 }

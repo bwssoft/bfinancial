@@ -17,7 +17,7 @@ export function PaymentTable({ payments }: OfferTableProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   function handleRowPress(data: Payment) {
-    router.push(`/payment/${data.uuid}}`);
+    router.push(`/payment/${data.uuid}`);
   }
 
   if (isDesktop) {

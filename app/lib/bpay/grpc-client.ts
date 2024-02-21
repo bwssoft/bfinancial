@@ -4,6 +4,7 @@ import path from 'path';
 import { promisify } from 'util';
 import fs from 'fs'
 import { ProtoGrpcType } from './types/payment';
+import { BPayTransaction } from '../definitions/BPayTransaction';
 
 const PROTO_PATH = path.join(process.cwd(), './app/lib/bpay/payment.proto');
 const CRT_PATH = path.join(process.cwd(), './app/lib/bpay/ca.crt')
@@ -41,7 +42,7 @@ export class BwPay extends TransactionService {
 
   public async getManyTransactionById(params: { id: string[] }): Promise<{
     status: boolean,
-    transactions?: { finished: boolean, _id: string }[],
+    transactions?: BPayTransaction[],
     error?: any
   }> {
     const getManyById = promisify(this.getManyById).bind(this);

@@ -14,8 +14,12 @@ import { Filter } from "mongodb";
 import { Payment } from "./definitions";
 
 export async function fetchClients(enterprise: OmieEnterpriseEnum, data?: Omit<OmieClientListParams, 'apenas_importado_api'>, secrets?: Partial<OmieCredentials>) {
-  OmieClientService.setSecrets(enterprise)
-  return await OmieClientService.findAll(data, secrets);
+  try {
+    OmieClientService.setSecrets(enterprise)
+    return await OmieClientService.findAll(data, secrets);
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchClientById(enterprise: OmieEnterpriseEnum, id: string) {
@@ -38,16 +42,20 @@ export async function fetchOfferById(enterprise: OmieEnterpriseEnum, id: number)
   return await OmieOrderService.find(id);
 }
 
-
-
-
-
-
-
-
-
 export async function fetchPayments(params?: Filter<Payment>) {
   return await paymentRepo.list(params);
+}
+
+export async function fetchPaymentById(id: string) {
+  return await paymentRepo.findOne({
+    uuid: id,
+  });
+}
+
+export async function fetchPaymentByGroup(group: string) {
+  return await paymentRepo.list({
+    group,
+  });
 }
 
 
@@ -156,6 +164,9 @@ export async function createPaymentFromOfferPage(
   return payment
 }
 
+export async function getTransactionByPaymentId(id: string) {
+  return
+}
 
 export async function getManyTransactionById(params: { id: string[] }) {
   return getTransactionById(params)
@@ -164,13 +175,6 @@ export async function getManyTransactionById(params: { id: string[] }) {
 export async function revalidateInstallmentOffer(pathname: string) {
   revalidatePath(pathname)
 }
-
-
-
-
-
-
-
 
 export async function fetchNote(payment: string) {
   return await noteRepo.list(payment);

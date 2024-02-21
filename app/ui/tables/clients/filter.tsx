@@ -7,7 +7,7 @@ import { Button } from "@/app/ui/button";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { Input } from "../../input";
-import { useDebouncedCallback } from "use-debounce";
+import { formatSearchParams } from "@/app/utils/format-search-params";
 
 export const enterprises: {
   id: OmieEnterpriseEnum;
@@ -21,30 +21,18 @@ export const enterprises: {
 ];
 
 export function ClientTableFilter() {
+  const [client, setClient] = React.useState<string>();
   const [enterprise, setEnterprise] = React.useState<string>();
 
-  const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { replace } = useRouter();
-
-  const handleSearchClient = useDebouncedCallback((term: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (term) {
-      params.set("client_name", term);
-    } else {
-      params.delete("client_name");
-    }
-    replace(`${pathname}?${params.toString()}`);
-  }, 300);
+  const router = useRouter();
 
   const onAction = () => {
-    const params = new URLSearchParams(searchParams);
-    if (enterprise) {
-      params.set("omie_enterprise", enterprise);
-    } else {
-      params.delete("omie_enterprise");
-    }
-    replace(`${pathname}?${params.toString()}`);
+    const params = formatSearchParams({
+      omie_enterprise: enterprise,
+      client_name: client
+    })
+    router.push(`${pathname}?${params}`)
   };
 
   return (
@@ -65,7 +53,7 @@ export function ClientTableFilter() {
       <div className="w-64">
         <Input
           placeholder="Pesquise pelo nome do cliente"
-          onChange={(e) => handleSearchClient(e.target.value)}
+          onChange={(e) => setClient(e.target.value)}
         />
       </div>
 
