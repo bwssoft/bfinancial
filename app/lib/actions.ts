@@ -38,16 +38,14 @@ export async function fetchOfferById(enterprise: OmieEnterpriseEnum, id: number)
   return await OmieOrderService.find(id);
 }
 
-
-
-
-
-
-
-
-
 export async function fetchPayments(params?: Filter<Payment>) {
   return await paymentRepo.list(params);
+}
+
+export async function fetchPaymentById(id: string) {
+  return await paymentRepo.findOne({
+    uuid: id,
+  });
 }
 
 
@@ -156,6 +154,9 @@ export async function createPaymentFromOfferPage(
   return payment
 }
 
+export async function getTransactionByPaymentId(id: string) {
+  return 
+}
 
 export async function getManyTransactionById(params: { id: string[] }) {
   return getTransactionById(params)
@@ -164,13 +165,6 @@ export async function getManyTransactionById(params: { id: string[] }) {
 export async function revalidateInstallmentOffer(pathname: string) {
   revalidatePath(pathname)
 }
-
-
-
-
-
-
-
 
 export async function fetchNote(payment: string) {
   return await noteRepo.list(payment);
