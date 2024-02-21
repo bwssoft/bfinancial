@@ -14,8 +14,12 @@ import { Filter } from "mongodb";
 import { Payment } from "./definitions";
 
 export async function fetchClients(enterprise: OmieEnterpriseEnum, data?: Omit<OmieClientListParams, 'apenas_importado_api'>, secrets?: Partial<OmieCredentials>) {
-  OmieClientService.setSecrets(enterprise)
-  return await OmieClientService.findAll(data, secrets);
+  try {
+    OmieClientService.setSecrets(enterprise)
+    return await OmieClientService.findAll(data, secrets);
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchClientById(enterprise: OmieEnterpriseEnum, id: string) {
