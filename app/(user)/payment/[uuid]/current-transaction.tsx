@@ -7,11 +7,13 @@ import { Button } from "@/app/ui/button";
 interface CurrentTransactionProps {
   transaction: BPayTransaction | null;
   qrCodeUrl: string | undefined;
+  action: () => void;
 }
 
 export function CurrentTransaction({
   transaction,
   qrCodeUrl,
+  action,
 }: CurrentTransactionProps) {
   const handlePixCodeCopy = () => {
     if (transaction) {
@@ -46,13 +48,11 @@ export function CurrentTransaction({
         >
           Copiar Código
         </Button>
-        <Button
-          className="w-full"
-          onClick={handlePixCodeCopy}
-          variant="outline"
-        >
-          Enviar cobrança
-        </Button>
+        <form action={action}>
+          <Button className="w-full" type="submit" variant="outline">
+            Enviar cobrança
+          </Button>
+        </form>
       </div>
       <div className="border-t gap-2 inline-flex p-4 w-full">
         <span className="truncate text-sm">

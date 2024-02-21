@@ -2,6 +2,7 @@ import {
   fetchNote,
   fetchPaymentByGroup,
   getManyTransactionById,
+  sendDue,
 } from "@/app/lib/actions";
 import { NoteCreateFrom } from "@/app/ui/form/note-create";
 import { NoteCard } from "./note-card";
@@ -38,6 +39,13 @@ export default async function PaymentDetailsPage({
   const currentTransactionQrcode = currentTransaction
     ? await generateQR(currentTransaction?.bb.pixCopyPaste as string)
     : undefined;
+
+  const createTemplateMessageBinded = sendDue.bind(null, {
+    telefone: "5527999697185",
+    numero_parcela: paymentData.omie_metadata.numero_parcela.toString(),
+    data_vencimento: paymentData.omie_metadata.data_vencimento.toString(),
+    pix_copia_e_cola: currentTransaction?.bb.pixCopyPaste!,
+  });
 
   return (
     <div className="min-h-full">
@@ -124,6 +132,7 @@ export default async function PaymentDetailsPage({
           <CurrentTransaction
             transaction={currentTransaction}
             qrCodeUrl={currentTransactionQrcode}
+            action={createTemplateMessageBinded}
           />
 
           <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
