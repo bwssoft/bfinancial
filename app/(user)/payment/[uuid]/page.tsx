@@ -1,7 +1,10 @@
 import {
+  createDueFromPayment,
   fetchNote,
   fetchPaymentByGroup,
   getManyTransactionById,
+  revalidatePaymentPage,
+  sendDue,
 } from "@/app/lib/actions";
 import { NoteCreateFrom } from "@/app/ui/form/note-create";
 import { NoteCard } from "./note-card";
@@ -11,6 +14,7 @@ import { BackButton } from "@/app/ui/back-button";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { CurrentTransaction } from "./current-transaction";
 import { generateQR } from "@/app/utils/qrCode";
+import { Button } from "@/app/ui/button";
 
 const user = {
   name: "Whitney Francis",
@@ -33,22 +37,54 @@ export default async function PaymentDetailsPage({
   const { transactions } = await getManyTransactionById({
     id: payment?.map((pay) => pay.bpay_transaction_id),
   });
+
+  const hasFinishedTransactions = transactions?.some((el) => el.finish);
   const paymentData = payment[0];
+
   const currentTransaction = transactions?.[0] ?? null;
   const currentTransactionQrcode = currentTransaction
     ? await generateQR(currentTransaction?.bb.pixCopyPaste as string)
     : undefined;
 
+  const createTemplateMessageBinded = sendDue.bind(null, {
+    telefone: "5527999697185",
+    numero_parcela: paymentData?.omie_metadata?.numero_parcela.toString(),
+    data_vencimento: paymentData?.omie_metadata?.data_vencimento.toString(),
+    pix_copia_e_cola: currentTransaction?.bb.pixCopyPaste!,
+  });
+
+  const createDueFromPaymentBinded = createDueFromPayment.bind(null, { payment: paymentData });
+
+  const revalidatePaymentPageBinded = revalidatePaymentPage.bind(
+    null,
+    `/payment/${params.uuid}`
+  );
+
   return (
     <div className="min-h-full">
-      <header className="mb-4">
-        <BackButton>
-          <ArrowLeftIcon className="h-3 w-3" />
-          Voltar
-        </BackButton>
-        <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
-          Visualizando um pagamento
-        </h1>
+      <header className="mb-4 flex w-full items-center justify-between">
+        <div>
+          <BackButton>
+            <ArrowLeftIcon className="h-3 w-3" />
+            Voltar
+          </BackButton>
+          <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
+            Visualizando um pagamento
+          </h1>
+        </div>  
+
+        <div className="inline-flex items-center gap-2">
+          <form action={revalidatePaymentPageBinded}>
+            <Button>Revalidar</Button>
+          </form>
+
+          {!hasFinishedTransactions && (
+            <form action={createDueFromPaymentBinded}>
+              <Button>Efetuar nova cobrança</Button>
+            </form>
+          )}
+        </div>
+
       </header>
       <div className="grid grid-cols-2 w-full gap-6">
         <div className="space-y-6">
@@ -124,6 +160,7 @@ export default async function PaymentDetailsPage({
           <CurrentTransaction
             transaction={currentTransaction}
             qrCodeUrl={currentTransactionQrcode}
+            action={createTemplateMessageBinded}
           />
 
           <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">

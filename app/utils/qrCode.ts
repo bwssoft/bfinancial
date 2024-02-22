@@ -12,3 +12,17 @@ export const generateQR = async (context: string, options?: QRCode.QRCodeToDataU
     console.error(err)
   }
 }
+
+export const generateQRBuffer = async (context: string): Promise<Buffer | null> => {
+  try {
+    return new Promise((resolve, reject) => {
+      QRCode.toBuffer(context, (err, buffer) => {
+        if (!err) return resolve(buffer)
+        reject(err)
+      })
+    })
+  } catch (err) {
+    console.error(err)
+    return null
+  }
+}

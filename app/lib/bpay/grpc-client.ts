@@ -33,7 +33,7 @@ export class BwPay extends TransactionService {
     // super(target, grpc.credentials.createInsecure());
   }
 
-  public async creactePixWithoutRecipient(params: any) {
+  public async createPixWithoutRecipient(params: any) {
     const pixWithoutRecipient = promisify(this.pixWithoutRecipient).bind(this);
     return await pixWithoutRecipient(params)
       .then((res) => res)
