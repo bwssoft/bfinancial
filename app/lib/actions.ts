@@ -14,6 +14,7 @@ import { Filter } from "mongodb";
 import { Payment } from "./definitions";
 import { BMessageClient } from "./bmessage/bessage";
 import { generateQRBuffer } from "../utils/qrCode";
+import { getCurrentInstallment } from "../utils/get-current-installment";
 
 export async function fetchClients(enterprise: OmieEnterpriseEnum, data?: Omit<OmieClientListParams, 'apenas_importado_api'>, secrets?: Partial<OmieCredentials>) {
   try {
@@ -214,6 +215,29 @@ export async function createTextMessage(params: { phone: string, message: string
   return result
 }
 
+export async function createDueFromPayment(params: { payment: Payment }) {
+  const payment = params.payment;
+
+  const enterprise = payment.omie_metadata?.enterprise;
+  const clientId = payment.omie_metadata?.codigo_cliente;
+  const offerId = payment.omie_metadata?.codigo_pedido;
+
+  const [offer, client] = await Promise.all([
+    getCachedOffer(enterprise, parseInt(offerId)),
+    fetchClientById(enterprise, clientId.toString())
+  ]);
+
+  if (offer && client) {
+    const currentInstallment = getCurrentInstallment(offer?.pedido_venda_produto.lista_parcelas.parcela);
+    await createPaymentFromOfferPage(
+      enterprise,
+      offerId,
+      client,
+      currentInstallment
+    )
+  }
+}
+
 export async function sendDue(params: {
   numero_parcela: string
   telefone: string
@@ -263,7 +287,7 @@ export async function sendDue(params: {
       },
     ],
   })
-  console.log('result createTemplateMessage', result)
+  console.log("🚀 ~ result:", result);
   return result
 }
 
