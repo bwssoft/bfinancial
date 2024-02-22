@@ -16,6 +16,8 @@ import { BMessageClient } from "./bmessage/bessage";
 import { generateQRBuffer } from "../utils/qrCode";
 import { getCurrentInstallment } from "../utils/get-current-installment";
 
+import { headers } from 'next/headers';
+
 export async function fetchClients(enterprise: OmieEnterpriseEnum, data?: Omit<OmieClientListParams, 'apenas_importado_api'>, secrets?: Partial<OmieCredentials>) {
   try {
     OmieClientService.setSecrets(enterprise)
@@ -244,6 +246,7 @@ export async function sendDue(params: {
   data_vencimento: string
   pix_copia_e_cola: string
 }) {
+  const headerInfo = Object.fromEntries(headers().entries());
   const buffer = await generateQRBuffer(params.pix_copia_e_cola)
   if (!buffer) return
   const { status, media_id } = await BMessageClient.uploadMediaWtp({ buffer })
@@ -277,7 +280,7 @@ export async function sendDue(params: {
           },
           {
             type: "text",
-            text: "https://mysite.com",
+            text: `${headerInfo['x-forwarded-proto']}://${headerInfo.host}`,
           },
           {
             type: "text",
