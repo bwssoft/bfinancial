@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "bpay-grpc-types": "proto-loader-gen-types --keepCase=true --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=./app/lib/bpay/types ./app/lib/bpay/payment.proto"
+    "bpay-grpc-types": "proto-loader-gen-types --keepCase=true --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=./app/lib/bpay/types ./app/lib/bpay/payment.proto",
+    "bmessage-grpc-types": "proto-loader-gen-types --keepCase=true --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=./app/lib/bmessage/types ./app/lib/bmessage/bmessage.proto"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.13",

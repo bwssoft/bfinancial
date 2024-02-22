@@ -8,10 +8,11 @@ export type Payment = {
   price: Cents
   created_at: string
   omie_metadata: {
-    enterprise?: OmieEnterpriseEnum;
-    codigo_cliente?: number;
-    codigo_pedido?: string;
-    numero_parcela?: number;
+    enterprise: OmieEnterpriseEnum;
+    codigo_cliente: number;
+    codigo_pedido: string;
+    numero_parcela: number;
+    data_vencimento: string
   },
   bpay_transaction_id: string
   group: string //codigo_pedido_omie + numero_parcela

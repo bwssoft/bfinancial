@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+package mail;
+
+service MailService {
+    rpc uploadMediaWtp(MessageUploadMediaWtpParams) returns (MessageUploadMediaWtpResult);
+    rpc templateMessage(MessageTemplateParams) returns (MessageTemplateResult);
+    rpc textMessage(MessageTextParams) returns (MessageTextResult);
+    rpc template(TextParams) returns (google.protobuf.Empty);
+    rpc text(TextParams) returns (google.protobuf.Empty);
+    rpc html(HtmlParams) returns (google.protobuf.Empty);
+  }
+
+  message MessageUploadMediaWtpParams {
+    bytes buffer = 1;
+  }
+  message MessageUploadMediaWtpResult {
+    bool status = 1;
+    optional string media_id = 2;
+  }
+
+  message MessageTextParams {
+    string phone = 1;
+    string message = 2;
+  }
+
+  message MessageTextResult {
+    bool status = 1;
+  }
+
+  message MessageTemplateParams {
+    string phone = 1;
+    string template = 2;
+    string code = 3;
+    repeated Components components = 4;
+  }
+
+  message MessageTemplateResult {
+    bool status = 1;
+  }
+  
+  message TextParams {
+    string text = 1;
+    string subject = 2;
+    string to = 3;
+    repeated Attachment attachments = 4;
+  }
+  
+  message HtmlParams {
+    string html = 1;
+    string subject = 2;
+    repeated Attachment attachments = 3;
+    string to = 4;
+  }
+
+  message Components {
+    string type = 1;
+    repeated Parameters parameters = 2; 
+  }
+  
+  message Parameters {
+    string type = 1;
+    optional string text = 2; 
+    optional ImageParamters image = 3; 
+  }
+
+  message ImageParamters {
+    optional string id = 1;
+    optional string link = 2;
+  }
+
+  message Attachment {
+    string filename = 1;
+    optional string path = 2;
+    optional bytes content = 3;
+  }

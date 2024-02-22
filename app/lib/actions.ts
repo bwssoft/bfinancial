@@ -12,6 +12,8 @@ import { OmieCredentials, OmieEnterpriseEnum } from "./definitions/OmieApi"
 import { ICompanySecrets } from "../utils/enterpriseSecrets"
 import { Filter } from "mongodb";
 import { Payment } from "./definitions";
+import { BMessageClient } from "./bmessage/bessage";
+import { generateQRBuffer } from "../utils/qrCode";
 
 export async function fetchClients(enterprise: OmieEnterpriseEnum, data?: Omit<OmieClientListParams, 'apenas_importado_api'>, secrets?: Partial<OmieCredentials>) {
   try {
@@ -138,8 +140,6 @@ export async function createPaymentFromOfferPage(
     price: "1"
   })
 
-  console.log(pix)
-
   if (!pix.status) {
     throw new Error("error on bpay microservice")
   }
@@ -153,7 +153,8 @@ export async function createPaymentFromOfferPage(
       enterprise: omie_enterprise,
       codigo_cliente: omie_client.codigo_cliente_omie,
       codigo_pedido: codigo_pedido_omie,
-      numero_parcela: installment.numero_parcela
+      numero_parcela: installment.numero_parcela,
+      data_vencimento: installment.data_vencimento
     },
     bpay_transaction_id: pix.transaction._id,
     group: `${codigo_pedido_omie}${installment.numero_parcela}`
@@ -161,6 +162,12 @@ export async function createPaymentFromOfferPage(
 
   const payment = await paymentRepo.create(data);
   revalidatePath(`offer/${omie_enterprise}/${omie_client.codigo_cliente_omie}/${codigo_pedido_omie}`)
+  await sendDue({
+    data_vencimento: installment.data_vencimento,
+    numero_parcela: installment.numero_parcela.toString(),
+    pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
+    telefone: "5527999697185"
+  })
   return payment
 }
 
@@ -195,4 +202,69 @@ interface User {
   img: string;
   name: string;
   id: string;
+}
+
+
+export async function createTextMessage(params: { phone: string, message: string }) {
+  const result = await BMessageClient.createTextMessage(params)
+  return result
+}
+
+export async function sendDue(params: {
+  numero_parcela: string
+  telefone: string
+  data_vencimento: string
+  pix_copia_e_cola: string
+}) {
+  const buffer = await generateQRBuffer(params.pix_copia_e_cola)
+  if (!buffer) return
+  const { status, media_id } = await BMessageClient.uploadMediaWtp({ buffer })
+  if (!status) return
+  const result = await BMessageClient.createTemplateMessage({
+    phone: params.telefone,
+    code: "pt_BR",
+    template: "cobranca_bfinancial",
+    components: [
+      {
+        type: "header",
+        parameters: [
+          {
+            type: "image",
+            image: {
+              id: media_id
+            },
+          },
+        ],
+      },
+      {
+        type: "body",
+        parameters: [
+          {
+            type: "text",
+            text: params.numero_parcela,
+          },
+          {
+            type: "text",
+            text: params.data_vencimento,
+          },
+          {
+            type: "text",
+            text: "https://mysite.com",
+          },
+          {
+            type: "text",
+            text: params.pix_copia_e_cola,
+          },
+        ],
+      },
+    ],
+  })
+  return result
+}
+
+export async function uploadMediaWtp(params: {
+  buffer: Buffer
+}) {
+  const result = await BMessageClient.uploadMediaWtp(params)
+  return result
 }
