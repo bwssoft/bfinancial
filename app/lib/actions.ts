@@ -183,6 +183,10 @@ export async function revalidateInstallmentOffer(pathname: string) {
   revalidatePath(pathname)
 }
 
+export async function revalidatePaymentPage(pathname: string) {
+  revalidatePath(pathname)
+}
+
 export async function fetchNote(payment: string) {
   return await noteRepo.list(payment);
 }
@@ -259,6 +263,7 @@ export async function sendDue(params: {
       },
     ],
   })
+  console.log('result createTemplateMessage', result)
   return result
 }
 

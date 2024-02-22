@@ -2,6 +2,7 @@ import {
   fetchNote,
   fetchPaymentByGroup,
   getManyTransactionById,
+  revalidatePaymentPage,
   sendDue,
 } from "@/app/lib/actions";
 import { NoteCreateFrom } from "@/app/ui/form/note-create";
@@ -12,6 +13,7 @@ import { BackButton } from "@/app/ui/back-button";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { CurrentTransaction } from "./current-transaction";
 import { generateQR } from "@/app/utils/qrCode";
+import { Button } from "@/app/ui/button";
 
 const user = {
   name: "Whitney Francis",
@@ -47,13 +49,23 @@ export default async function PaymentDetailsPage({
     pix_copia_e_cola: currentTransaction?.bb.pixCopyPaste!,
   });
 
+  const revalidatePaymentPageBinded = revalidatePaymentPage.bind(
+    null,
+    `/payment/${params.uuid}`
+  );
+
   return (
     <div className="min-h-full">
       <header className="mb-4">
-        <BackButton>
-          <ArrowLeftIcon className="h-3 w-3" />
-          Voltar
-        </BackButton>
+        <div className="flex items-center justify-between">
+          <BackButton>
+            <ArrowLeftIcon className="h-3 w-3" />
+            Voltar
+          </BackButton>
+          <form action={revalidatePaymentPageBinded}>
+            <Button>Revalidar</Button>
+          </form>
+        </div>
         <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
           Visualizando um pagamento
         </h1>
