@@ -5,7 +5,6 @@ import {
   getManyTransactionById,
   revalidateInstallmentOffer,
 } from "@/app/lib/actions";
-import { Payment } from "@/app/lib/definitions";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { BackButton } from "@/app/ui/back-button";
 import { Button } from "@/app/ui/button";

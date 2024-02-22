@@ -11,7 +11,7 @@ export async function createPixTransaction({
   receiver: Receiver
   price: string
 }) {
-  return await bwpay.creactePixWithoutRecipient({
+  return await bwpay.createPixWithoutRecipient({
     payer,
     receiver,
     price
