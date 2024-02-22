@@ -7,7 +7,7 @@ async function createTextMessage(params: {
   message: string
 }) {
   try {
-    return await bmessage.creacteTextMessage(params)
+    return await bmessage.createTextMessage(params)
   } catch (e) {
     return null;
   }
@@ -23,7 +23,7 @@ async function createTemplateMessage(params: {
   }[]
 }) {
   try {
-    return await bmessage.creacteTemplateMessage(params)
+    return await bmessage.createTemplateMessage(params)
   } catch (e) {
     return null;
   }

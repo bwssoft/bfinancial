@@ -29,14 +29,14 @@ export class BMessage extends MailService {
     super(target, grpc.credentials.createInsecure());
   }
 
-  public async creacteTextMessage(params: any) {
+  public async createTextMessage(params: any) {
     const textMessage = promisify(this.textMessage).bind(this);
     return await textMessage(params)
       .then((res) => res)
       .catch((error) => error);
   }
 
-  public async creacteTemplateMessage(params: any) {
+  public async createTemplateMessage(params: any) {
     const templateMessage = promisify(this.templateMessage).bind(this);
     return await templateMessage(params)
       .then((res) => res)
