@@ -29,8 +29,24 @@ const statusBadges: StatusBadges = {
 };
 
 export const paymentColumns: ColumnDef<Payment>[] = [
-  { header: "Código do pagamento", accessorKey: "uuid" },
-  { header: "Registrado por", accessorKey: "user_uuid" },
-  { header: "Parcelas", id: "installment", cell: () => <span>0 de 0</span> },
+  {
+    header: "Empresa",
+    accessorKey: "omie_metadata",
+    cell: (cell) => <span>{cell.row.original.omie_metadata.enterprise}</span>,
+  },
+  {
+    header: "Código Cliente Omie",
+    accessorKey: "omie_metadata",
+    cell: (cell) => (
+      <span>{cell.row.original.omie_metadata.codigo_cliente}</span>
+    ),
+  },
+  {
+    header: "Código Pedido Omie",
+    accessorKey: "omie_metadata",
+    cell: (cell) => (
+      <span>{cell.row.original.omie_metadata.codigo_pedido}</span>
+    ),
+  },
   { header: "Valor", accessorKey: "price" },
 ];
