@@ -34,10 +34,10 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
         pageTitle="Propostas"
         description="⚠️ Insira o cliente e a empresa para buscar e exibir as propostas."
       >
-        <div className="flex space-x-3 md:ml-4 md:mt-0">
+        {/* <div className="flex space-x-3 md:ml-4 md:mt-0">
           <Button variant="outline">Exportar</Button>
           <Button>Nova proposta</Button>
-        </div>
+        </div> */}
       </PageHeader>
 
       <section>

@@ -45,9 +45,9 @@ export default async function Example({
             pageTitle="Clientes"
             description="⚠️ Insira a empresa para buscar e exibir os clients."
           >
-            <div className="inline-flex items-center gap-2">
+            {/* <div className="inline-flex items-center gap-2">
               <Button>Exportar</Button>
-            </div>
+            </div> */}
           </PageHeader>
 
           <section>
