@@ -24,6 +24,10 @@ export default async function PayPage({ params }: PageProps) {
   const transaction = transactions?.[0] ?? null;
   const qrCodeSrc = transaction ? await generateQR(transaction?.bb.pixCopyPaste) : undefined;
 
+  if (!payment || !transaction) {
+    throw new Error();
+  }
+
   return (
     <main className="flex flex-col items-center gap-6">
       <header className="flex justify-center bg-white border-b shadow-sm py-4 w-full">
