@@ -196,17 +196,17 @@ export async function fetchNote(payment: string) {
 
 export async function createNote(author: User, formData: FormData,) {
   const _formData = Object.fromEntries(formData.entries()) as any;
-  return await noteRepo.create({
+  await noteRepo.create({
     uuid: uuidv4(),
     createdAt: new Date(),
     author,
     note: _formData.comment,
     payment: _formData.payment
   })
+  revalidatePath(`/payment/${_formData.payment}`)
 }
 
 interface User {
-  img: string;
   name: string;
   id: string;
 }
@@ -299,4 +299,11 @@ export async function uploadMediaWtp(params: {
 }) {
   const result = await BMessageClient.uploadMediaWtp(params)
   return result
+}
+
+export async function generatePayShareLink(params: {
+  paymentGroupId: string
+}) {
+  const headerInfo = Object.fromEntries(headers().entries());
+  return `${headerInfo['x-forwarded-proto']}://${headerInfo.host}/pay/${params.paymentGroupId}`;
 }

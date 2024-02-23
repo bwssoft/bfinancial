@@ -20,7 +20,7 @@ export type Payment = {
 
 export type Note = {
   uuid: string
-  author: { img: string, name: string, id: string }
+  author: { name: string, id: string }
   createdAt: Date,
   note: string
   payment: string

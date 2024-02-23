@@ -5,7 +5,7 @@ import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
 
 interface NoteParams {
   uuid: string;
-  user: { id: string; name: string; imageUrl: string };
+  user: { id: string; name: string };
 }
 
 export function NoteCreateFrom(params: NoteParams) {
