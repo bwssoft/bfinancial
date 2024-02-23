@@ -50,7 +50,7 @@ export function NavBar() {
               <span className="sr-only">Open user menu</span>
               <img
                 className="h-8 w-8 rounded-full border shadow-sm border-gray-200"
-                src="logotipo.png"
+                src="/logotipo.png"
                 alt="Foto do usuario"
               />
               <span className="hidden lg:flex lg:items-center">

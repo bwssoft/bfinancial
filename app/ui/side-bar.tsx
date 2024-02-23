@@ -8,7 +8,7 @@ import {
   HomeIcon,
   UserCircleIcon,
   XMarkIcon,
-  ArrowLeftEndOnRectangleIcon
+  ArrowLeftEndOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Link from "next/link";
@@ -106,7 +106,7 @@ export function SideBar() {
                   <div className="flex h-16 shrink-0 items-center">
                     <img
                       className="h-8 w-auto"
-                      src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                      src="/logotipo.png"
                       alt="Your Company"
                     />
                   </div>
@@ -168,7 +168,7 @@ export function SideBar() {
           <div className="flex h-16 shrink-0 items-center">
             <img
               className="h-8 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+              src="/logotipo.png"
               alt="Your Company"
             />
           </div>
