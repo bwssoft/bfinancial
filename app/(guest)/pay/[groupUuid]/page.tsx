@@ -1,9 +1,8 @@
 import { fetchPaymentByGroup, getManyTransactionById } from "@/app/lib/actions";
-import { Button } from "@/app/ui/button";
-import { Input } from "@/app/ui/input";
 import { LabelValue } from "@/app/ui/label-value";
 import { Surface, SurfaceFooter, SurfaceHeader } from "@/app/ui/surface";
 import { generateQR } from "@/app/utils/qrCode";
+import { CopyQrCode } from "./copy-qrcode";
 
 interface PageProps {
   params: {
@@ -46,15 +45,7 @@ export default async function PayPage({ params }: PageProps) {
                 <img src={qrCodeSrc} className="w-[18.125rem] h-[18.125rem]" alt="QR code pix" />
               </div>
 
-              <div className="inline-flex p-4 border rounded-md items-center w-full gap-2">
-                <Input 
-                  readOnly
-                  defaultValue={transaction?.bb?.pixCopyPaste}
-                />
-                <Button variant="outline">
-                  Copiar código
-                </Button>
-              </div>
+              <CopyQrCode pixCode={transaction?.bb?.pixCopyPaste} /> 
 
               <ol className="list-decimal pl-[1.2em]">
                 <li>Acesse o aplicativo do seu banco</li>
