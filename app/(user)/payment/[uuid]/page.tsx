@@ -5,6 +5,7 @@ import {
   getManyTransactionById,
   revalidatePaymentPage,
   sendDue,
+  generatePayShareLink
 } from "@/app/lib/actions";
 import { NoteCreateFrom } from "@/app/ui/form/note-create";
 import { NoteCard } from "./note-card";
@@ -15,13 +16,9 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { CurrentTransaction } from "./current-transaction";
 import { generateQR } from "@/app/utils/qrCode";
 import { Button } from "@/app/ui/button";
-
-const user = {
-  name: "Whitney Francis",
-  email: "whitney@example.com",
-  imageUrl:
-    "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=256&h=256&q=80",
-};
+import { auth } from "@/auth";
+import { ShareIcon } from "@heroicons/react/24/outline";
+import { GenerateShare } from "./generate-share";
 
 export default async function PaymentDetailsPage({
   params,
@@ -30,6 +27,8 @@ export default async function PaymentDetailsPage({
     uuid: string;
   };
 }) {
+  const data = await auth();
+
   const [comments, payment] = await Promise.all([
     fetchNote(params.uuid),
     fetchPaymentByGroup(params.uuid),
@@ -74,6 +73,8 @@ export default async function PaymentDetailsPage({
         </div>  
 
         <div className="inline-flex items-center gap-2">
+          <GenerateShare paymentGroupId={paymentData.group} />
+
           <form action={revalidatePaymentPageBinded}>
             <Button>Revalidar</Button>
           </form>
@@ -143,9 +144,8 @@ export default async function PaymentDetailsPage({
                   <div className="min-w-0 flex-1">
                     <NoteCreateFrom
                       user={{
-                        id: user.name,
-                        imageUrl: user.imageUrl,
-                        name: user.name,
+                        id: data?.user.uuid!,
+                        name: data?.user.name!,
                       }}
                       uuid={params.uuid}
                     />
