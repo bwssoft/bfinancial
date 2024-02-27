@@ -47,7 +47,9 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
       },
     });
 
-    setClients(data.clientes_cadastro);
+    if (data) {
+      setClients(data.clientes_cadastro);
+    }
   }
 
   return (
