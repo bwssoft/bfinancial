@@ -55,7 +55,7 @@ export function OfferTable({
 
   function handleRowPress(data: OmieOffer) {
     router.push(
-      `/offer/${omie_enterprise}/${codigo_cliente_omie}/${data.cabecalho.codigo_pedido}`
+      `/offer/${omie_enterprise}/${data.cabecalho.codigo_cliente}/${data.cabecalho.codigo_pedido}`
     );
   }
 
