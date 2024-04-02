@@ -13,6 +13,8 @@ import { ICompanySecrets } from "../utils/enterpriseSecrets"
 import { Filter } from "mongodb";
 import { Payment } from "./definitions";
 import { BMessageClient } from "./bmessage/bessage";
+import { nanoid } from 'nanoid';
+import { FirebaseGateway } from "./firebase";
 import { generateQRBuffer } from "../utils/qrCode";
 import { getCurrentInstallment } from "../utils/get-current-installment";
 
@@ -249,8 +251,9 @@ export async function sendDue(params: {
   const headerInfo = Object.fromEntries(headers().entries());
   const buffer = await generateQRBuffer(params.pix_copia_e_cola)
   if (!buffer) return
-  const { status, media_id } = await BMessageClient.uploadMediaWtp({ buffer })
-  if (!status) return
+  const firebaseGateway = new FirebaseGateway()
+  const link = await firebaseGateway.uploadFile({ buffer, name:`qr-code-${nanoid()}`, type:'image/jpeg'})
+  if (!link) return
   const result = await BMessageClient.createTemplateMessage({
     phone: params.telefone,
     code: "pt_BR",
@@ -262,7 +265,7 @@ export async function sendDue(params: {
           {
             type: "image",
             image: {
-              id: media_id
+              link
             },
           },
         ],
