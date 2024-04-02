@@ -19,7 +19,7 @@ async function createTemplateMessage(params: {
   code: string
   components: {
     type: string,
-    parameters: ({ type: string, text: string } | { type: string, image: { id: string } })[]
+    parameters: ({ type: string, text: string } | { type: string, image: { link: string } })[]
   }[]
 }) {
   try {
