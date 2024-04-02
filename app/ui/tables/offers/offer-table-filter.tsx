@@ -24,7 +24,6 @@ interface OfferFilterProps {
 export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
   const [clients, setClients] = React.useState<OmieClientModel[]>([]);
   const [enterprise, setEnterprise] = React.useState<OmieEnterpriseEnum>();
-  const [orderBy, setOrderBy] = React.useState<string>();
   const [orderStep, setOrderStep] = React.useState<string>();
   const [orderId, setOrderId] = React.useState<string>();
 
@@ -35,7 +34,6 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
     const params = formatSearchParams({
       omie_enterprise: enterprise,
       codigo_cliente_omie: client?.codigo_cliente_omie,
-      ordenar_por: orderBy,
       etapa: orderStep,
       codigo_pedido: orderId,
     });
@@ -69,23 +67,6 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
         className="w-64"
         onChange={(e) => setOrderId(e.target.value)}
       />
-
-      <div className="w-52">
-        <Autocomplete
-          placeholder="Ordenar por"
-          options={[
-            { label: "Data de emissão", value: "DATA_EMISSAO" },
-            { label: "Data de inclusão", value: "DATA_INCLUSAO" },
-            { label: "Data de alteração", value: "DATA_ALTERACAO" },
-            { label: "Data de vencimento", value: "DATA_VENCIMENTO" },
-            { label: "Data de pagamento", value: "DATA_PAGAMENTO" },
-          ]}
-          onChange={(newValue) => {
-            const option = newValue as AutocompleteResponse<string>;
-            setOrderBy(option.value);
-          }}
-        />
-      </div>
 
       <div className="w-52">
         <Autocomplete

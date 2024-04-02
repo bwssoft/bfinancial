@@ -9,7 +9,6 @@ interface OfferPageParams {
   searchParams: Omit<OmieDefaultParams, "apenas_importado_api"> & {
     omie_enterprise?: OmieEnterpriseEnum;
     codigo_cliente_omie?: string;
-    ordenar_por?: string[];
     etapa?: string;
     codigo_pedido?: string;
   };
@@ -17,7 +16,6 @@ interface OfferPageParams {
 
 export default async function OfferPage({ searchParams }: OfferPageParams) {
   const {
-    ordenar_por,
     omie_enterprise,
     pagina,
     registros_por_pagina,
@@ -50,8 +48,7 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
     return await fetchOffers(omie_enterprise, {
       pagina: pagina ?? 1,
       registros_por_pagina: registros_por_pagina ?? 5,
-      // filtrar_por_cliente: parseInt(codigo_cliente_omie),
-      ordenar_por,
+      filtrar_por_cliente: codigo_cliente_omie ? parseInt(codigo_cliente_omie) : undefined,
       etapa,
     });
   }
