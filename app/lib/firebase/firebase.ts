@@ -16,7 +16,7 @@ export class FirebaseGateway {
   async uploadFile(input: { buffer: Buffer, name: string, type: string }): Promise<string> {
       const { buffer, name, type } = input
 
-      const fileRef = ref(this._storage, `bota/upload-files/${name}`);
+      const fileRef = ref(this._storage, `b-financial/qr-codes/${name}`);
 
       const fileUrl = await uploadBytes(
           fileRef,
