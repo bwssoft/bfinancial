@@ -1,5 +1,6 @@
-import { fetchOffers } from "@/app/lib/actions";
+import { fetchOfferById, fetchOffers } from "@/app/lib/actions";
 import { OmieDefaultParams, OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { OmieListOfferResponse } from "@/app/lib/definitions/OmieOffer";
 import { PageHeader } from "@/app/ui/navigation/page-header";
 import { Pagination } from "@/app/ui/pagination";
 import { OfferTable } from "@/app/ui/tables/offers";
@@ -15,18 +16,47 @@ interface OfferPageParams {
 }
 
 export default async function OfferPage({ searchParams }: OfferPageParams) {
-  const { ordenar_por, omie_enterprise, pagina, registros_por_pagina, codigo_cliente_omie, etapa } =
-    searchParams;
+  const {
+    ordenar_por,
+    omie_enterprise,
+    pagina,
+    registros_por_pagina,
+    codigo_cliente_omie,
+    etapa,
+    codigo_pedido,
+  } = searchParams;
 
-  const offers = !omie_enterprise
-    ? null
-    : await fetchOffers(omie_enterprise, {
-        pagina: pagina ?? 1,
-        registros_por_pagina: registros_por_pagina ?? 5,
-        // filtrar_por_cliente: parseInt(codigo_cliente_omie),
-        ordenar_por,
-        etapa,
-      });
+  async function formatOffers(): Promise<OmieListOfferResponse | null> {
+    if (!omie_enterprise) {
+      return null;
+    }
+
+    if (codigo_pedido) {
+      const offer = await fetchOfferById(omie_enterprise, parseInt(codigo_pedido));
+
+      if (offer?.pedido_venda_produto) {
+        return {
+          pagina: 1,
+          pedido_venda_produto: [offer?.pedido_venda_produto],
+          registros: 1,
+          total_de_paginas: 1,
+          total_de_registros: 1,
+        };
+      }
+
+      return null;
+    }
+
+    return await fetchOffers(omie_enterprise, {
+      pagina: pagina ?? 1,
+      registros_por_pagina: registros_por_pagina ?? 5,
+      // filtrar_por_cliente: parseInt(codigo_cliente_omie),
+      ordenar_por,
+      etapa,
+    });
+  }
+
+  const offers = await formatOffers();
 
   return (
     <main className="flex-1 pb-8 min-h-full">
