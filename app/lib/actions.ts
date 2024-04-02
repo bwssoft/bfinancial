@@ -1,28 +1,32 @@
-"use server"
-import { OmieClientService } from "@/app/lib/omie/client.omie"
-import { paymentRepo, CreatePayment } from "./mongodb/repositories/payment.mongo"
-import { revalidatePath, unstable_cache } from 'next/cache';
-import { v4 as uuidv4 } from 'uuid';
-import { OmieOrderService } from "./omie/order.omie"
-import { OmieClientListParams, OmieClientModel } from "./definitions/OmieClient"
-import { OmieListOfferParams, OmieOfferInstallment } from "./definitions/OmieOffer"
-import { DocumentEnum, createPixTransaction, getTransactionById } from "./bpay/bpay"
-import { noteRepo } from "./mongodb/repositories/note.mongo"
-import { OmieCredentials, OmieEnterpriseEnum } from "./definitions/OmieApi"
-import { ICompanySecrets } from "../utils/enterpriseSecrets"
+"use server";
+import { OmieClientService } from "@/app/lib/omie/client.omie";
 import { Filter } from "mongodb";
-import { Payment } from "./definitions";
-import { BMessageClient } from "./bmessage/bessage";
-import { nanoid } from 'nanoid';
-import { FirebaseGateway } from "./firebase";
-import { generateQRBuffer } from "../utils/qrCode";
+import { nanoid } from "nanoid";
+import { revalidatePath, unstable_cache } from "next/cache";
+import { v4 as uuidv4 } from "uuid";
+import { ICompanySecrets } from "../utils/enterpriseSecrets";
 import { getCurrentInstallment } from "../utils/get-current-installment";
+import { generateQRBuffer } from "../utils/qrCode";
+import { BMessageClient } from "./bmessage/bessage";
+import { DocumentEnum, createPixTransaction, getTransactionById } from "./bpay/bpay";
+import { Payment } from "./definitions";
+import { OmieCredentials, OmieEnterpriseEnum } from "./definitions/OmieApi";
+import { OmieClientListParams, OmieClientModel } from "./definitions/OmieClient";
+import { OmieListOfferParams, OmieOfferInstallment } from "./definitions/OmieOffer";
+import { FirebaseGateway } from "./firebase";
+import { noteRepo } from "./mongodb/repositories/note.mongo";
+import { CreatePayment, paymentRepo } from "./mongodb/repositories/payment.mongo";
+import { OmieOrderService } from "./omie/order.omie";
 
-import { headers } from 'next/headers';
+import { headers } from "next/headers";
 
-export async function fetchClients(enterprise: OmieEnterpriseEnum, data?: Omit<OmieClientListParams, 'apenas_importado_api'>, secrets?: Partial<OmieCredentials>) {
+export async function fetchClients(
+  enterprise: OmieEnterpriseEnum,
+  data?: Omit<OmieClientListParams, "apenas_importado_api">,
+  secrets?: Partial<OmieCredentials>
+) {
   try {
-    OmieClientService.setSecrets(enterprise)
+    OmieClientService.setSecrets(enterprise);
     return await OmieClientService.findAll(data, secrets);
   } catch {
     return null;
@@ -30,22 +34,30 @@ export async function fetchClients(enterprise: OmieEnterpriseEnum, data?: Omit<O
 }
 
 export async function fetchClientById(enterprise: OmieEnterpriseEnum, id: string) {
-  OmieClientService.setSecrets(enterprise)
-  return await OmieClientService.find(id)
+  OmieClientService.setSecrets(enterprise);
+  return await OmieClientService.find(id);
 }
 
-export async function fetchOffers(enterprise: OmieEnterpriseEnum, data?: Omit<OmieListOfferParams, 'apenas_importado_api'>) {
-  OmieOrderService.setSecrets(enterprise)
+export async function fetchOffers(
+  enterprise: OmieEnterpriseEnum,
+  data?: Omit<OmieListOfferParams, "apenas_importado_api">
+) {
+  OmieOrderService.setSecrets(enterprise);
   return await OmieOrderService.findAll(data);
 }
 
+export const listCachedOffers = unstable_cache(
+  async (enterprise, data) => await fetchOffers(enterprise, data),
+  ["omie-offers"]
+);
+
 export const getCachedOffer = unstable_cache(
   async (enterprise, id) => await fetchOfferById(enterprise, id),
-  ['omie-offer-list']
+  ["omie-offer-list"]
 );
 
 export async function fetchOfferById(enterprise: OmieEnterpriseEnum, id: number) {
-  OmieOrderService.setSecrets(enterprise)
+  OmieOrderService.setSecrets(enterprise);
   return await OmieOrderService.find(id);
 }
 
@@ -65,7 +77,6 @@ export async function fetchPaymentByGroup(group: string) {
   });
 }
 
-
 export async function createClientPayment(
   client: OmieClientModel,
   enterprise: ICompanySecrets,
@@ -73,7 +84,6 @@ export async function createClientPayment(
 ) {
   // const _formData = Object.fromEntries(formData.entries()) as any;
   // const clientType = _formData.client_type;
-
   // const payer = {
   //   document: {
   //     type: DocumentEnum.CNPJ,
@@ -90,11 +100,9 @@ export async function createClientPayment(
   //   receiver,
   //   price: _formData.price
   // })
-
   // if (!pix.status) {
   //   throw new Error("error on bpay microservice")
   // }
-
   // const data: CreatePayment = {
   //   user_uuid: uuidv4(),
   //   uuid: uuidv4(),
@@ -110,7 +118,6 @@ export async function createClientPayment(
   //     transaction_id: pix.transaction._id
   //   }
   // }
-
   // return await paymentRepo.create(data);
 }
 
@@ -120,11 +127,11 @@ export async function createPaymentFromOfferPage(
   omie_client: OmieClientModel,
   installment: OmieOfferInstallment
 ) {
-  if (!omie_enterprise || !codigo_pedido_omie) return
+  if (!omie_enterprise || !codigo_pedido_omie) return;
 
-  const client = omie_client
+  const client = omie_client;
 
-  if (!client) return
+  if (!client) return;
 
   const payer = {
     document: {
@@ -132,21 +139,21 @@ export async function createPaymentFromOfferPage(
       value: client.cnpj_cpf,
     },
     email: client.email,
-    name: client.nome_fantasia
-  }
+    name: client.nome_fantasia,
+  };
   const receiver = {
-    name: omie_enterprise
-  }
+    name: omie_enterprise,
+  };
 
   const pix = await createPixTransaction({
     payer,
     receiver,
     // price: installment.valor.toString()
-    price: "1"
-  })
+    price: "1",
+  });
 
   if (!pix.status) {
-    throw new Error("error on bpay microservice")
+    throw new Error("error on bpay microservice");
   }
 
   const data: CreatePayment = {
@@ -159,53 +166,55 @@ export async function createPaymentFromOfferPage(
       codigo_cliente: omie_client.codigo_cliente_omie,
       codigo_pedido: codigo_pedido_omie,
       numero_parcela: installment.numero_parcela,
-      data_vencimento: installment.data_vencimento
+      data_vencimento: installment.data_vencimento,
     },
     bpay_transaction_id: pix.transaction._id,
-    group: `${codigo_pedido_omie}${installment.numero_parcela}`
-  }
+    group: `${codigo_pedido_omie}${installment.numero_parcela}`,
+  };
 
   const payment = await paymentRepo.create(data);
-  revalidatePath(`offer/${omie_enterprise}/${omie_client.codigo_cliente_omie}/${codigo_pedido_omie}`)
+  revalidatePath(
+    `offer/${omie_enterprise}/${omie_client.codigo_cliente_omie}/${codigo_pedido_omie}`
+  );
   await sendDue({
     data_vencimento: installment.data_vencimento,
     numero_parcela: installment.numero_parcela.toString(),
     pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
-    telefone: "5527999697185"
-  })
-  return payment
+    telefone: "5527999697185",
+  });
+  return payment;
 }
 
 export async function getTransactionByPaymentId(id: string) {
-  return
+  return;
 }
 
 export async function getManyTransactionById(params: { id: string[] }) {
-  return getTransactionById(params)
+  return getTransactionById(params);
 }
 
 export async function revalidateInstallmentOffer(pathname: string) {
-  revalidatePath(pathname)
+  revalidatePath(pathname);
 }
 
 export async function revalidatePaymentPage(pathname: string) {
-  revalidatePath(pathname)
+  revalidatePath(pathname);
 }
 
 export async function fetchNote(payment: string) {
   return await noteRepo.list(payment);
 }
 
-export async function createNote(author: User, formData: FormData,) {
+export async function createNote(author: User, formData: FormData) {
   const _formData = Object.fromEntries(formData.entries()) as any;
   await noteRepo.create({
     uuid: uuidv4(),
     createdAt: new Date(),
     author,
     note: _formData.comment,
-    payment: _formData.payment
-  })
-  revalidatePath(`/payment/${_formData.payment}`)
+    payment: _formData.payment,
+  });
+  revalidatePath(`/payment/${_formData.payment}`);
 }
 
 interface User {
@@ -213,10 +222,9 @@ interface User {
   id: string;
 }
 
-
-export async function createTextMessage(params: { phone: string, message: string }) {
-  const result = await BMessageClient.createTextMessage(params)
-  return result
+export async function createTextMessage(params: { phone: string; message: string }) {
+  const result = await BMessageClient.createTextMessage(params);
+  return result;
 }
 
 export async function createDueFromPayment(params: { payment: Payment }) {
@@ -228,32 +236,33 @@ export async function createDueFromPayment(params: { payment: Payment }) {
 
   const [offer, client] = await Promise.all([
     getCachedOffer(enterprise, parseInt(offerId)),
-    fetchClientById(enterprise, clientId.toString())
+    fetchClientById(enterprise, clientId.toString()),
   ]);
 
   if (offer && client) {
-    const currentInstallment = getCurrentInstallment(offer?.pedido_venda_produto.lista_parcelas.parcela);
-    await createPaymentFromOfferPage(
-      enterprise,
-      offerId,
-      client,
-      currentInstallment
-    )
+    const currentInstallment = getCurrentInstallment(
+      offer?.pedido_venda_produto.lista_parcelas.parcela
+    );
+    await createPaymentFromOfferPage(enterprise, offerId, client, currentInstallment);
   }
 }
 
 export async function sendDue(params: {
-  numero_parcela: string
-  telefone: string
-  data_vencimento: string
-  pix_copia_e_cola: string
+  numero_parcela: string;
+  telefone: string;
+  data_vencimento: string;
+  pix_copia_e_cola: string;
 }) {
   const headerInfo = Object.fromEntries(headers().entries());
-  const buffer = await generateQRBuffer(params.pix_copia_e_cola)
-  if (!buffer) return
-  const firebaseGateway = new FirebaseGateway()
-  const link = await firebaseGateway.uploadFile({ buffer, name:`qr-code-${nanoid()}`, type:'image/jpeg'})
-  if (!link) return
+  const buffer = await generateQRBuffer(params.pix_copia_e_cola);
+  if (!buffer) return;
+  const firebaseGateway = new FirebaseGateway();
+  const link = await firebaseGateway.uploadFile({
+    buffer,
+    name: `qr-code-${nanoid()}`,
+    type: "image/jpeg",
+  });
+  if (!link) return;
   const result = await BMessageClient.createTemplateMessage({
     phone: params.telefone,
     code: "pt_BR",
@@ -265,7 +274,7 @@ export async function sendDue(params: {
           {
             type: "image",
             image: {
-              link
+              link,
             },
           },
         ],
@@ -283,7 +292,7 @@ export async function sendDue(params: {
           },
           {
             type: "text",
-            text: `${headerInfo['x-forwarded-proto']}://${headerInfo.host}`,
+            text: `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}`,
           },
           {
             type: "text",
@@ -292,21 +301,17 @@ export async function sendDue(params: {
         ],
       },
     ],
-  })
+  });
   console.log("🚀 ~ result:", result);
-  return result
+  return result;
 }
 
-export async function uploadMediaWtp(params: {
-  buffer: Buffer
-}) {
-  const result = await BMessageClient.uploadMediaWtp(params)
-  return result
+export async function uploadMediaWtp(params: { buffer: Buffer }) {
+  const result = await BMessageClient.uploadMediaWtp(params);
+  return result;
 }
 
-export async function generatePayShareLink(params: {
-  paymentGroupId: string
-}) {
+export async function generatePayShareLink(params: { paymentGroupId: string }) {
   const headerInfo = Object.fromEntries(headers().entries());
-  return `${headerInfo['x-forwarded-proto']}://${headerInfo.host}/pay/${params.paymentGroupId}`;
+  return `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}/pay/${params.paymentGroupId}`;
 }
