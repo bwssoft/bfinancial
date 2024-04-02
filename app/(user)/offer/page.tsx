@@ -37,8 +37,6 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
       return null;
     }
 
-    console.log("passei por aqui");
-
     return await listCachedOffers(omie_enterprise, {
       pagina: pagina ?? 1,
       registros_por_pagina: 1000,
