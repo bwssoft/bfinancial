@@ -27,7 +27,11 @@ export default async function PayPage({ params }: PageProps) {
   const qrCodeSrc = transaction ? await generateQR(transaction?.bb.pixCopyPaste) : undefined;
 
   if (!payment || !transaction) {
-    throw new Error();
+    throw new Error("pay-404");
+  }
+
+  if (transaction.finish) {
+    throw new Error("pay-200");
   }
 
   return (
