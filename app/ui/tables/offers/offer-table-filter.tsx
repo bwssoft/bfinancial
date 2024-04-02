@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import { usePathname, useRouter } from "next/navigation";
+import React from "react";
 
 import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
 import { Autocomplete, AutocompleteResponse } from "@/app/ui/autocomplete";
@@ -10,9 +10,11 @@ import { fetchClients } from "@/app/lib/actions";
 import { Button } from "@/app/ui/button";
 import { useDebouncedCallback } from "use-debounce";
 
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { enterprises } from "../clients/filter";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { formatSearchParams } from "@/app/utils/format-search-params";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Input } from "../../input";
+import { enterprises } from "../clients/filter";
 
 interface OfferFilterProps {
   client?: OmieClientModel;
@@ -22,14 +24,20 @@ interface OfferFilterProps {
 export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
   const [clients, setClients] = React.useState<OmieClientModel[]>([]);
   const [enterprise, setEnterprise] = React.useState<OmieEnterpriseEnum>();
+  const [orderStep, setOrderStep] = React.useState<string>();
+  const [orderId, setOrderId] = React.useState<string>();
 
   const pathname = usePathname();
   const router = useRouter();
 
   const onAction = () => {
-    router.push(
-      `${pathname}?omie_enterprise=${enterprise}&codigo_cliente_omie=${client?.codigo_cliente_omie}`
-    );
+    const params = formatSearchParams({
+      omie_enterprise: enterprise,
+      codigo_cliente_omie: client?.codigo_cliente_omie,
+      etapa: orderStep,
+      codigo_pedido: orderId,
+    });
+    router.push(`${pathname}?${params}`);
   };
 
   const handleClientsSearch = useDebouncedCallback((query: string) => {
@@ -47,12 +55,38 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
       },
     });
 
-    setClients(data.clientes_cadastro);
+    if (data) {
+      setClients(data.clientes_cadastro);
+    }
   }
 
   return (
     <form action={onAction} className="inline-flex items-center my-4 gap-2">
-      <div className="w-64">
+      <Input
+        placeholder="Código do pedido"
+        className="w-64"
+        onChange={(e) => setOrderId(e.target.value)}
+      />
+
+      <div className="w-52">
+        <Autocomplete
+          placeholder="Etapa"
+          options={[
+            { label: "Proposta / Orçamento", value: "10" },
+            { label: "Separar estoque", value: "20" },
+            { label: "Faturar", value: "50" },
+            { label: "Faturado", value: "60" },
+            { label: "Entrega", value: "70" },
+            { label: "Pedido / Aprovação Financeira", value: "80" },
+          ]}
+          onChange={(newValue) => {
+            const option = newValue as AutocompleteResponse<string>;
+            setOrderStep(option.value);
+          }}
+        />
+      </div>
+
+      <div className="w-52">
         <Autocomplete
           placeholder="Filtrar empresa"
           options={enterprises.map((enterprise) => ({
@@ -65,7 +99,7 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
           }}
         />
       </div>
-      <div className="w-64">
+      <div className="w-52">
         <Autocomplete
           placeholder="Filtrar cliente"
           options={clients?.map((client) => ({

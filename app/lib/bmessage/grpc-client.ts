@@ -2,8 +2,9 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import path from 'path';
 import { promisify } from 'util';
-import { ProtoGrpcType } from './types/bmessage';
 import * as fs from 'fs'
+//Falta tipar
+//import { ProtoGrpcType } from './types/bmessage';
 
 const PROTO_PATH = path.join(process.cwd(), './app/lib/bmessage/bmessage.proto');
 const CRT_PATH = path.join(process.cwd(), './app/lib/bmessage/ca.crt')
@@ -14,7 +15,7 @@ const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
 });
 
 const mailServer = (
-  grpc.loadPackageDefinition(packageDefinition) as unknown as ProtoGrpcType
+  grpc.loadPackageDefinition(packageDefinition) as unknown as any
 ).mail;
 
 const { MailService } = mailServer;
@@ -33,21 +34,21 @@ export class BMessage extends MailService {
   public async createTextMessage(params: any) {
     const textMessage = promisify(this.textMessage).bind(this);
     return await textMessage(params)
-      .then((res) => res)
-      .catch((error) => error);
+      .then((res: any) => res)
+      .catch((error: any) => error);
   }
 
   public async createTemplateMessage(params: any) {
     const templateMessage = promisify(this.templateMessage).bind(this);
     return await templateMessage(params)
-      .then((res) => res)
-      .catch((error) => error);
+      .then((res: any) => res)
+      .catch((error: any) => error);
   }
 
   public async uploadBuffer(params: any) {
     const uploadMediaWtp = promisify(this.uploadMediaWtp).bind(this);
     return await uploadMediaWtp(params)
-      .then((res) => res)
-      .catch((error) => error);
+      .then((res: any) => res)
+      .catch((error: any) => error);
   }
 }

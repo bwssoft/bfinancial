@@ -1,4 +1,4 @@
-import { OmieResponse, OmieBoolean, OmieSearchParams } from "./OmieApi";
+import { OmieBoolean, OmieResponse, OmieSearchParams } from "./OmieApi";
 
 type OmieOfferHeader = {
   bloqueado: OmieBoolean;
@@ -9,39 +9,48 @@ type OmieOfferHeader = {
   codigo_pedido: number;
   codigo_pedido_integracao: string;
   data_previsao: string;
-  etapa: string;
+  etapa: keyof typeof OmieOfferStep;
   importado_api: string;
   numero_pedido: string;
   origem_pedido: string;
   qtde_parcelas: number;
   quantidade_itens: number;
-}
+};
+
+export const OmieOfferStep = {
+  "10": "Proposta / Orçamento",
+  "20": "Separar estoque",
+  "50": "Faturar",
+  "60": "Faturado",
+  "70": "Entrega",
+  "80": "Pedido / Aprovação Financeira",
+};
 
 type OmieOfferFreight = {
   modalidade: string;
   codigo_rastreio?: string;
   quantidade_volumes: number;
   valor_frete: number;
-}
+};
 
 type OmieOfferRegisterInfo = {
-  autorizado: OmieBoolean,
-  cImpAPI: OmieBoolean,
-  cancelado: OmieBoolean,
-  dAlt: string,
-  dFat: string,
-  dInc: string,
-  denegado: OmieBoolean,
-  devolvido: OmieBoolean,
-  devolvido_parcial: OmieBoolean,
-  faturado: OmieBoolean,
-  hAlt: string,
-  hFat: string,
-  hInc: string,
-  uAlt: string,
-  uFat: string,
-  uInc: string
-}
+  autorizado: OmieBoolean;
+  cImpAPI: OmieBoolean;
+  cancelado: OmieBoolean;
+  dAlt: string;
+  dFat: string;
+  dInc: string;
+  denegado: OmieBoolean;
+  devolvido: OmieBoolean;
+  devolvido_parcial: OmieBoolean;
+  faturado: OmieBoolean;
+  hAlt: string;
+  hFat: string;
+  hInc: string;
+  uAlt: string;
+  uFat: string;
+  uInc: string;
+};
 
 export type OmieOfferInstallment = {
   data_vencimento: string;
@@ -49,12 +58,12 @@ export type OmieOfferInstallment = {
   percentual: number;
   quantidade_dias: number;
   valor: number;
-}
+};
 
 export type OmieOffer = {
   cabecalho: OmieOfferHeader;
   exportacao: {
-    nao_exportacao: OmieBoolean
+    nao_exportacao: OmieBoolean;
   };
   frete: OmieOfferFreight;
   infoCadastro: OmieOfferRegisterInfo;
@@ -67,17 +76,19 @@ export type OmieOffer = {
   total_pedido: {
     valor_mercadorias: number;
     valor_total_pedido: number;
-  }
-}
+  };
+};
 
 export type OmieListOfferParams = OmieSearchParams & {
+  codigo_pedido?: string;
   filtrar_por_cliente?: number;
-}
+  etapa?: string;
+};
 
 export type OmieListOfferResponse = OmieResponse & {
-  pedido_venda_produto: Array<OmieOffer>
-}
+  pedido_venda_produto: Array<OmieOffer>;
+};
 
 export type OmieFindOfferResponse = OmieResponse & {
-  pedido_venda_produto: OmieOffer
-}
+  pedido_venda_produto: OmieOffer;
+};

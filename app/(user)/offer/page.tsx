@@ -1,32 +1,59 @@
-import { fetchOffers } from "@/app/lib/actions";
-import { OfferTable } from "@/app/ui/tables/offers";
-import {
-  OmieDefaultParams,
-  OmieEnterpriseEnum,
-} from "@/app/lib/definitions/OmieApi";
+import { fetchOfferById, fetchOffers } from "@/app/lib/actions";
+import { OmieDefaultParams, OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { OmieListOfferResponse } from "@/app/lib/definitions/OmieOffer";
 import { PageHeader } from "@/app/ui/navigation/page-header";
-import { Button } from "@/app/ui/button";
 import { Pagination } from "@/app/ui/pagination";
+import { OfferTable } from "@/app/ui/tables/offers";
 
 interface OfferPageParams {
   searchParams: Omit<OmieDefaultParams, "apenas_importado_api"> & {
     omie_enterprise?: OmieEnterpriseEnum;
     codigo_cliente_omie?: string;
+    etapa?: string;
+    codigo_pedido?: string;
   };
 }
 
 export default async function OfferPage({ searchParams }: OfferPageParams) {
-  const { omie_enterprise, pagina, registros_por_pagina, codigo_cliente_omie } =
-    searchParams;
-  const offers = !omie_enterprise
-    ? null
-    : await fetchOffers(omie_enterprise, {
-        pagina: pagina ?? 1,
-        registros_por_pagina: 1000,
-        filtrar_por_cliente: codigo_cliente_omie
-          ? parseInt(codigo_cliente_omie)
-          : undefined,
-      });
+  const {
+    omie_enterprise,
+    pagina,
+    registros_por_pagina,
+    codigo_cliente_omie,
+    etapa,
+    codigo_pedido,
+  } = searchParams;
+
+  async function formatOffers(): Promise<OmieListOfferResponse | null> {
+    if (!omie_enterprise) {
+      return null;
+    }
+
+    if (codigo_pedido) {
+      const offer = await fetchOfferById(omie_enterprise, parseInt(codigo_pedido));
+
+      if (offer?.pedido_venda_produto) {
+        return {
+          pagina: 1,
+          pedido_venda_produto: [offer?.pedido_venda_produto],
+          registros: 1,
+          total_de_paginas: 1,
+          total_de_registros: 1,
+        };
+      }
+
+      return null;
+    }
+
+    return await fetchOffers(omie_enterprise, {
+      pagina: pagina ?? 1,
+      registros_por_pagina: 1000,
+      filtrar_por_cliente: codigo_cliente_omie ? parseInt(codigo_cliente_omie) : undefined,
+      etapa,
+    });
+  }
+
+  const offers = await formatOffers();
 
   return (
     <main className="flex-1 pb-8 min-h-full">
