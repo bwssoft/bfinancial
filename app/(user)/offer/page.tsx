@@ -1,5 +1,8 @@
 import { getCachedOffer, listCachedOffers } from "@/app/lib/actions";
-import { OmieDefaultParams, OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import {
+  OmieDefaultParams,
+  OmieEnterpriseEnum,
+} from "@/app/lib/definitions/OmieApi";
 import { OmieListOfferResponse } from "@/app/lib/definitions/OmieOffer";
 import { PageHeader } from "@/app/ui/navigation/page-header";
 import { OfferTable } from "@/app/ui/tables/offers";
@@ -14,7 +17,8 @@ interface OfferPageParams {
 }
 
 export default async function OfferPage({ searchParams }: OfferPageParams) {
-  const { omie_enterprise, pagina, codigo_cliente_omie, etapa, codigo_pedido } = searchParams;
+  const { omie_enterprise, pagina, codigo_cliente_omie, etapa, codigo_pedido } =
+    searchParams;
 
   async function formatOffers(): Promise<OmieListOfferResponse | null> {
     if (!omie_enterprise) {
@@ -22,7 +26,10 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
     }
 
     if (codigo_pedido) {
-      const offer = await getCachedOffer(omie_enterprise, parseInt(codigo_pedido));
+      const offer = await getCachedOffer(
+        omie_enterprise,
+        parseInt(codigo_pedido)
+      );
 
       if (offer?.pedido_venda_produto) {
         return {
@@ -39,8 +46,10 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
 
     return await listCachedOffers(omie_enterprise, {
       pagina: pagina ?? 1,
-      registros_por_pagina: 1000,
-      filtrar_por_cliente: codigo_cliente_omie ? parseInt(codigo_cliente_omie) : undefined,
+      registros_por_pagina: 500,
+      filtrar_por_cliente: codigo_cliente_omie
+        ? parseInt(codigo_cliente_omie)
+        : undefined,
       etapa,
     });
   }
