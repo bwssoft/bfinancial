@@ -13,7 +13,8 @@ const EnviromentsSchema = z.object({
     MGC: SecretSchema,
     ICBFILIAL: SecretSchema,
   }),
-  OMIE_URL: z.string()
+  OMIE_URL: z.string(),
+  FIREBASE_CONFIG: z.any()
 });
 
 export const env = EnviromentsSchema.parse({
@@ -39,5 +40,6 @@ export const env = EnviromentsSchema.parse({
       secret: process.env.OMIE_ICBFILIAL_API_SECRET
     },
   },
-  OMIE_URL: process.env.NEXT_PUBLIC_OMIE_URL
+  OMIE_URL: process.env.NEXT_PUBLIC_OMIE_URL,
+	FIREBASE_CONFIG: (process.env.FIREBASE_CONFIG && JSON.parse(process.env.FIREBASE_CONFIG as string)) || '',
 });
