@@ -1,31 +1,31 @@
 import { fetchOffers } from "@/app/lib/actions";
-import { OfferTable } from "@/app/ui/tables/offers";
-import {
-  OmieDefaultParams,
-  OmieEnterpriseEnum,
-} from "@/app/lib/definitions/OmieApi";
+import { OmieDefaultParams, OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { PageHeader } from "@/app/ui/navigation/page-header";
-import { Button } from "@/app/ui/button";
 import { Pagination } from "@/app/ui/pagination";
+import { OfferTable } from "@/app/ui/tables/offers";
 
 interface OfferPageParams {
   searchParams: Omit<OmieDefaultParams, "apenas_importado_api"> & {
     omie_enterprise?: OmieEnterpriseEnum;
     codigo_cliente_omie?: string;
+    ordenar_por?: string[];
+    etapa?: string;
+    codigo_pedido?: string;
   };
 }
 
 export default async function OfferPage({ searchParams }: OfferPageParams) {
-  const { omie_enterprise, pagina, registros_por_pagina, codigo_cliente_omie } =
+  const { ordenar_por, omie_enterprise, pagina, registros_por_pagina, codigo_cliente_omie, etapa } =
     searchParams;
+
   const offers = !omie_enterprise
     ? null
     : await fetchOffers(omie_enterprise, {
         pagina: pagina ?? 1,
         registros_por_pagina: registros_por_pagina ?? 5,
-        filtrar_por_cliente: codigo_cliente_omie
-          ? parseInt(codigo_cliente_omie)
-          : undefined,
+        // filtrar_por_cliente: parseInt(codigo_cliente_omie),
+        ordenar_por,
+        etapa,
       });
 
   return (
