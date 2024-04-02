@@ -26,6 +26,7 @@ export function DataTableDesktop<TData, TValue>({
   ...rest
 }: DataTableDesktopProps<TData, TValue>) {
   const table = useReactTable({
+    manualPagination:true,
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
