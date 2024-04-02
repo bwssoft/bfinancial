@@ -22,7 +22,7 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
     ? null
     : await fetchOffers(omie_enterprise, {
         pagina: pagina ?? 1,
-        registros_por_pagina: registros_por_pagina ?? 5,
+        registros_por_pagina: 1000,
         filtrar_por_cliente: codigo_cliente_omie
           ? parseInt(codigo_cliente_omie)
           : undefined,
@@ -46,11 +46,11 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
           codigo_cliente_omie={codigo_cliente_omie}
           omie_enterprise={omie_enterprise}
         />
-        <Pagination
+        {/* <Pagination
           className="px-0 sm:px-0 bg-transparent"
           totalRegister={offers?.total_de_registros}
           totalPage={offers?.total_de_paginas}
-        />
+        /> */}
       </section>
     </main>
   );
