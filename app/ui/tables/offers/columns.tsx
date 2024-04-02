@@ -1,24 +1,15 @@
-import { OmieOffer } from "@/app/lib/definitions/OmieOffer";
-import { ColumnDef } from "@tanstack/react-table";
-import { Badge, BadgeThemes } from "@/app/ui/badge";
 import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
+import { OmieOffer, OmieOfferStep } from "@/app/lib/definitions/OmieOffer";
+import { Badge, BadgeThemes } from "@/app/ui/badge";
+import { ColumnDef } from "@tanstack/react-table";
 
-type OfferStatusBadges = {
-  [key: string]: {
-    label: string;
-    color: BadgeThemes;
-  };
-};
-
-const offerStatusBadges: OfferStatusBadges = {
-  "60": {
-    label: "60",
-    color: "yellow",
-  },
-  "70": {
-    label: "Concluido",
-    color: "green",
-  },
+const offerStatusBadgeColor: { [key: string]: BadgeThemes } = {
+  "10": "gray",
+  "20": "gray",
+  "50": "gray",
+  "60": "gray",
+  "70": "gray",
+  "80": "gray",
 };
 
 export type OmieOfferTable = OmieOffer & {
@@ -45,9 +36,8 @@ export const orderOfferColumns: ColumnDef<OmieOfferTable>[] = [
     accessorKey: "cabecalho.etapa",
     cell: ({ row }) => {
       const status = row.original.cabecalho.etapa;
-      const label = offerStatusBadges[status]?.label;
-      const theme = offerStatusBadges[status]?.color;
-
+      const label = OmieOfferStep[status];
+      const theme = offerStatusBadgeColor[status];
       return <Badge size="sm" label={label} theme={theme} />;
     },
   },
