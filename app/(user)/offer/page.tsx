@@ -46,7 +46,7 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
 
     return await listCachedOffers(omie_enterprise, {
       pagina: pagina ?? 1,
-      registros_por_pagina: 500,
+      registros_por_pagina: 250,
       filtrar_por_cliente: codigo_cliente_omie
         ? parseInt(codigo_cliente_omie)
         : undefined,
