@@ -32,13 +32,19 @@ export const orderOfferColumns: ColumnDef<OmieOfferTable>[] = [
     },
   },
   {
-    header: "Status",
+    header: "Etapa",
     accessorKey: "cabecalho.etapa",
     cell: ({ row }) => {
       const status = row.original.cabecalho.etapa;
       const label = OmieOfferStep[status];
       const theme = offerStatusBadgeColor[status];
       return <Badge size="sm" label={label} theme={theme} />;
+    },
+  },
+  {
+    header: "Criado em",
+    cell: ({ row }) => {
+      return `${row.original.infoCadastro.dInc} às ${row.original.infoCadastro.hInc}`;
     },
   },
 ];
