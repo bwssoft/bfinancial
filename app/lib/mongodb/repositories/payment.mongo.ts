@@ -1,6 +1,6 @@
 import { Collection, Filter, FindCursor, WithId } from "mongodb";
-import { Payment } from "../../definitions";
 import clientPromise from "../config";
+import { Payment } from "../../definitions/Payment";
 
 async function connect() {
   const client = await clientPromise;
@@ -21,7 +21,7 @@ async function list(params: Filter<Payment> = {}) {
   }
 }
 
-export async function findOne(params: Partial<WithId<Payment>>) {
+export async function findOne(params: Partial<WithId<Payment>> | any) {
   try {
     const db = await connect();
     return await db.collection<Payment>('payment').findOne(params);

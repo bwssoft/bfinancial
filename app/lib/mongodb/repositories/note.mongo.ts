@@ -1,6 +1,6 @@
 import { Collection } from "mongodb";
-import { Note } from "../../definitions";
 import clientPromise from "../config";
+import { Note } from "../../definitions/Note";
 
 async function connect() {
   const client = await clientPromise;
@@ -8,14 +8,14 @@ async function connect() {
   return db;
 }
 
-async function list(paymentId:string) :Promise<Note[]>{
+async function list(paymentId: string): Promise<Note[]> {
   try {
     const db = await connect();
 
     const notes: Collection<Note> = db.collection("note");
     const data = await notes.find().toArray();
 
-    return data.filter(({payment})=> paymentId === payment)
+    return data.filter(({ payment }) => paymentId === payment)
 
   } catch (error: any) {
     console.log('[error/note-repo] (list)', error.toString())

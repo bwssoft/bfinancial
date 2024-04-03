@@ -1,9 +1,14 @@
 "use client";
 
-import { cn } from "@/app/lib/cn";
+import { cn } from "@/app/utils/cn";
 import { BPayTransaction } from "@/app/lib/definitions/BPayTransaction";
 import { Button } from "@/app/ui/button";
-import { XMarkIcon, MinusIcon, CalendarIcon, CheckIcon } from "@heroicons/react/20/solid";
+import {
+  XMarkIcon,
+  MinusIcon,
+  CalendarIcon,
+  CheckIcon,
+} from "@heroicons/react/20/solid";
 import { ReactNode } from "react";
 
 interface TransactionFeedProps {
@@ -79,17 +84,17 @@ export function TransactionFeed({ transactions }: TransactionFeedProps) {
 
         if (transaction.finish) {
           badge = {
-            text: 'Pagamento efetuado',
+            text: "Pagamento efetuado",
             icon: CheckIcon,
-            iconBackground: 'bg-green-500'
-          }
+            iconBackground: "bg-green-500",
+          };
         } else {
           badge = {
             text: transactionStatus?.[status]?.text,
             icon: transactionStatus?.[status]?.icon ?? MinusIcon,
             iconBackground:
               transactionStatus?.[status]?.iconBackground ?? "bg-gray-500",
-          }
+          };
         }
 
         return (

@@ -2,13 +2,13 @@
 
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
-import { cn } from "../lib/cn";
+import { cn } from "../utils/cn";
 
 type PaginationDesktopProps = {
   totalPage?: number;
   totalRegister?: number;
   className?: string;
-}
+};
 
 type PaginationActions = "previous" | "next";
 
@@ -16,10 +16,10 @@ type PaginationActionFunction = {
   [key in PaginationActions]: () => void;
 };
 
-export function Pagination({ 
-  totalPage = 0, 
-  totalRegister = 0, 
-  className 
+export function Pagination({
+  totalPage = 0,
+  totalRegister = 0,
+  className,
 }: PaginationDesktopProps) {
   const { replace } = useRouter();
   const pathname = usePathname();
@@ -40,16 +40,16 @@ export function Pagination({
         return handleSearch("1");
       }
 
-      handleSearch((currentPage + 1).toString())
+      handleSearch((currentPage + 1).toString());
     },
     previous: () => {
       if (currentPage === 1) {
-        return handleSearch(totalPage?.toString() || "1")
+        return handleSearch(totalPage?.toString() || "1");
       }
 
       handleSearch((currentPage - 1).toString());
-    }
-  }
+    },
+  };
 
   function handlePaginationPress(action: PaginationActions) {
     paginationActions[action]();
@@ -57,9 +57,10 @@ export function Pagination({
 
   return (
     <nav
-      className={
-        cn("flex items-center rounded-b-lg justify-between border-gray-200 bg-white px-4 py-3 sm:px-6", className)
-      }
+      className={cn(
+        "flex items-center rounded-b-lg justify-between border-gray-200 bg-white px-4 py-3 sm:px-6",
+        className
+      )}
       aria-label="Pagination"
     >
       <div className="hidden sm:block">
@@ -86,5 +87,5 @@ export function Pagination({
         </button>
       </div>
     </nav>
-  )
+  );
 }
