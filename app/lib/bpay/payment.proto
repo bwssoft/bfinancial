@@ -93,6 +93,7 @@ message Transaction {
   optional Receiver receiver = 9;
   optional string payer = 10;
   optional TransactionBB bb = 11;
+  optional string createdAt = 12;
 }
 
 message TransactionBB {
