@@ -82,6 +82,8 @@ export type OmieOffer = {
 export type OmieListOfferParams = OmieSearchParams & {
   codigo_pedido?: string;
   filtrar_por_cliente?: number;
+  filtrar_por_data_de?: string;
+  filtrar_por_data_ate?: string;
   etapa?: string;
 };
 
