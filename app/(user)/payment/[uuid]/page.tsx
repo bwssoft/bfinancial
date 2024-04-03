@@ -5,7 +5,7 @@ import {
   getManyTransactionById,
   revalidatePaymentPage,
   sendDue,
-  generatePayShareLink
+  generatePayShareLink,
 } from "@/app/lib/actions";
 import { NoteCreateFrom } from "@/app/ui/form/note-create";
 import { NoteCard } from "./note-card";
@@ -34,7 +34,7 @@ export default async function PaymentDetailsPage({
     fetchPaymentByGroup(params.uuid),
   ]);
   const { transactions } = await getManyTransactionById({
-    id: payment?.map((pay) => pay.bpay_transaction_id),
+    id: payment?.map((pay) => pay.bpay_metadata.id),
   });
 
   const hasFinishedTransactions = transactions?.some((el) => el.finish);
@@ -52,7 +52,9 @@ export default async function PaymentDetailsPage({
     pix_copia_e_cola: currentTransaction?.bb.pixCopyPaste!,
   });
 
-  const createDueFromPaymentBinded = createDueFromPayment.bind(null, { payment: paymentData });
+  const createDueFromPaymentBinded = createDueFromPayment.bind(null, {
+    payment: paymentData,
+  });
 
   const revalidatePaymentPageBinded = revalidatePaymentPage.bind(
     null,
@@ -70,7 +72,7 @@ export default async function PaymentDetailsPage({
           <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
             Visualizando um pagamento
           </h1>
-        </div>  
+        </div>
 
         <div className="inline-flex items-center gap-2">
           <GenerateShare paymentGroupId={paymentData.group} />
@@ -85,7 +87,6 @@ export default async function PaymentDetailsPage({
             </form>
           )}
         </div>
-
       </header>
       <div className="grid grid-cols-2 w-full gap-6">
         <div className="space-y-6">
