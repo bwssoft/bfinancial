@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 
 import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
@@ -10,10 +10,16 @@ import { fetchClients } from "@/app/lib/actions";
 import { Button } from "@/app/ui/button";
 import { useDebouncedCallback } from "use-debounce";
 
+import { format, subDays } from "date-fns";
+
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { Badge } from "@/app/ui/badge";
+import { Input } from "@/app/ui/input";
+import { Label } from "@/app/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/app/ui/popover";
+import { ToggleGroup, ToggleGroupItem } from "@/app/ui/toggle-group";
 import { formatSearchParams } from "@/app/utils/format-search-params";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { Input } from "../../input";
+import { ChevronDownIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { enterprises } from "../clients/filter";
 
 interface OfferFilterProps {
@@ -22,10 +28,22 @@ interface OfferFilterProps {
 }
 
 export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
+  const searchParams = useSearchParams();
+
   const [clients, setClients] = React.useState<OmieClientModel[]>([]);
-  const [enterprise, setEnterprise] = React.useState<OmieEnterpriseEnum>();
-  const [orderStep, setOrderStep] = React.useState<string>();
-  const [orderId, setOrderId] = React.useState<string>();
+  const [enterprise, setEnterprise] = React.useState<OmieEnterpriseEnum | undefined>(
+    (searchParams.get("omie_enterprise") as OmieEnterpriseEnum) ?? undefined
+  );
+
+  const [orderStep, setOrderStep] = React.useState<string | undefined>(
+    searchParams.get("etapa") ?? undefined
+  );
+  const [orderId, setOrderId] = React.useState<string | undefined>(
+    searchParams.get("codigo_pedido") ?? undefined
+  );
+  const [period, setPeriod] = React.useState<string | undefined>(
+    searchParams.get("periodo") ?? undefined
+  );
 
   const pathname = usePathname();
   const router = useRouter();
@@ -36,6 +54,7 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
       codigo_cliente_omie: client?.codigo_cliente_omie,
       etapa: orderStep,
       codigo_pedido: orderId,
+      periodo: period,
     });
     router.push(`${pathname}?${params}`);
   };
@@ -60,64 +79,150 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
     }
   }
 
+  function formatPeriod(value: string) {
+    const pastDays = parseInt(value);
+    const date = subDays(new Date(), pastDays);
+    setPeriod(format(date, "dd/MM/yyyy"));
+  }
+
   return (
-    <form action={onAction} className="inline-flex items-center my-4 gap-2">
-      <Input
-        placeholder="Código do pedido"
-        className="w-64"
-        onChange={(e) => setOrderId(e.target.value)}
-      />
+    <form action={onAction} className="inline-flex flex-col gap-2 my-4 w-full">
+      <div className="inline-flex items-end gap-1">
+        <div className="w-72">
+          <Autocomplete
+            label="Selecionar empresa"
+            options={enterprises.map((enterprise) => ({
+              label: enterprise.name,
+              value: enterprise.id,
+            }))}
+            onChange={(newValue) => {
+              const option = newValue as AutocompleteResponse<string>;
+              setEnterprise(option?.value as OmieEnterpriseEnum);
+            }}
+          />
+        </div>
 
-      <div className="w-52">
-        <Autocomplete
-          placeholder="Etapa"
-          options={[
-            { label: "Proposta / Orçamento", value: "10" },
-            { label: "Separar estoque", value: "20" },
-            { label: "Faturar", value: "50" },
-            { label: "Faturado", value: "60" },
-            { label: "Entrega", value: "70" },
-            { label: "Pedido / Aprovação Financeira", value: "80" },
-          ]}
-          onChange={(newValue) => {
-            const option = newValue as AutocompleteResponse<string>;
-            setOrderStep(option.value);
-          }}
-        />
+        <div className="flex flex-col">
+          <Label>Periodo de tempo</Label>
+          <ToggleGroup type="single" variant="outline" onValueChange={formatPeriod}>
+            <ToggleGroupItem value="15" className="w-24">
+              15 dias
+            </ToggleGroupItem>
+            <ToggleGroupItem value="30" className="w-24">
+              30 dias
+            </ToggleGroupItem>
+            <ToggleGroupItem value="60" className="w-24">
+              2 meses
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+
+        <div>
+          <Button type="submit">
+            <MagnifyingGlassIcon className="h-4 w-4" />
+            Buscar
+          </Button>
+        </div>
+
+        <Popover>
+          <PopoverTrigger type="button" asChild>
+            <Button type="button" variant="outline">
+              Ver mais filtros
+              <ChevronDownIcon className="transition-transform duration-200 h-3 w-3" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80">
+            <form action={onAction} className="grid grid-flow-row gap-4 rounded-md">
+              <Input
+                label="Código do pedido"
+                placeholder="Código do pedido"
+                defaultValue={searchParams.get("codigo_pedido") ?? undefined}
+                onChange={(e) => setOrderId(e.target.value)}
+              />
+
+              <Autocomplete
+                label="Etapa do pedido"
+                placeholder="Etapa"
+                defaultValue={searchParams.get("etapa")}
+                options={[
+                  { label: "Proposta / Orçamento", value: "10" },
+                  { label: "Separar estoque", value: "20" },
+                  { label: "Faturar", value: "50" },
+                  { label: "Faturado", value: "60" },
+                  { label: "Entrega", value: "70" },
+                  { label: "Pedido / Aprovação Financeira", value: "80" },
+                ]}
+                onChange={(newValue) => {
+                  const option = newValue as AutocompleteResponse<string>;
+                  setOrderStep(option.value);
+                }}
+              />
+
+              <Autocomplete
+                label="Cliente"
+                placeholder="Filtrar cliente"
+                options={clients?.map((client) => ({
+                  label: client.nome_fantasia,
+                  value: client,
+                }))}
+                onInputChange={handleClientsSearch}
+                onChange={(newValue) => {
+                  const option = newValue as AutocompleteResponse<OmieClientModel>;
+                  onClientChange(option.value);
+                }}
+              />
+
+              <Button type="submit">Adicionar filtros</Button>
+            </form>
+          </PopoverContent>
+        </Popover>
       </div>
 
-      <div className="w-52">
-        <Autocomplete
-          placeholder="Filtrar empresa"
-          options={enterprises.map((enterprise) => ({
-            label: enterprise.name,
-            value: enterprise.id,
-          }))}
-          onChange={(newValue) => {
-            const option = newValue as AutocompleteResponse<string>;
-            setEnterprise(option?.value as OmieEnterpriseEnum);
-          }}
-        />
-      </div>
-      <div className="w-52">
-        <Autocomplete
-          placeholder="Filtrar cliente"
-          options={clients?.map((client) => ({
-            label: client.nome_fantasia,
-            value: client,
-          }))}
-          onInputChange={handleClientsSearch}
-          onChange={(newValue) => {
-            const option = newValue as AutocompleteResponse<OmieClientModel>;
-            onClientChange(option.value);
-          }}
-        />
-      </div>
+      <div className="inline-flex items-center gap-1">
+        {searchParams.get("omie_enterprise") && (
+          <Badge
+            label="Empresa"
+            isRemoved
+            onClick={() => {
+              setEnterprise(undefined);
+              onAction();
+            }}
+          />
+        )}
 
-      <Button type="submit">
-        <MagnifyingGlassIcon className="h-4 w-4" />
-        Buscar
-      </Button>
+        {searchParams.get("periodo") && (
+          <Badge
+            label="Periodo de tempo"
+            isRemoved
+            onClick={() => {
+              setPeriod(undefined);
+              onAction();
+            }}
+          />
+        )}
+
+        {searchParams.get("codigo_pedido") && (
+          <Badge
+            label="Codigo pedido"
+            isRemoved
+            onClick={() => {
+              setOrderId(undefined);
+              onAction();
+            }}
+          />
+        )}
+
+        {searchParams.get("etapa") && (
+          <Badge
+            label="Etapa"
+            isRemoved
+            onClick={() => {
+              setOrderStep(undefined);
+              onAction();
+            }}
+          />
+        )}
+      </div>
     </form>
   );
 }
