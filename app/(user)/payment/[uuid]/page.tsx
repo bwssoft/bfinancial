@@ -5,7 +5,6 @@ import {
   getManyTransactionById,
   revalidatePaymentPage,
   sendDue,
-  generatePayShareLink,
 } from "@/app/lib/actions";
 import { NoteCreateFrom } from "@/app/ui/form/note-create";
 import { NoteCard } from "./note-card";
@@ -78,12 +77,12 @@ export default async function PaymentDetailsPage({
           <GenerateShare paymentGroupId={paymentData.group} />
 
           <form action={revalidatePaymentPageBinded}>
-            <Button>Revalidar</Button>
+            <Button type="submit">Revalidar</Button>
           </form>
 
           {!hasFinishedTransactions && (
             <form action={createDueFromPaymentBinded}>
-              <Button>Efetuar nova cobrança</Button>
+              <Button type="submit">Efetuar nova cobrança</Button>
             </form>
           )}
         </div>
