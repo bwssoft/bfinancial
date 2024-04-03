@@ -5,7 +5,7 @@ import { formatPrice } from "@/app/utils/formatters";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
 import { Button } from "../../button";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
-import { Payment } from "@/app/lib/definitions";
+import { Payment } from "@/app/lib/definitions/Payment";
 import Link from "next/link";
 import { createPaymentFromOfferPage } from "@/app/lib/actions";
 import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
@@ -94,18 +94,16 @@ export const installmentColumns: ColumnDef<OmieInstallmentTable>[] = [
         );
       }
       label = "Cobrar";
-      const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(null,
+      const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(
+        null,
         installment.omie_enterprise!,
         installment.codigo_pedido_omie!,
         installment.omie_client!,
         installment
-      )
+      );
       return (
         <form action={createPaymentFromOfferPageBinded}>
-          <Button
-            type="submit"
-            size="sm"
-            >
+          <Button type="submit" size="sm">
             {label}
           </Button>
         </form>

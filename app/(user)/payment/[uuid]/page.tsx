@@ -49,6 +49,7 @@ export default async function PaymentDetailsPage({
     numero_parcela: paymentData?.omie_metadata?.numero_parcela.toString(),
     data_vencimento: paymentData?.omie_metadata?.data_vencimento.toString(),
     pix_copia_e_cola: currentTransaction?.bb.pixCopyPaste!,
+    payment_group: paymentData.group,
   });
 
   const createDueFromPaymentBinded = createDueFromPayment.bind(null, {

@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge, BadgeThemes } from "@/app/ui/badge";
-import { Payment } from "@/app/lib/definitions";
+import { Payment } from "@/app/lib/definitions/Payment";
 
 type StatusBadges = {
   [key: string]: {

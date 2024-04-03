@@ -1,4 +1,4 @@
-import { Note } from "@/app/lib/definitions";
+import { Note } from "@/app/lib/definitions/Note";
 
 interface NoteCardProps {
   note: Note;
@@ -10,7 +10,7 @@ export function NoteCard({ note }: NoteCardProps) {
       <div className="flex space-x-3 text-sm">
         <div>
           <div className="inline-flex items-center gap-2">
-            {note.author.name} 
+            {note.author.name}
             <span className="font-medium text-gray-500">&middot;</span>
             <span className="font-medium text-gray-500">
               {note.createdAt.toLocaleDateString(`pt-BR`, {
