@@ -94,20 +94,21 @@ export const installmentColumns: ColumnDef<OmieInstallmentTable>[] = [
         );
       }
       label = "Cobrar";
+      const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(null,
+        installment.omie_enterprise!,
+        installment.codigo_pedido_omie!,
+        installment.omie_client!,
+        installment
+      )
       return (
-        <Button
-          size="sm"
-          onClick={() =>
-            createPaymentFromOfferPage(
-              installment.omie_enterprise!,
-              installment.codigo_pedido_omie!,
-              installment.omie_client!,
-              installment
-            )
-          }
-        >
-          {label}
-        </Button>
+        <form action={createPaymentFromOfferPageBinded}>
+          <Button
+            type="submit"
+            size="sm"
+            >
+            {label}
+          </Button>
+        </form>
       );
     },
   },
