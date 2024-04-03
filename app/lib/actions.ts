@@ -184,6 +184,7 @@ export async function createPaymentFromOfferPage(
     numero_parcela: installment.numero_parcela.toString(),
     pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
     telefone: "5527999697185",
+    payment_group:data.group!
   });
   return payment;
 }
@@ -255,12 +256,12 @@ export async function sendDue(params: {
   telefone: string;
   data_vencimento: string;
   pix_copia_e_cola: string;
+  payment_group:string
 }) {
   const headerInfo = Object.fromEntries(headers().entries());
   const buffer = await generateQRBuffer(params.pix_copia_e_cola);
   if (!buffer) return;
-  const firebaseGateway = new FirebaseGateway();
-  const link = await firebaseGateway.uploadFile({
+  const link = await FirebaseGateway.uploadFile({
     buffer,
     name: `qr-code-${nanoid()}`,
     type: "image/jpeg",
@@ -295,7 +296,7 @@ export async function sendDue(params: {
           },
           {
             type: "text",
-            text: `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}`,
+            text: `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}/${params.payment_group}`,
           },
           {
             type: "text",

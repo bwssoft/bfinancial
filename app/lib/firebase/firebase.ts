@@ -4,7 +4,7 @@ import { FirebaseStorage, getBytes, getDownloadURL, getStorage, ref, uploadBytes
 
 const firebaseConfig: FirebaseOptions = env.FIREBASE_CONFIG;
 
-export class FirebaseGateway {
+class FirebaseGateway {
   private _app: FirebaseApp
   private _storage: FirebaseStorage
 
@@ -38,3 +38,7 @@ export class FirebaseGateway {
       return await getBytes(fileRef)
   }
 }
+
+const firebaseGateway = new FirebaseGateway();
+
+export {firebaseGateway as FirebaseGateway} 
