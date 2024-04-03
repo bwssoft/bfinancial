@@ -24,6 +24,7 @@ export type OmieSearchParams = Omit<OmieDefaultParams, "apenas_importado_api">;
 export type OmieCallFunctions =
   | "ListarClientes"
   | "ListarPedidos"
+  | "AlterarPedidoVenda"
   | "ConsultarCliente"
   | "ConsultarPedido";
 
