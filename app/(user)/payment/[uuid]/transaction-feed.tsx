@@ -10,7 +10,6 @@ import {
   CheckIcon,
 } from "@heroicons/react/20/solid";
 import { ReactNode } from "react";
-
 interface TransactionFeedProps {
   transactions: BPayTransaction[];
 }
@@ -74,6 +73,19 @@ export function TransactionFeed({ transactions }: TransactionFeedProps) {
     navigator.clipboard.writeText(transaction?.bb?.pixCopyPaste);
     alert("Pix copiado com sucesso!");
   };
+  const localeConfig:Intl.DateTimeFormatOptions = {
+    day:'2-digit',
+    month:'2-digit',
+    year:'numeric',
+    hour:'2-digit',
+    minute:'2-digit'
+  }
+  function convertExpiration(tra:BPayTransaction){
+    const expiresIn = new Date(tra.createdAt) 
+    expiresIn.setDate(expiresIn.getDate()+1)
+    
+    return expiresIn.toLocaleDateString('pt-BR',localeConfig)
+  }
 
   return (
     <ul role="list" className="-mb-8 w-full">
@@ -130,23 +142,34 @@ export function TransactionFeed({ transactions }: TransactionFeedProps) {
                       {badge.text}
 
                       {status === 2 && !transaction.finish && (
+                        <>
                         <Button
                           onClick={() => handlePixCodeCopy(transaction)}
                           size="sm"
                           variant="outline"
-                        >
+                          >
                           Copiar código
                         </Button>
+                        
+                        <Button
+                          size="sm"
+                          variant='secondary'
+                          disabled
+                        >
+                          {`Expira em ${convertExpiration(transaction)}`}
+                        </Button>
+                        </>
+                        
                       )}
                     </p>
                   </div>
                   <div className="whitespace-nowrap text-right text-sm text-gray-500">
                     <time
                       dateTime={
-                        transaction.createdAt?.toISOString() ?? new Date()
+                        new Date(transaction.createdAt)?.toLocaleDateString('pt-BR',localeConfig) ?? new Date().toLocaleDateString('pt-BR',localeConfig)
                       }
                     >
-                      {transaction.createdAt?.toISOString()}
+                      {new Date(transaction.createdAt)?.toLocaleDateString('pt-BR',localeConfig)}
                     </time>
                   </div>
                 </div>
