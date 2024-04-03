@@ -13,12 +13,13 @@ import { useDebouncedCallback } from "use-debounce";
 import { format, subDays } from "date-fns";
 
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { Badge } from "@/app/ui/badge";
+import { Input } from "@/app/ui/input";
+import { Label } from "@/app/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/app/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "@/app/ui/toggle-group";
 import { formatSearchParams } from "@/app/utils/format-search-params";
 import { ChevronDownIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { Input } from "../../input";
-import { Label } from "../../label";
-import { Popover, PopoverContent, PopoverTrigger } from "../../popover";
 import { enterprises } from "../clients/filter";
 
 interface OfferFilterProps {
@@ -30,7 +31,9 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
   const searchParams = useSearchParams();
 
   const [clients, setClients] = React.useState<OmieClientModel[]>([]);
-  const [enterprise, setEnterprise] = React.useState<OmieEnterpriseEnum>();
+  const [enterprise, setEnterprise] = React.useState<OmieEnterpriseEnum | undefined>(
+    (searchParams.get("omie_enterprise") as OmieEnterpriseEnum) ?? undefined
+  );
 
   const [orderStep, setOrderStep] = React.useState<string | undefined>(
     searchParams.get("etapa") ?? undefined
@@ -175,17 +178,51 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
         </Popover>
       </div>
 
-      {/* <div className="flex items-center gap-1">
-          {period && (
-            <Badge
-              label={`Periodo de tempo: ${period}`}
-              onClick={() => {
-                setPeriod(undefined);
-              }}
-              isRemoved
-            />
-          )}
-        </div> */}
+      <div className="inline-flex items-center gap-1">
+        {searchParams.get("omie_enterprise") && (
+          <Badge
+            label="Empresa"
+            isRemoved
+            onClick={() => {
+              setEnterprise(undefined);
+              onAction();
+            }}
+          />
+        )}
+
+        {searchParams.get("periodo") && (
+          <Badge
+            label="Periodo de tempo"
+            isRemoved
+            onClick={() => {
+              setPeriod(undefined);
+              onAction();
+            }}
+          />
+        )}
+
+        {searchParams.get("codigo_pedido") && (
+          <Badge
+            label="Codigo pedido"
+            isRemoved
+            onClick={() => {
+              setOrderId(undefined);
+              onAction();
+            }}
+          />
+        )}
+
+        {searchParams.get("etapa") && (
+          <Badge
+            label="Etapa"
+            isRemoved
+            onClick={() => {
+              setOrderStep(undefined);
+              onAction();
+            }}
+          />
+        )}
+      </div>
     </form>
   );
 }
