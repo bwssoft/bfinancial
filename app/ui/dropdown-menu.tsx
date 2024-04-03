@@ -9,7 +9,7 @@ import {
   FlagIcon as DotFilledIcon,
 } from "@heroicons/react/24/outline";
 
-import { cn } from "@/app/lib/cn";
+import { cn } from "@/app/utils/cn";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

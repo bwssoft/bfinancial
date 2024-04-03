@@ -1,8 +1,9 @@
 import * as React from "react";
 
-import { cn } from "@/app/lib/cn";
+import { cn } from "@/app/utils/cn";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
 }
 
@@ -10,7 +11,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, type, ...props }, ref) => {
     return (
       <div className="flex flex-col">
-        {label && <label className="text-sm font-medium text-gray-900 mb-1">{label}</label>}
+        {label && (
+          <label className="text-sm font-medium text-gray-900 mb-1">
+            {label}
+          </label>
+        )}
 
         <input
           type={type}

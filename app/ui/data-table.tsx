@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { ComponentProps, ReactNode } from "react";
 import { useMediaQuery } from "@/app/hook/use-media-query";
-import { cn } from "../lib/cn";
+import { cn } from "../utils/cn";
 
 interface DataTableDesktopProps<TData, TValue> extends ComponentProps<"div"> {
   columns: ColumnDef<TData, TValue>[];
@@ -26,7 +26,7 @@ export function DataTableDesktop<TData, TValue>({
   ...rest
 }: DataTableDesktopProps<TData, TValue>) {
   const table = useReactTable({
-    manualPagination:true,
+    manualPagination: true,
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
