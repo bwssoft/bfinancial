@@ -1,7 +1,7 @@
 import { OmieBoolean, OmieResponse, OmieSearchParams } from "./OmieApi";
 
 type OmieOfferHeader = {
-  bloqueado: OmieBoolean;
+  bloqueado?: OmieBoolean;
   codigo_cenario_impostos: string;
   codigo_cliente: number;
   codigo_empresa: number;
@@ -11,7 +11,7 @@ type OmieOfferHeader = {
   data_previsao: string;
   etapa: keyof typeof OmieOfferStep;
   importado_api: string;
-  numero_pedido: string;
+  numero_pedido?: string;
   origem_pedido: string;
   qtde_parcelas: number;
   quantidade_itens: number;
@@ -62,10 +62,10 @@ export type OmieOfferInstallment = {
 
 export type OmieOffer = {
   cabecalho: OmieOfferHeader;
-  exportacao: {
-    nao_exportacao: OmieBoolean;
+  exportacao?: {
+    nao_exportacao?: OmieBoolean;
   };
-  frete: OmieOfferFreight;
+  frete?: OmieOfferFreight;
   infoCadastro: OmieOfferRegisterInfo;
   lista_parcelas: {
     parcela: OmieOfferInstallment[];
@@ -73,6 +73,7 @@ export type OmieOffer = {
   observacoes: {
     obs_venda: string;
   };
+  informacoes_adicionais?: any;
   total_pedido: {
     valor_mercadorias: number;
     valor_total_pedido: number;
@@ -93,4 +94,12 @@ export type OmieListOfferResponse = OmieResponse & {
 
 export type OmieFindOfferResponse = OmieResponse & {
   pedido_venda_produto: OmieOffer;
+};
+
+export type OmieOfferUpdateResponse = {
+  codigo_pedido: number;
+  codigo_pedido_integracao: string;
+  codigo_status: string;
+  descricao_status: string;
+  numero_pedido: string;
 };
