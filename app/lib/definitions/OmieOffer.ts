@@ -61,6 +61,7 @@ export type OmieOfferInstallment = {
 };
 
 export type OmieOffer = {
+  det: any;
   cabecalho: OmieOfferHeader;
   exportacao?: {
     nao_exportacao?: OmieBoolean;

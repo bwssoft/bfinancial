@@ -186,7 +186,7 @@ export async function createPaymentFromOfferPage(
     numero_parcela: installment.numero_parcela.toString(),
     pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
     telefone: "5527999697185",
-    payment_group:data.group!
+    payment_group: data.group!
   });
   return payment;
 }
@@ -258,7 +258,7 @@ export async function sendDue(params: {
   telefone: string;
   data_vencimento: string;
   pix_copia_e_cola: string;
-  payment_group:string
+  payment_group: string
 }) {
   const headerInfo = Object.fromEntries(headers().entries());
   const buffer = await generateQRBuffer(params.pix_copia_e_cola);
