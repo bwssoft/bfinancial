@@ -58,7 +58,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button";
 
     const { pending } = useFormStatus();
-
     const isLoading = (pending && type === "submit") || clientLoading;
 
     if (asChild) {
