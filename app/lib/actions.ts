@@ -4,12 +4,10 @@ import { Filter } from "mongodb";
 import { nanoid } from "nanoid";
 import { revalidatePath, unstable_cache } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
-import { ICompanySecrets } from "../utils/enterpriseSecrets";
 import { getCurrentInstallment } from "../utils/get-current-installment";
 import { generateQRBuffer } from "../utils/qrCode";
 import { BMessageClient } from "./bmessage/bessage";
 import { DocumentEnum, createPixTransaction, getTransactionById } from "./bpay/bpay";
-import { Payment } from "./definitions";
 import { OmieCredentials, OmieEnterpriseEnum } from "./definitions/OmieApi";
 import { OmieClientListParams, OmieClientModel } from "./definitions/OmieClient";
 import { OmieListOfferParams, OmieOfferInstallment } from "./definitions/OmieOffer";
@@ -19,6 +17,7 @@ import { CreatePayment, paymentRepo } from "./mongodb/repositories/payment.mongo
 import { OmieOrderService } from "./omie/order.omie";
 
 import { headers } from "next/headers";
+import { Payment } from "./definitions/Payment";
 
 export async function fetchClients(
   enterprise: OmieEnterpriseEnum,
@@ -79,7 +78,10 @@ export async function fetchPaymentByGroup(group: string) {
 
 export async function createClientPayment(
   client: OmieClientModel,
-  enterprise: ICompanySecrets,
+  enterprise: {
+    apiKey: string;
+    apiSecret: string;
+  },
   formData: FormData
 ) {
   // const _formData = Object.fromEntries(formData.entries()) as any;
