@@ -62,7 +62,7 @@ export default async function PayPage({ params }: PageProps) {
 
               <div className="flex justify-center">
                 <Button asChild>
-                  <a href={qrCodeSrc} download>
+                  <a href={qrCodeSrc} download target="_blank">
                     Baixar QRCode
                   </a>
                 </Button>

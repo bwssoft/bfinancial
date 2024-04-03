@@ -32,7 +32,7 @@ export function CurrentTransaction({ transaction, qrCodeUrl, action }: CurrentTr
       <div className="border-t gap-4 flex flex-col items-center justify-center p-4 w-full">
         <img src={qrCodeUrl} className="border p-2 rounded-sm" />
         <Button asChild>
-          <a href={qrCodeUrl} download>
+          <a href={qrCodeUrl} download target="_blank">
             Baixar QRCode
           </a>
         </Button>
