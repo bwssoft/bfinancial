@@ -6,7 +6,7 @@ import { DataTableDesktop, DataTableMobile } from "@/app/ui/data-table";
 
 import { paymentColumns } from "./columns";
 import { PaymentTableFilter } from "./filter";
-import { Payment } from "@/app/lib/definitions";
+import { Payment } from "@/app/lib/definitions/Payment";
 
 type OfferTableProps = {
   payments: Payment[];
