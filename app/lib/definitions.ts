@@ -14,7 +14,10 @@ export type Payment = {
     numero_parcela: number;
     data_vencimento: string
   },
-  bpay_transaction_id: string
+  bpay_metadata: {
+    id: string
+    txid: string
+  }
   group: string //codigo_pedido_omie + numero_parcela
 }
 

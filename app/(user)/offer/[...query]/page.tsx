@@ -33,7 +33,7 @@ export default async function Example({
   ]);
 
   const transactions = await getManyTransactionById({
-    id: payments.map((pay) => pay.bpay_transaction_id),
+    id: payments.map((pay) => pay.bpay_metadata.id),
   });
 
   if (!offer || !client) {
@@ -52,7 +52,7 @@ export default async function Example({
       );
 
       const transactions_id = payment.map(
-        (payment) => payment.bpay_transaction_id
+        (payment) => payment.bpay_metadata.id
       );
 
       const bpay_transaction =

@@ -168,7 +168,10 @@ export async function createPaymentFromOfferPage(
       numero_parcela: installment.numero_parcela,
       data_vencimento: installment.data_vencimento,
     },
-    bpay_transaction_id: pix.transaction._id,
+    bpay_metadata: {
+      id: pix.transaction._id,
+      txid: pix.transaction.bb.txid
+    },
     group: `${codigo_pedido_omie}${installment.numero_parcela}`,
   };
 
