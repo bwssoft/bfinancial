@@ -1,11 +1,9 @@
 import { getCachedOffer, listCachedOffers } from "@/app/lib/actions";
-import {
-  OmieDefaultParams,
-  OmieEnterpriseEnum,
-} from "@/app/lib/definitions/OmieApi";
+import { OmieDefaultParams, OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { OmieListOfferResponse } from "@/app/lib/definitions/OmieOffer";
 import { PageHeader } from "@/app/ui/navigation/page-header";
 import { OfferTable } from "@/app/ui/tables/offers";
+import { format } from "date-fns";
 
 interface OfferPageParams {
   searchParams: Omit<OmieDefaultParams, "apenas_importado_api"> & {
@@ -13,11 +11,12 @@ interface OfferPageParams {
     codigo_cliente_omie?: string;
     etapa?: string;
     codigo_pedido?: string;
+    periodo?: string;
   };
 }
 
 export default async function OfferPage({ searchParams }: OfferPageParams) {
-  const { omie_enterprise, pagina, codigo_cliente_omie, etapa, codigo_pedido } =
+  const { omie_enterprise, pagina, codigo_cliente_omie, etapa, codigo_pedido, periodo } =
     searchParams;
 
   async function formatOffers(): Promise<OmieListOfferResponse | null> {
@@ -26,10 +25,7 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
     }
 
     if (codigo_pedido) {
-      const offer = await getCachedOffer(
-        omie_enterprise,
-        parseInt(codigo_pedido)
-      );
+      const offer = await getCachedOffer(omie_enterprise, parseInt(codigo_pedido));
 
       if (offer?.pedido_venda_produto) {
         return {
@@ -44,13 +40,19 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
       return null;
     }
 
+    const period = periodo
+      ? {
+          filtrar_por_data_de: periodo,
+          filtrar_por_data_ate: format(new Date(), "dd/MM/yyyy"),
+        }
+      : undefined;
+
     return await listCachedOffers(omie_enterprise, {
       pagina: pagina ?? 1,
       registros_por_pagina: 250,
-      filtrar_por_cliente: codigo_cliente_omie
-        ? parseInt(codigo_cliente_omie)
-        : undefined,
+      filtrar_por_cliente: codigo_cliente_omie ? parseInt(codigo_cliente_omie) : undefined,
       etapa,
+      ...period,
     });
   }
 
