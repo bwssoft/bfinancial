@@ -19,12 +19,14 @@ export default async function PayPage({ params }: PageProps) {
   const payments = await fetchPaymentByGroup(params.groupUuid);
 
   const { transactions } = await getManyTransactionById({
-    id: payments?.map((pay) => pay.bpay_transaction_id),
+    id: payments?.map((pay) => pay.bpay_metadata.id),
   });
 
   const payment = payments?.[0] ?? null;
   const transaction = transactions?.[0] ?? null;
-  const qrCodeSrc = transaction ? await generateQR(transaction?.bb.pixCopyPaste) : undefined;
+  const qrCodeSrc = transaction
+    ? await generateQR(transaction?.bb.pixCopyPaste)
+    : undefined;
 
   if (!payment || !transaction) {
     throw new Error("pay-404");
@@ -44,7 +46,9 @@ export default async function PayPage({ params }: PageProps) {
         <div>
           <Surface>
             <SurfaceHeader>
-              <h1 className="text-lg font-medium">Finalize o pagamento com pix</h1>
+              <h1 className="text-lg font-medium">
+                Finalize o pagamento com pix
+              </h1>
             </SurfaceHeader>
 
             <div className="p-4 text-sm space-y-4">
