@@ -43,6 +43,8 @@ export type OmieInstallmentTable = OmieOfferInstallment & {
 export const installmentColumns: ColumnDef<OmieInstallmentTable>[] = [
   { header: "Índice", accessorKey: "numero_parcela" },
   { header: "Vencimento", accessorKey: "data_vencimento" },
+  { header: "Empresa", accessorKey: "omie_enterprise" },
+  { header: "Cliente", accessorKey: "omie_client.nome_fantasia" },
   {
     header: "Valor",
     accessorKey: "valor",
