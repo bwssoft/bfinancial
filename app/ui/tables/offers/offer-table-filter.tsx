@@ -85,6 +85,7 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
     if(value){
       setPeriod(format(date, "dd/MM/yyyy"));
     }
+    setPeriod(undefined);
   }
 
   return (
