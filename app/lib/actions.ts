@@ -52,7 +52,10 @@ export const listCachedOffers = unstable_cache(
 
 export const getCachedOffer = unstable_cache(
   async (enterprise, id) => await fetchOfferById(enterprise, id),
-  ["omie-offer-list"]
+  ["omie-offer-list"],
+  {
+    revalidate: 90,
+  }
 );
 
 export async function fetchOfferById(enterprise: OmieEnterpriseEnum, id: number) {
@@ -172,7 +175,7 @@ export async function createPaymentFromOfferPage(
     },
     bpay_metadata: {
       id: pix.transaction._id,
-      txid: pix.transaction.bb.txid
+      txid: pix.transaction.bb.txid,
     },
     group: `${codigo_pedido_omie}${installment.numero_parcela}`,
   };
@@ -186,7 +189,7 @@ export async function createPaymentFromOfferPage(
     numero_parcela: installment.numero_parcela.toString(),
     pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
     telefone: "5527999697185",
-    payment_group: data.group!
+    payment_group: data.group!,
   });
   return payment;
 }
@@ -258,7 +261,7 @@ export async function sendDue(params: {
   telefone: string;
   data_vencimento: string;
   pix_copia_e_cola: string;
-  payment_group: string
+  payment_group: string;
 }) {
   const headerInfo = Object.fromEntries(headers().entries());
   const buffer = await generateQRBuffer(params.pix_copia_e_cola);
