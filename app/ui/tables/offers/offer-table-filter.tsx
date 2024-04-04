@@ -82,11 +82,13 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
   function formatPeriod(value: string) {
     const pastDays = parseInt(value);
     const date = subDays(new Date(), pastDays);
-    setPeriod(format(date, "dd/MM/yyyy"));
+    if(value){
+      setPeriod(format(date, "dd/MM/yyyy"));
+    }
   }
 
   return (
-    <form action={onAction} className="inline-flex flex-col gap-2 my-4 w-full">
+    <div className="inline-flex flex-col gap-2 my-4 w-full">
       <div className="inline-flex items-end gap-1">
         <div className="w-72">
           <Autocomplete
@@ -117,12 +119,12 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
           </ToggleGroup>
         </div>
 
-        <div>
+        <form action={onAction}>
           <Button type="submit">
             <MagnifyingGlassIcon className="h-4 w-4" />
             Buscar
           </Button>
-        </div>
+        </form>
 
         <Popover>
           <PopoverTrigger type="button" asChild>
@@ -223,6 +225,6 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
           />
         )}
       </div>
-    </form>
+    </div>
   );
 }
