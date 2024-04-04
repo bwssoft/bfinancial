@@ -129,9 +129,17 @@ export async function createPaymentFromOfferPage(
   omie_client: OmieClientModel,
   installment: OmieOfferInstallment
 ) {
+  console.log("🚀 ~ file: actions.ts:132 ~ createPaymentFromOfferPage: Iniciando action");
   if (!omie_enterprise || !codigo_pedido_omie) return;
 
+  console.log(
+    "🚀 ~ file: actions.ts:132 ~ createPaymentFromOfferPage: omie_enterprise e codigo_pedido_omie encontrado",
+    { omie_enterprise, codigo_pedido_omie }
+  );
+
   const client = omie_client;
+
+  console.log("🚀 ~ file: actions.ts:132 ~ createPaymentFromOfferPage: client encontrado", client);
 
   if (!client) return;
 
@@ -153,6 +161,8 @@ export async function createPaymentFromOfferPage(
     // price: installment.valor.toString()
     price: "1",
   });
+
+  console.log("🚀 ~ file: actions.ts:132 ~ createPaymentFromOfferPage: pix encontrado", pix);
 
   if (!pix.status) {
     throw new Error("error on bpay microservice");
@@ -178,6 +188,8 @@ export async function createPaymentFromOfferPage(
   };
 
   const payment = await paymentRepo.create(data);
+  console.log("🚀 ~ file: actions.ts:132 ~ createPaymentFromOfferPage: payment criado");
+
   revalidatePath(
     `offer/${omie_enterprise}/${omie_client.codigo_cliente_omie}/${codigo_pedido_omie}`
   );
@@ -188,6 +200,9 @@ export async function createPaymentFromOfferPage(
     telefone: "5527999697185",
     payment_group: data.group!,
   });
+
+  console.log("🚀 ~ file: actions.ts:132 ~ createPaymentFromOfferPage: send due executado");
+
   return payment;
 }
 
