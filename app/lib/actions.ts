@@ -249,6 +249,9 @@ export async function createTextMessage(params: { phone: string; message: string
 }
 
 export async function createDueFromPayment(params: { payment: Payment }) {
+  console.log(
+    "🚀 ~ file: actions.ts:252 ~ createDueFromPayment ~ createDueFromPayment iniciando action"
+  );
   const payment = params.payment;
 
   const enterprise = payment.omie_metadata?.enterprise;
@@ -260,11 +263,29 @@ export async function createDueFromPayment(params: { payment: Payment }) {
     fetchClientById(enterprise, clientId.toString()),
   ]);
 
+  console.log(
+    "🚀 ~ file: actions.ts:252 ~ createDueFromPayment ~ createDueFromPayment recuperei getCachedOffer e fetchClientById",
+    { offer, client }
+  );
+
   if (offer && client) {
+    console.log(
+      "🚀 ~ file: actions.ts:252 ~ createDueFromPayment ~ createDueFromPayment offer e client sao algo"
+    );
+
     const currentInstallment = getCurrentInstallment(
       offer?.pedido_venda_produto.lista_parcelas.parcela
     );
+
+    console.log(
+      "🚀 ~ file: actions.ts:252 ~ createDueFromPayment ~ createDueFromPayment parcela encontrada"
+    );
+
     await createPaymentFromOfferPage(enterprise, offerId, client, currentInstallment);
+
+    console.log(
+      "🚀 ~ file: actions.ts:252 ~ createDueFromPayment ~ createDueFromPayment createPaymentFromOfferPage executado"
+    );
   }
 }
 
