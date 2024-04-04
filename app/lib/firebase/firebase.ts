@@ -28,7 +28,7 @@ class FirebaseGateway {
 
     const fileUrl: UploadResult = await uploadBytes(fileRef, buffer, { contentType: type });
 
-    const url = await getDownloadURL(fileUrl.ref).then((url) => url);
+    const url = await getDownloadURL(fileUrl.ref);
 
     return url;
   }
