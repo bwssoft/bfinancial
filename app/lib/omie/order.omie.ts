@@ -59,7 +59,8 @@ class OrderService extends OmieBaseService {
         data
       );
       return response.data;
-    } catch {
+    } catch (e) {
+      console.error('update offer error', e)
       return null;
     }
   }

@@ -54,8 +54,8 @@ export async function POST(request: Request) {
 const nCodCCByEnterprise = {
   WFC: '7974650357', // descrição: adiantamento
   ICB: '6331754348', // descrição: adiantamento
-  MGC: '2225386193', //codigo_banco 999
-  ICBFILIAL: '8397776986', //codigo_banco 999
+  ICBFILIAL: '8397776986', //codigo_banco 999 //nao é possivel por que não esta com o cnpj da priscila vinculado e a aplicação no bb não está em produção
+  MGC: '8402307862', //'2225386193', //codigo_banco 999
   BWS: '2225316057'//codigo_banco 999
 }
 
