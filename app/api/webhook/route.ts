@@ -41,8 +41,9 @@ export async function POST(request: Request) {
   })
   _offer.lista_parcelas.parcela = parcela
 
-  await OmieOrderService.update(_offer)
+  const omie_result = await OmieOrderService.update(_offer)
 
+  console.log('omie_result', omie_result)
   await axios.post(
     "https://bpay-rest-api.bwsoft.app/update-pix-without-recipient",
     data
