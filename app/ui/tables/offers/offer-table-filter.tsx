@@ -84,8 +84,9 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
     const date = subDays(new Date(), pastDays);
     if(value){
       setPeriod(format(date, "dd/MM/yyyy"));
+    }else{
+      setPeriod(undefined);
     }
-    setPeriod(undefined);
   }
 
   return (
