@@ -261,14 +261,18 @@ export async function sendDue(params: {
   payment_group: string;
 }) {
   try {
+    console.log("🚀 ~ file: actions.ts:263 ~ sendDue: Iniciando action");
     const headerInfo = Object.fromEntries(headers().entries());
+    console.log("🚀 ~ file: actions.ts:263 ~ sendDue: headerInfo montado", headerInfo);
     const buffer = await generateQRBuffer(params.pix_copia_e_cola);
+    console.log("🚀 ~ file: actions.ts:263 ~ sendDue: buffer montado", buffer);
     if (!buffer) return;
     const link = await FirebaseGateway.uploadFile({
       buffer,
       name: `qr-code-${nanoid()}`,
       type: "image/jpeg",
     });
+    console.log("🚀 ~ file: actions.ts:263 ~ sendDue: link do firebase gerado", link);
     if (!link) return;
     const result = await BMessageClient.createTemplateMessage({
       phone: params.telefone,
@@ -309,10 +313,10 @@ export async function sendDue(params: {
         },
       ],
     });
-
+    console.log("🚀 ~ file: actions.ts:263 ~ sendDue: BMessage acionado", result);
     return result;
   } catch (error: any) {
-    console.error("🚀 ~ file: actions.ts:266 ~ error:", JSON.stringify(error));
+    console.error("🚀 ~ file: actions.ts:266 ~ sendDue error:", JSON.stringify(error));
     throw new Error(JSON.stringify(error));
   }
 }
