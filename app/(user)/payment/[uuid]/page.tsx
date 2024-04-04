@@ -6,18 +6,18 @@ import {
   revalidatePaymentPage,
   sendDue,
 } from "@/app/lib/actions";
-import { NoteCreateFrom } from "@/app/ui/form/note-create";
-import { NoteCard } from "./note-card";
-import { LabelValue } from "@/app/ui/label-value";
-import { TransactionFeed } from "./transaction-feed";
 import { BackButton } from "@/app/ui/back-button";
+import { Button } from "@/app/ui/button";
+import { NoteCreateFrom } from "@/app/ui/form/note-create";
+import { LabelValue } from "@/app/ui/label-value";
+import { generateQR } from "@/app/utils/qrCode";
+import { auth } from "@/auth";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { CurrentTransaction } from "./current-transaction";
-import { generateQR } from "@/app/utils/qrCode";
-import { Button } from "@/app/ui/button";
-import { auth } from "@/auth";
-import { ShareIcon } from "@heroicons/react/24/outline";
 import { GenerateShare } from "./generate-share";
+import { NewTransactionForm } from "./new-transaction-form";
+import { NoteCard } from "./note-card";
+import { TransactionFeed } from "./transaction-feed";
 
 export default async function PaymentDetailsPage({
   params,
@@ -56,10 +56,7 @@ export default async function PaymentDetailsPage({
     payment: paymentData,
   });
 
-  const revalidatePaymentPageBinded = revalidatePaymentPage.bind(
-    null,
-    `/payment/${params.uuid}`
-  );
+  const revalidatePaymentPageBinded = revalidatePaymentPage.bind(null, `/payment/${params.uuid}`);
 
   return (
     <div className="min-h-full">
@@ -81,11 +78,7 @@ export default async function PaymentDetailsPage({
             <Button type="submit">Revalidar</Button>
           </form>
 
-          {!hasFinishedTransactions && (
-            <form action={createDueFromPaymentBinded}>
-              <Button type="submit">Efetuar nova cobrança</Button>
-            </form>
-          )}
+          {!hasFinishedTransactions && <NewTransactionForm action={createDueFromPaymentBinded} />}
         </div>
       </header>
       <div className="grid grid-cols-2 w-full gap-6">
@@ -100,10 +93,7 @@ export default async function PaymentDetailsPage({
               </div>
               <div className="grid grid-cols-2 p-4 gap-2 gap-y-4">
                 {/* <LabelValue label="Protocolo" value={currentPayment?.uuid} /> */}
-                <LabelValue
-                  label="Valor total"
-                  value={`R$${paymentData?.price.toString()}`}
-                />
+                <LabelValue label="Valor total" value={`R$${paymentData?.price.toString()}`} />
                 <LabelValue
                   label="(OMIE) Cód. cliente"
                   value={paymentData?.omie_metadata.codigo_cliente?.toString()}
@@ -125,10 +115,7 @@ export default async function PaymentDetailsPage({
             <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
               <div className="divide-y divide-gray-200">
                 <div className="p-4">
-                  <h2
-                    id="notes-title"
-                    className="text-lg font-medium text-gray-900"
-                  >
+                  <h2 id="notes-title" className="text-lg font-medium text-gray-900">
                     Anotações
                   </h2>
                 </div>
@@ -167,10 +154,7 @@ export default async function PaymentDetailsPage({
           <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
             <div className="divide-y divide-gray-200">
               <div className="p-4">
-                <h2
-                  id="notes-title"
-                  className="text-lg font-medium text-gray-900"
-                >
+                <h2 id="notes-title" className="text-lg font-medium text-gray-900">
                   Histórico de pix
                 </h2>
               </div>

@@ -128,15 +128,15 @@ export async function createClientPayment(
 
 export async function createPaymentFromOfferPage(
   omie_enterprise: OmieEnterpriseEnum,
-  codigo_pedido_omie: string,
+  codigo_pedido_omie: string | null,
   omie_client: OmieClientModel,
   installment: OmieOfferInstallment
 ) {
-  if (!omie_enterprise || !codigo_pedido_omie) return;
+  if (!omie_enterprise || !codigo_pedido_omie || !omie_client) {
+    throw new Error("Empresa, cliente ou pedido inválidos! Tente novamente.");
+  }
 
   const client = omie_client;
-
-  if (!client) return;
 
   const payer = {
     document: {
@@ -265,13 +265,21 @@ export async function sendDue(params: {
 }) {
   const headerInfo = Object.fromEntries(headers().entries());
   const buffer = await generateQRBuffer(params.pix_copia_e_cola);
-  if (!buffer) return;
+
+  if (!buffer) {
+    throw new Error("Não foi possível gerar o QR Code para continuar.");
+  }
+
   const link = await FirebaseGateway.uploadFile({
     buffer,
     name: `qr-code-${nanoid()}`,
     type: "image/jpeg",
   });
-  if (!link) return;
+
+  if (!link) {
+    throw new Error("Não foi possível gerar o QR Code e salvá-lo.");
+  }
+
   const result = await BMessageClient.createTemplateMessage({
     phone: params.telefone,
     code: "pt_BR",
@@ -311,7 +319,7 @@ export async function sendDue(params: {
       },
     ],
   });
-  console.log("🚀 ~ result:", result);
+
   return result;
 }
 

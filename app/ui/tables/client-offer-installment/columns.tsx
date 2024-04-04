@@ -1,14 +1,12 @@
+import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
 import { OmieOfferInstallment } from "@/app/lib/definitions/OmieOffer";
-import { ColumnDef } from "@tanstack/react-table";
+import { Payment } from "@/app/lib/definitions/Payment";
 import { Badge, BadgeThemes } from "@/app/ui/badge";
 import { formatPrice } from "@/app/utils/formatters";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
-import { Button } from "../../button";
-import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
-import { Payment } from "@/app/lib/definitions/Payment";
-import Link from "next/link";
-import { createPaymentFromOfferPage } from "@/app/lib/actions";
-import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
+import { ColumnDef } from "@tanstack/react-table";
+import { ClientOfferActionColumn } from "./action-column";
 
 type InstallmentStatusBadges = {
   [key: string]: {
@@ -81,35 +79,6 @@ export const installmentColumns: ColumnDef<OmieInstallmentTable>[] = [
   {
     header: "Ação",
     accessorKey: "cabecalho.etapa",
-    cell: ({ row }) => {
-      const installment = row.original;
-      const bpay_transaction = row.original.bpay_transaction;
-      let label;
-      if (bpay_transaction?.length) {
-        label = "Ver transação";
-        return (
-          <Link href={`/payment/${installment.payment?.[0].group}`}>
-            <Button size="sm" variant="outline">
-              {label}
-            </Button>
-          </Link>
-        );
-      }
-      label = "Cobrar";
-      const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(
-        null,
-        installment.omie_enterprise!,
-        installment.codigo_pedido_omie!,
-        installment.omie_client!,
-        installment
-      );
-      return (
-        <form action={createPaymentFromOfferPageBinded}>
-          <Button type="submit" size="sm">
-            {label}
-          </Button>
-        </form>
-      );
-    },
+    cell: ({ row }) => <ClientOfferActionColumn data={row.original} />,
   },
 ];
