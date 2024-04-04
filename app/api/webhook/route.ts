@@ -1,6 +1,7 @@
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi"
 import { paymentRepo } from "@/app/lib/mongodb/repositories/payment.mongo"
 import { OmieOrderService } from "@/app/lib/omie/order.omie"
+import { OmieReceiveOrdersService } from "@/app/lib/omie/receive-orders.omie"
 import axios from "axios"
 
 export async function POST(request: Request) {
@@ -43,7 +44,36 @@ export async function POST(request: Request) {
 
   const omie_result = await OmieOrderService.update(_offer)
 
-  console.log('omie_result', omie_result)
+  //listar contas a receber por cliente
+  const receive_orders = await OmieReceiveOrdersService.findAll({
+    pagina: 1,
+    registros_por_pagina: 1000,
+    filtrar_cliente: Number(omie_metadata.codigo_cliente)
+  })
+
+  if (!receive_orders) return Response.json({ 3: false })
+
+  //filtar via js pelo codigo do pedido
+  const [receive_order] = receive_orders.conta_receber_cadastro.filter(a =>
+    Number(a.nCodPedido) === Number(omie_metadata.codigo_pedido) &&
+    Number(a.numero_parcela.split('/')[0]) === Number(omie_metadata.numero_parcela)
+  )
+
+  if (!receive_order) return Response.json({ 4: false })
+
+  //dar baixa
+  await OmieReceiveOrdersService.post({
+    codigo_lancamento: receive_order.codigo_lancamento_omie,
+    codigo_conta_corrente: receive_order.id_conta_corrente,
+    valor: payment.price,
+    data: new Date().toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    }),
+    observacao: "Baixa realizada automaticamente pelo sistema BFinancial"
+  })
+
   await axios.post(
     "https://bpay-rest-api.bwsoft.app/update-pix-without-recipient",
     data

@@ -9,7 +9,7 @@ export interface OmieReceiveOrder {
 }
 
 export type OmieListReceiveOrderParams = OmieSearchParams & {
-  filtrar_cliente?: string;
+  filtrar_cliente?: number;
 };
 
 export type OmieListReceiveOrderResponse = OmieResponse & {
@@ -18,7 +18,6 @@ export type OmieListReceiveOrderResponse = OmieResponse & {
 
 export type OmiePostReceiptParams = {
   codigo_lancamento: number;
-  codigo_baixa: number;
   codigo_conta_corrente: number;
   valor: number;
   data: string;
