@@ -172,7 +172,7 @@ export async function createPaymentFromOfferPage(
     },
     bpay_metadata: {
       id: pix.transaction._id,
-      txid: pix.transaction.bb.txid
+      txid: pix.transaction.bb.txid,
     },
     group: `${codigo_pedido_omie}${installment.numero_parcela}`,
   };
@@ -186,7 +186,7 @@ export async function createPaymentFromOfferPage(
     numero_parcela: installment.numero_parcela.toString(),
     pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
     telefone: "5527999697185",
-    payment_group: data.group!
+    payment_group: data.group!,
   });
   return payment;
 }
@@ -258,58 +258,62 @@ export async function sendDue(params: {
   telefone: string;
   data_vencimento: string;
   pix_copia_e_cola: string;
-  payment_group: string
+  payment_group: string;
 }) {
-  const headerInfo = Object.fromEntries(headers().entries());
-  const buffer = await generateQRBuffer(params.pix_copia_e_cola);
-  if (!buffer) return;
-  const link = await FirebaseGateway.uploadFile({
-    buffer,
-    name: `qr-code-${nanoid()}`,
-    type: "image/jpeg",
-  });
-  if (!link) return;
-  const result = await BMessageClient.createTemplateMessage({
-    phone: params.telefone,
-    code: "pt_BR",
-    template: "cobranca_bfinancial",
-    components: [
-      {
-        type: "header",
-        parameters: [
-          {
-            type: "image",
-            image: {
-              link,
+  try {
+    const headerInfo = Object.fromEntries(headers().entries());
+    const buffer = await generateQRBuffer(params.pix_copia_e_cola);
+    if (!buffer) return;
+    const link = await FirebaseGateway.uploadFile({
+      buffer,
+      name: `qr-code-${nanoid()}`,
+      type: "image/jpeg",
+    });
+    if (!link) return;
+    const result = await BMessageClient.createTemplateMessage({
+      phone: params.telefone,
+      code: "pt_BR",
+      template: "cobranca_bfinancial",
+      components: [
+        {
+          type: "header",
+          parameters: [
+            {
+              type: "image",
+              image: {
+                link,
+              },
             },
-          },
-        ],
-      },
-      {
-        type: "body",
-        parameters: [
-          {
-            type: "text",
-            text: params.numero_parcela,
-          },
-          {
-            type: "text",
-            text: params.data_vencimento,
-          },
-          {
-            type: "text",
-            text: `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}/${params.payment_group}`,
-          },
-          {
-            type: "text",
-            text: params.pix_copia_e_cola,
-          },
-        ],
-      },
-    ],
-  });
-  console.log("🚀 ~ result:", result);
-  return result;
+          ],
+        },
+        {
+          type: "body",
+          parameters: [
+            {
+              type: "text",
+              text: params.numero_parcela,
+            },
+            {
+              type: "text",
+              text: params.data_vencimento,
+            },
+            {
+              type: "text",
+              text: `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}/${params.payment_group}`,
+            },
+            {
+              type: "text",
+              text: params.pix_copia_e_cola,
+            },
+          ],
+        },
+      ],
+    });
+    return result;
+  } catch (error: any) {
+    console.error("🚀 ~ file: actions.ts:266 ~ error:", JSON.stringify(error));
+    throw new Error(JSON.stringify(error));
+  }
 }
 
 export async function uploadMediaWtp(params: { buffer: Buffer }) {
