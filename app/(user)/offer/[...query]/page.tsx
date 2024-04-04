@@ -19,8 +19,7 @@ export default async function Example({
     query: [OmieEnterpriseEnum, string, string];
   };
 }) {
-  const [omie_enterprise, codigo_cliente_omie, codigo_pedido_omie] =
-    params.query;
+  const [omie_enterprise, codigo_cliente_omie, codigo_pedido_omie] = params.query;
 
   if (!omie_enterprise || !codigo_cliente_omie || !codigo_pedido_omie) {
     throw new Error("Lmao");
@@ -44,34 +43,29 @@ export default async function Example({
     );
   }
 
-  const installments = offer.pedido_venda_produto.lista_parcelas.parcela.map(
-    (installent) => {
-      const payment = payments.filter(
-        (payment) =>
-          payment.omie_metadata.numero_parcela === installent.numero_parcela
-      );
+  const installments = offer.pedido_venda_produto.lista_parcelas?.parcela.map((installent) => {
+    const payment = payments.filter(
+      (payment) => payment.omie_metadata.numero_parcela === installent.numero_parcela
+    );
 
-      const transactions_id = payment.map(
-        (payment) => payment.bpay_metadata.id
-      );
+    const transactions_id = payment.map((payment) => payment.bpay_metadata.id);
 
-      const bpay_transaction =
-        transactions.status && transactions.transactions
-          ? transactions?.transactions.filter((transaction) =>
-              transactions_id.includes(transaction._id)
-            )
-          : undefined;
+    const bpay_transaction =
+      transactions.status && transactions.transactions
+        ? transactions?.transactions.filter((transaction) =>
+            transactions_id.includes(transaction._id)
+          )
+        : undefined;
 
-      return {
-        ...installent,
-        bpay_transaction, // ### fazer request no micro serviço bpay para ter acesso a essas trasanções
-        payment,
-        omie_enterprise,
-        codigo_pedido_omie,
-        omie_client: client,
-      };
-    }
-  );
+    return {
+      ...installent,
+      bpay_transaction, // ### fazer request no micro serviço bpay para ter acesso a essas trasanções
+      payment,
+      omie_enterprise,
+      codigo_pedido_omie,
+      omie_client: client,
+    };
+  });
 
   const revalidateInstallment = revalidateInstallmentOffer.bind(
     null,
@@ -82,10 +76,7 @@ export default async function Example({
     <div className="min-h-full">
       <main className="flex-1 pb-8">
         {/* Page header */}
-        <PageHeader
-          pageTitle="Pedido"
-          description="Visualizar dados do pedido."
-        >
+        <PageHeader pageTitle="Pedido" description="Visualizar dados do pedido.">
           <BackButton>
             <span className="flex space-x-2 items-center">
               <ArrowLeftIcon className="h-3 w-3" />
