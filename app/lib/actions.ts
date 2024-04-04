@@ -253,6 +253,7 @@ export async function createDueFromPayment(params: { payment: Payment }) {
     "🚀 ~ file: actions.ts:252 ~ createDueFromPayment ~ createDueFromPayment iniciando action"
   );
   const payment = params.payment;
+  console.log("🚀 ~ file: actions.ts:256 ~ createDueFromPayment ~ payment:", payment);
 
   const enterprise = payment.omie_metadata?.enterprise;
   const clientId = payment.omie_metadata?.codigo_cliente;
