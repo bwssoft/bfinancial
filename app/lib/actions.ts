@@ -52,12 +52,17 @@ export const listCachedOffers = unstable_cache(
 
 export const getCachedOffer = unstable_cache(
   async (enterprise, id) => await fetchOfferById(enterprise, id),
-  ["omie-offer-list"]
+  ["omie-offer-list"],
+  {
+    revalidate: 60,
+  }
 );
 
 export async function fetchOfferById(enterprise: OmieEnterpriseEnum, id: number) {
   OmieOrderService.setSecrets(enterprise);
-  return await OmieOrderService.find(id);
+  const result = await OmieOrderService.find(id);
+  console.log("🚀 ~ file: actions.ts:61 ~ fetchOfferById ~ result:", result);
+  return result;
 }
 
 export async function fetchPayments(params?: Filter<Payment>) {
