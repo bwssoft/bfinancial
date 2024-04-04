@@ -1,3 +1,4 @@
+import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi"
 import { paymentRepo } from "@/app/lib/mongodb/repositories/payment.mongo"
 import { OmieOrderService } from "@/app/lib/omie/order.omie"
 import axios from "axios"
@@ -31,7 +32,9 @@ export async function POST(request: Request) {
         ...parcela,
         parcela_adiantamento: "S",
         categoria_adiantamento: "1.01.01",
-        conta_corrente_adiantamento: "6331754348",
+        conta_corrente_adiantamento: nCodCCByEnterprise[
+          OmieEnterpriseEnum[omie_metadata.enterprise]
+        ],
       }
     }
     return parcela
@@ -46,6 +49,14 @@ export async function POST(request: Request) {
   )
 
   return Response.json({ ok: true })
+}
+
+const nCodCCByEnterprise = {
+  WFC: '7974650357', // descrição: adiantamento
+  ICB: '6331754348', // descrição: adiantamento
+  MGC: '2225386193', //codigo_banco 999
+  ICBFILIAL: '8397776986', //codigo_banco 999
+  BWS: '2225316057'//codigo_banco 999
 }
 
 interface Pix {
