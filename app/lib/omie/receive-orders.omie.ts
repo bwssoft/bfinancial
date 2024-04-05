@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { OmieCredentials } from "../definitions/OmieApi";
 import {
   OmieListReceiveOrderParams,
@@ -34,7 +35,11 @@ class ReceiveOrdersService extends OmieBaseService {
       console.log('response', response)
       return response.data;
     } catch (e) {
-      console.log('e', e)
+      const _e = e as AxiosError<any>
+      console.log('cause', _e.cause)
+      console.log('message', _e.message)
+      console.log('name', _e.name)
+      console.log('response', _e.response)
       return null;
     }
   }
