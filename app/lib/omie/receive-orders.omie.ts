@@ -35,6 +35,7 @@ class ReceiveOrdersService extends OmieBaseService {
       console.log('response', response)
       return response.data;
     } catch (e) {
+      console.log(e)
       const _e = e as AxiosError<any>
       console.log('cause', _e.cause)
       console.log('message', _e.message)
