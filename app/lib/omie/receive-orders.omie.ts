@@ -39,6 +39,7 @@ class ReceiveOrdersService extends OmieBaseService {
       console.log('cause', _e.cause)
       console.log('message', _e.message)
       console.log('name', _e.name)
+      console.log('toJSON', _e.toJSON())
       console.log('response', _e.response)
       return null;
     }
