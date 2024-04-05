@@ -31,8 +31,10 @@ class ReceiveOrdersService extends OmieBaseService {
         "/financas/contareceber/",
         data
       );
+      console.log('response', response)
       return response.data;
-    } catch {
+    } catch (e) {
+      console.log('e', e)
       return null;
     }
   }
