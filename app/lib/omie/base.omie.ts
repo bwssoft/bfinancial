@@ -29,6 +29,7 @@ export class OmieBaseService {
         return response;
       },
       function (error) {
+        console.log("BaseService error");
         if (error.response) {
           console.log(error.response.status, error.response.data);
         } else if (error.request) {
