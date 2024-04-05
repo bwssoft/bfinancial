@@ -30,39 +30,40 @@ export async function POST(request: Request) {
   const offer = await OmieOrderService.find(Number(omie_metadata.codigo_pedido))
   if (!offer) return new Response("No offer with this code", { status: 404 })
 
-  /**
-  * create object to update prop "situação" from omie offer
-  */
-  let _offer = offer.pedido_venda_produto
+  if (offer.pedido_venda_produto.cabecalho.etapa !== "60") {
+    /**
+    * create object to update prop "situação" from omie offer
+    */
+    let _offer = offer.pedido_venda_produto
 
-  delete _offer.cabecalho.numero_pedido
-  delete _offer.cabecalho.bloqueado
-  delete _offer.frete
-  delete _offer.informacoes_adicionais
-  delete _offer.exportacao
-  delete _offer.det
+    delete _offer.cabecalho.numero_pedido
+    delete _offer.cabecalho.bloqueado
+    delete _offer.frete
+    delete _offer.informacoes_adicionais
+    delete _offer.exportacao
+    delete _offer.det
 
-  _offer.cabecalho.origem_pedido = "API"
-  const parcela = _offer.lista_parcelas.parcela.map(parcela => {
-    if (parcela.numero_parcela === omie_metadata.numero_parcela) {
-      return {
-        ...parcela,
-        parcela_adiantamento: "S",
-        categoria_adiantamento: "1.01.01",
-        conta_corrente_adiantamento: nCodCCByEnterprise[
-          OmieEnterpriseEnum[omie_metadata.enterprise]
-        ],
+    _offer.cabecalho.origem_pedido = "API"
+    const parcela = _offer.lista_parcelas.parcela.map(parcela => {
+      if (parcela.numero_parcela === omie_metadata.numero_parcela) {
+        return {
+          ...parcela,
+          parcela_adiantamento: "S",
+          categoria_adiantamento: "1.01.01",
+          conta_corrente_adiantamento: nCodCCByEnterprise[
+            OmieEnterpriseEnum[omie_metadata.enterprise]
+          ],
+        }
       }
-    }
-    return parcela
-  })
-  _offer.lista_parcelas.parcela = parcela
+      return parcela
+    })
+    _offer.lista_parcelas.parcela = parcela
 
-
-  /**
-  * update omie offer (pedido) 
-  */
-  await OmieOrderService.update(_offer)
+    /**
+    * update omie offer (pedido) 
+    */
+    await OmieOrderService.update(_offer)
+  }
 
   /**
   * request for all omie receive orders (contas a receber)
