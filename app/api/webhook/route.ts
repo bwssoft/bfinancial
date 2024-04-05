@@ -1,22 +1,39 @@
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi"
 import { paymentRepo } from "@/app/lib/mongodb/repositories/payment.mongo"
 import { OmieOrderService } from "@/app/lib/omie/order.omie"
+import { OmieReceiveOrdersService } from "@/app/lib/omie/receive-orders.omie"
 import axios from "axios"
 
 export async function POST(request: Request) {
+  /**
+   * data received from bb webhook
+  */
   const data: { pix: Pix[] } = await request.json()
   const [pix] = data.pix
 
+  /**
+   * request payment entity associated with txid from bb pix in our repository
+  */
   const payment = await paymentRepo.findOne({ "bpay_metadata.txid": pix.txid })
-  if (!payment) return Response.json({ 0: false })
+  if (!payment) return new Response("No payment with this code", { status: 404 })
 
+  /**
+  * set omie secrets on service with enterprise associated with payment entity
+  */
   const { omie_metadata } = payment
   OmieOrderService.setSecrets(omie_metadata.enterprise);
-  const offer = await OmieOrderService.find(Number(omie_metadata.codigo_pedido))
-  if (!offer) return Response.json({ 1: false })
+  OmieReceiveOrdersService.setSecrets(omie_metadata.enterprise);
 
-  let _offer = offer?.pedido_venda_produto
-  if (!_offer) return Response.json({ 2: false })
+  /**
+  * request omie offer (pedido)
+  */
+  const offer = await OmieOrderService.find(Number(omie_metadata.codigo_pedido))
+  if (!offer) return new Response("No offer with this code", { status: 404 })
+
+  /**
+  * create object to update prop "situação" from omie offer
+  */
+  let _offer = offer.pedido_venda_produto
 
   delete _offer.cabecalho.numero_pedido
   delete _offer.cabecalho.bloqueado
@@ -41,9 +58,61 @@ export async function POST(request: Request) {
   })
   _offer.lista_parcelas.parcela = parcela
 
-  const omie_result = await OmieOrderService.update(_offer)
 
-  console.log('omie_result', omie_result)
+  /**
+  * update omie offer (pedido) 
+  */
+  await OmieOrderService.update(_offer)
+
+  /**
+  * request for all omie receive orders (contas a receber)
+  */
+  const receive_orders = await OmieReceiveOrdersService.findAll({
+    pagina: 1,
+    registros_por_pagina: 1000,
+    filtrar_cliente: Number(omie_metadata.codigo_cliente)
+  })
+
+  if (!receive_orders) return new Response(
+    "No receive offer with this code",
+    {
+      status: 404
+    }
+  )
+
+  /**
+  * filter omie receive orders that fit with payment entity
+  */
+  const [current_receive_order] = receive_orders.conta_receber_cadastro.filter(a =>
+    Number(a.nCodPedido) === Number(omie_metadata.codigo_pedido) &&
+    Number(a.numero_parcela.split('/')[0]) === Number(omie_metadata.numero_parcela)
+  )
+
+  if (!current_receive_order) return new Response(
+    "No receive offer linked",
+    {
+      status: 404
+    }
+  )
+
+  /**
+  * 
+  */
+  await OmieReceiveOrdersService.post({
+    codigo_lancamento: current_receive_order.codigo_lancamento_omie,
+    codigo_conta_corrente: current_receive_order.id_conta_corrente,
+    valor: payment.price,
+    data: new Date().toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    }),
+    observacao: "Baixa realizada automaticamente pelo sistema BFinancial"
+  })
+
+  /**
+  *  notify bpay microservice with the dara received from bb webhook
+  */
   await axios.post(
     "https://bpay-rest-api.bwsoft.app/update-pix-without-recipient",
     data

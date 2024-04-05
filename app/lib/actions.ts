@@ -153,8 +153,8 @@ export async function createPaymentFromOfferPage(
   const pix = await createPixTransaction({
     payer,
     receiver,
-    // price: installment.valor.toString()
-    price: "1",
+    price: installment.valor.toString()
+    // price: "1",
   });
 
   if (!pix.status) {
