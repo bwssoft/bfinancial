@@ -10,7 +10,7 @@ import { useMediaQuery } from "@/app/hook/use-media-query";
 import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
 import { OfferTableFilter } from "./offer-table-filter";
 import { orderOfferColumns } from "./columns";
-import { fetchClientById } from "@/app/lib/actions";
+import { getCachedClient } from "@/app/lib/actions";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 
 type OfferTableProps = {
@@ -46,7 +46,7 @@ export function OfferTable({
   }
 
   async function fetchClient(omie_enterprise: OmieEnterpriseEnum) {
-    const data = await fetchClientById(
+    const data = await getCachedClient(
       omie_enterprise,
       codigo_cliente_omie ?? ""
     );

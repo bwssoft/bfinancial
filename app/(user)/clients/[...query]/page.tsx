@@ -1,4 +1,4 @@
-import { fetchClientById, fetchOffers } from "@/app/lib/actions";
+import { getCachedClient, fetchOffers } from "@/app/lib/actions";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { BackButton } from "@/app/ui/back-button";
 import { LabelValue } from "@/app/ui/label-value";
@@ -18,7 +18,7 @@ export default async function ClientPage({
     throw new Error("Lmao");
   }
 
-  const client = await fetchClientById(omie_enterprise, codigo_cliente_omie);
+  const client = await getCachedClient(omie_enterprise, codigo_cliente_omie);
 
   if (!client) {
     return (

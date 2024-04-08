@@ -13,6 +13,7 @@ import { OmieClientListParams, OmieClientModel } from "./definitions/OmieClient"
 import { OmieListOfferParams, OmieOfferInstallment } from "./definitions/OmieOffer";
 import { FirebaseGateway } from "./firebase";
 import { noteRepo } from "./mongodb/repositories/note.mongo";
+import { auditRepo } from "./mongodb/repositories/audit.mongo";
 import { CreatePayment, paymentRepo } from "./mongodb/repositories/payment.mongo";
 import { OmieOrderService } from "./omie/order.omie";
 
@@ -65,6 +66,14 @@ export const getCachedClient = unstable_cache(
     revalidate: 10800,
   }
 );
+
+async function fetchAuditByMetadata<T = any>(params: T ) {
+  return await auditRepo.findOne({ metadata:params })
+}
+
+export async function fetchAuditByOmieCode(code:string){
+  return await fetchAuditByMetadata<{codigo_pedido_omie:string}>({codigo_pedido_omie:code})
+}
 
 export async function fetchOfferById(enterprise: OmieEnterpriseEnum, id: number) {
   OmieOrderService.setSecrets(enterprise);
