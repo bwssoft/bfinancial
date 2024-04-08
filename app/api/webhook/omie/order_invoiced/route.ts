@@ -2,6 +2,7 @@ import { getCachedClient, getCachedOffer } from "@/app/lib/actions";
 import { BMessageClient } from "@/app/lib/bmessage/bessage";
 import { DocumentEnum, createPixTransaction } from "@/app/lib/bpay/bpay";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { OmieOfferInstallment } from "@/app/lib/definitions/OmieOffer";
 import { FirebaseGateway } from "@/app/lib/firebase";
 import { auditRepo } from "@/app/lib/mongodb/repositories/audit.mongo";
 import { paymentRepo } from "@/app/lib/mongodb/repositories/payment.mongo";
@@ -15,135 +16,135 @@ import { nanoid } from "nanoid";
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: Request) {
-  const data: VendaProdutoFaturadaEvent = await request.json();
-  const omie_enterprise: OmieEnterpriseEnum = appHashByEnterpriseEnum[data.appHash];
+  try {
+    const data: VendaProdutoFaturadaEvent = await request.json();
+    const omie_enterprise: OmieEnterpriseEnum = appHashByEnterpriseEnum[data.appHash];
 
-  const codigo_pedido = data.event.idPedido;
-  const codigo_cliente = data.event.idCliente;
+    const codigo_pedido = data.event.idPedido;
+    const codigo_cliente = data.event.idCliente;
 
-  /**
-   * Requisitar os dados do pedido omie
-   */
-  OmieOrderService.setSecrets(omie_enterprise);
-  const order = await getCachedOffer(omie_enterprise, Number(codigo_pedido));
-  if (!order) return new Response("Omie order not found", { status: 404 });
+    /**
+     * Requisitar os dados do pedido omie e do cliente omie
+     */
+    OmieOrderService.setSecrets(omie_enterprise);
+    OmieClientService.setSecrets(omie_enterprise);
+    const [order, client] = await Promise.all([
+      getCachedOffer(omie_enterprise, Number(codigo_pedido)),
+      getCachedClient(omie_enterprise, String(codigo_cliente))
+    ])
+    if (!order) return new Response("Omie order not found", { status: 404 });
+    if (!client) return new Response("Omie client not found", { status: 404 });
 
-  /**
-   * Requisitar os dados do do cliente omie relacionado no pedido
-   */
-  OmieClientService.setSecrets(omie_enterprise);
-  const client = await getCachedClient(omie_enterprise, String(codigo_cliente));
-  if (!client) return new Response("Omie client not found", { status: 404 });
+    /**
+     * Gerar um pix para cada parcela do pedido omie
+     */
+    const installments = order?.pedido_venda_produto.lista_parcelas.parcela;
+    if (!installments.length) return new Response("Omie order without installments", { status: 404 });
 
-  /**
-   * Gerar um pix para cada parcela do pedido omie
-   */
-  const installments = order?.pedido_venda_produto.lista_parcelas.parcela;
-  if (!installments.length) return new Response("Omie order without installments", { status: 404 });
+    const qrCode = await Promise.all<{ url: string, code: string } & OmieOfferInstallment>(installments.map(async installment => {
+      try {
+        const [day, month, year] = installment.data_vencimento.split("/");
+        const expirationDate = new Date();
+        expirationDate.setDate(Number(day));
+        expirationDate.setMonth(Number(month));
+        expirationDate.setMonth(Number(year));
 
-  const qrCode = [];
-  for (let installment of installments) {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const [day, month, year] = installment.data_vencimento.split("/");
-      const expirationDate = new Date();
-      expirationDate.setDate(Number(day));
-      expirationDate.setMonth(Number(month));
-      expirationDate.setMonth(Number(year));
-
-      const pix = await createPixTransaction({
-        payer: {
-          document: {
-            type: DocumentEnum.CNPJ,
-            value: client.cnpj_cpf,
+        const pix = await createPixTransaction({
+          payer: {
+            document: {
+              type: DocumentEnum.CNPJ,
+              value: client.cnpj_cpf,
+            },
+            email: client.email,
+            name: client.nome_fantasia,
           },
-          email: client.email,
-          name: client.nome_fantasia,
-        },
-        receiver: {
-          name: omie_enterprise,
-        },
-        price: installment.valor.toString(),
-        expiration: differenceInSeconds(expirationDate, new Date()),
-      });
+          receiver: {
+            name: omie_enterprise,
+          },
+          price: installment.valor.toString(),
+          expiration: differenceInSeconds(expirationDate, new Date()),
+        });
 
-      if (!pix.status) {
+        if (!pix.status) {
+          throw new Error();
+        }
+
+        const qrCodeBuffer = await generateQRBuffer(pix.transaction.bb.pixCopyPaste);
+
+        if (!qrCodeBuffer) {
+          throw new Error();
+        }
+
+        const qrCodeurl = await FirebaseGateway.uploadFile({
+          buffer: qrCodeBuffer,
+          name: `qr-code-${nanoid()}`,
+          type: "image/jpeg",
+        });
+
+        if (!qrCodeurl) {
+          throw new Error();
+        }
+
+        await paymentRepo.create({
+          user_uuid: uuidv4(),
+          uuid: uuidv4(),
+          created_at: new Date().toISOString(),
+          price: pix.transaction.amount,
+          omie_metadata: {
+            enterprise: omie_enterprise,
+            codigo_cliente: codigo_cliente,
+            codigo_pedido: String(codigo_pedido),
+            numero_parcela: installment.numero_parcela,
+            data_vencimento: installment.data_vencimento,
+          },
+          bpay_metadata: {
+            id: pix.transaction._id,
+            txid: pix.transaction.bb.txid,
+          },
+          group: `${codigo_pedido}${installment.numero_parcela}`,
+        });
+
+        return { url: qrCodeurl, code: pix.transaction.bb.pixCopyPaste, ...installment }
+
+      } catch (e) {
+        await auditRepo.create({
+          operation: "create-pix",
+          metadata: {
+            codigo_pedido_omie: codigo_pedido,
+          },
+        });
         throw new Error();
       }
+    }))
 
-      const qrCodeBuffer = await generateQRBuffer(pix.transaction.bb.pixCopyPaste);
+    const clientName =
+      client.pessoa_fisica === "S"
+        ? client.nome_fantasia
+        : `${client.nome_fantasia} (${client.razao_social})`;
 
-      if (!qrCodeBuffer) {
-        throw new Error();
-      }
+    /**
+     * Enviar a cobrança para o email do cliente omie
+     */
+    await BMessageClient.createTemplateEmail({
+      html: render(
+        QRCodeEmail({
+          metadata: {
+            clientName,
+            createdAt: order.pedido_venda_produto.infoCadastro.dInc,
+            total: order.pedido_venda_produto.total_pedido.valor_total_pedido,
+          },
+          installments: qrCode,
+        })
+      ),
+      subject: "Cobrança dos produtos BWS",
+      to: client.email
+    });
 
-      const qrCodeurl = await FirebaseGateway.uploadFile({
-        buffer: qrCodeBuffer,
-        name: `qr-code-${nanoid()}`,
-        type: "image/jpeg",
-      });
+    return Response.json({ ok: true });
+  } catch (e) {
 
-      if (!qrCodeurl) {
-        throw new Error();
-      }
-
-      qrCode.push({ url: qrCodeurl, code: pix.transaction.bb.pixCopyPaste, ...installment });
-
-      await paymentRepo.create({
-        user_uuid: uuidv4(),
-        uuid: uuidv4(),
-        created_at: new Date().toISOString(),
-        price: pix.transaction.amount,
-        omie_metadata: {
-          enterprise: omie_enterprise,
-          codigo_cliente: codigo_cliente,
-          codigo_pedido: String(codigo_pedido),
-          numero_parcela: installment.numero_parcela,
-          data_vencimento: installment.data_vencimento,
-        },
-        bpay_metadata: {
-          id: pix.transaction._id,
-          txid: pix.transaction.bb.txid,
-        },
-        group: `${codigo_pedido}${installment.numero_parcela}`,
-      });
-    } catch (e) {
-      await auditRepo.create({
-        operation: "create-pix",
-        metadata: {
-          codigo_pedido_omie: codigo_pedido,
-        },
-      });
-
-      return new Response("Error when created payment", { status: 500 });
-    }
+    return new Response("Error", { status: 500 })
   }
-
-  const clientName =
-    client.pessoa_fisica === "S"
-      ? client.nome_fantasia
-      : `${client.nome_fantasia} (${client.razao_social})`;
-
-  /**
-   * Enviar a cobrança para o email do cliente omie
-   */
-  await BMessageClient.createTemplateEmail({
-    html: render(
-      QRCodeEmail({
-        metadata: {
-          clientName,
-          createdAt: order.pedido_venda_produto.infoCadastro.dInc,
-          total: order.pedido_venda_produto.total_pedido.valor_total_pedido,
-        },
-        installments: qrCode,
-      })
-    ),
-    subject: "Cobrança dos produtos BWS",
-    to: client.email
-  });
-  //enviar uma mensagem no wtp falando que as cobranças foram geradas?
-  return Response.json({ ok: true });
 }
 
 const appHashByEnterpriseEnum: {
