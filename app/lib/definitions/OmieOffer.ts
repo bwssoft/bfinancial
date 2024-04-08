@@ -104,3 +104,15 @@ export type OmieOfferUpdateResponse = {
   descricao_status: string;
   numero_pedido: string;
 };
+
+export type OmieInvoice = {
+  cCodIntPed?: string,
+  nCodPed: number
+}
+
+export type OmieInvoiceResponse = {
+  cCodIntPed?: string,
+  nCodPed: number,
+  cCodStatus: string,
+  cDescStatus: string
+}
