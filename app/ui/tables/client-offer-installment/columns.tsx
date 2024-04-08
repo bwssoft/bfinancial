@@ -38,47 +38,53 @@ export type OmieInstallmentTable = OmieOfferInstallment & {
   omie_client?: OmieClientModel;
 };
 
-export const installmentColumns: ColumnDef<OmieInstallmentTable>[] = [
-  { header: "Índice", accessorKey: "numero_parcela" },
-  { header: "Vencimento", accessorKey: "data_vencimento" },
-  { header: "Empresa", accessorKey: "omie_enterprise" },
-  { header: "Cliente", accessorKey: "omie_client.nome_fantasia" },
-  {
-    header: "Valor",
-    accessorKey: "valor",
-    cell: ({ row }) => {
-      const installment = row.original;
-      return (
-        <span className="flex flex-1 space-x-2 truncate">
-          <BanknotesIcon
-            className="h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-            aria-hidden="true"
-          />
-          <p className="truncate text-gray-500 group-hover:text-gray-900">
-            {formatPrice(installment.valor)}
-          </p>
-        </span>
-      );
+export interface GetInstallmentColumnsParams {
+  client: OmieClientModel;
+}
+
+export function getInstallmentColumns({
+  client,
+}: GetInstallmentColumnsParams): ColumnDef<OmieInstallmentTable>[] {
+  return [
+    { header: "Índice", accessorKey: "numero_parcela" },
+    { header: "Vencimento", accessorKey: "data_vencimento" },
+    {
+      header: "Valor",
+      accessorKey: "valor",
+      cell: ({ row }) => {
+        const installment = row.original;
+        return (
+          <span className="flex flex-1 space-x-2 truncate">
+            <BanknotesIcon
+              className="h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+              aria-hidden="true"
+            />
+            <p className="truncate text-gray-500 group-hover:text-gray-900">
+              {formatPrice(installment.valor)}
+            </p>
+          </span>
+        );
+      },
     },
-  },
-  {
-    header: "Status",
-    accessorKey: "cabecalho.etapa",
-    cell: ({ row }) => {
-      const bpay_transaction = row.original.bpay_transaction;
-      const status = !bpay_transaction?.length
-        ? "PENDENTE"
-        : bpay_transaction?.some((transaction) => transaction.finish)
-        ? "DEFERIDO"
-        : "PROCESSANDO";
-      const label = installmentStatusBadges[status]?.label;
-      const theme = installmentStatusBadges[status]?.color;
-      return <Badge size="sm" label={label} theme={theme} />;
+    {
+      header: "Status",
+      accessorKey: "cabecalho.etapa",
+      cell: ({ row }) => {
+        const bpay_transaction = row.original.bpay_transaction;
+        const status = !bpay_transaction?.length
+          ? "PENDENTE"
+          : bpay_transaction?.some((transaction) => transaction.finish)
+          ? "DEFERIDO"
+          : "PROCESSANDO";
+        const label = installmentStatusBadges[status]?.label;
+        const theme = installmentStatusBadges[status]?.color;
+        return <Badge size="sm" label={label} theme={theme} />;
+      },
     },
-  },
-  {
-    header: "Ação",
-    accessorKey: "cabecalho.etapa",
-    cell: ({ row }) => <ClientOfferActionColumn data={row.original}/>,
-  },
-];
+    {
+      header: "Ação",
+      accessorKey: "cabecalho.etapa",
+      cell: ({ row }) => <ClientOfferActionColumn data={row.original} client={client} />,
+    },
+  ];
+}

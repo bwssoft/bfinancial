@@ -2,15 +2,19 @@
 
 import { useToast } from "@/app/hook/use-toast";
 import { createPaymentFromOfferPage } from "@/app/lib/actions";
+import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
+import { differenceInSeconds } from "date-fns";
 import Link from "next/link";
 import { Button } from "../../button";
+import { DueCreateForm } from "../../form/due-create/due-create";
+import { Popover, PopoverContent, PopoverTrigger } from "../../popover";
 import { OmieInstallmentTable } from "./columns";
-import { differenceInSeconds } from 'date-fns'
 interface ClientOfferColumn {
   data: OmieInstallmentTable;
+  client: OmieClientModel;
 }
 
-export function ClientOfferActionColumn({ data }: ClientOfferColumn) {
+export function ClientOfferActionColumn({ data, client }: ClientOfferColumn) {
   const { toast } = useToast();
   const installment = data;
 
@@ -27,25 +31,23 @@ export function ClientOfferActionColumn({ data }: ClientOfferColumn) {
 
   async function handleAction(form: FormData) {
     try {
-      const [day, month, year] = data.data_vencimento.split('/')
+      const [day, month, year] = data.data_vencimento.split("/");
 
-      const expirationDate = new Date()
+      const expirationDate = new Date();
 
-      expirationDate.setDate(Number(day))
-      expirationDate.setMonth(Number(month))
-      expirationDate.setMonth(Number(year))
-      
-      const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(
-        form,
-        installment.omie_enterprise!,
-        installment.codigo_pedido_omie!,
-        installment.omie_client!,
+      expirationDate.setDate(Number(day));
+      expirationDate.setMonth(Number(month));
+      expirationDate.setMonth(Number(year));
+
+      const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(null, {
+        omie_enterprise: installment.omie_enterprise!,
+        codigo_pedido_omie: installment.codigo_pedido_omie!,
+        omie_client: installment.omie_client!,
         installment,
-        differenceInSeconds(expirationDate, new Date())
-      );
+        expiration: differenceInSeconds(expirationDate, new Date()),
+      });
 
-
-      await createPaymentFromOfferPageBinded();
+      await createPaymentFromOfferPageBinded(form);
 
       toast({
         title: "Sucesso!",
@@ -62,10 +64,17 @@ export function ClientOfferActionColumn({ data }: ClientOfferColumn) {
   }
 
   return (
-    <form action={handleAction}>
-      <Button type="submit" size="sm">
-        Cobrar
-      </Button>
-    </form>
+    <div>
+      <Popover>
+        <PopoverTrigger>
+          <Button type="button" size="sm">
+            Cobrar
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-96 space-y-4">
+          <DueCreateForm client={client} action={handleAction} />
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

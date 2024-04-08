@@ -2,6 +2,7 @@ import {
   createDueFromPayment,
   fetchNote,
   fetchPaymentByGroup,
+  getCachedClient,
   getManyTransactionById,
   revalidatePaymentPage,
   sendDue,
@@ -52,9 +53,10 @@ export default async function PaymentDetailsPage({
     payment_group: paymentData.group,
   });
 
-  const createDueFromPaymentBinded = createDueFromPayment.bind(null, {
-    payment: paymentData,
-  });
+  const client = await getCachedClient(
+    paymentData.omie_metadata.enterprise,
+    paymentData.omie_metadata.codigo_cliente.toString()
+  );
 
   const revalidatePaymentPageBinded = revalidatePaymentPage.bind(null, `/payment/${params.uuid}`);
 
@@ -78,7 +80,13 @@ export default async function PaymentDetailsPage({
             <Button type="submit">Revalidar</Button>
           </form>
 
-          {!hasFinishedTransactions && <NewTransactionForm action={createDueFromPaymentBinded} />}
+          {!hasFinishedTransactions && (
+            <NewTransactionForm
+              client={client}
+              payment={paymentData}
+              action={createDueFromPayment}
+            />
+          )}
         </div>
       </header>
       <div className="grid grid-cols-2 w-full gap-6">

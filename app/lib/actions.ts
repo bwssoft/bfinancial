@@ -58,6 +58,14 @@ export const getCachedOffer = unstable_cache(
   }
 );
 
+export const getCachedClient = unstable_cache(
+  async (enterprise, id) => await fetchClientById(enterprise, id),
+  ["omie-find-client"],
+  {
+    revalidate: 10800,
+  }
+);
+
 export async function fetchOfferById(enterprise: OmieEnterpriseEnum, id: number) {
   OmieOrderService.setSecrets(enterprise);
   return await OmieOrderService.find(id);
@@ -126,13 +134,21 @@ export async function createClientPayment(
   // return await paymentRepo.create(data);
 }
 
+interface CreatePaymentFromOfferPageParams {
+  omie_enterprise: OmieEnterpriseEnum;
+  codigo_pedido_omie: string | null;
+  omie_client: OmieClientModel;
+  installment: OmieOfferInstallment;
+  expiration?: number;
+}
+
 export async function createPaymentFromOfferPage(
-  omie_enterprise: OmieEnterpriseEnum,
-  codigo_pedido_omie: string | null,
-  omie_client: OmieClientModel,
-  installment: OmieOfferInstallment,
-  expiration?: number
+  params: CreatePaymentFromOfferPageParams,
+  form: FormData
 ) {
+  const { omie_enterprise, codigo_pedido_omie, omie_client, installment, expiration } = params;
+  const formData = Object.fromEntries(form.entries()) as any;
+
   if (!omie_enterprise || !codigo_pedido_omie || !omie_client) {
     throw new Error("Empresa, cliente ou pedido inválidos! Tente novamente.");
   }
@@ -144,7 +160,7 @@ export async function createPaymentFromOfferPage(
       type: DocumentEnum.CNPJ,
       value: client.cnpj_cpf,
     },
-    email: client.email,
+    email: formData.contact_email,
     name: client.nome_fantasia,
   };
   const receiver = {
@@ -155,7 +171,7 @@ export async function createPaymentFromOfferPage(
     payer,
     receiver,
     price: installment.valor.toString(),
-    expiration
+    expiration,
   });
 
   if (!pix.status) {
@@ -189,7 +205,7 @@ export async function createPaymentFromOfferPage(
     data_vencimento: installment.data_vencimento,
     numero_parcela: installment.numero_parcela.toString(),
     pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
-    telefone: "5527999697185",
+    telefone: formData.contact_phone,
     payment_group: data.group!,
   });
   return payment;
@@ -237,7 +253,7 @@ export async function createTextMessage(params: { phone: string; message: string
   return result;
 }
 
-export async function createDueFromPayment(params: { payment: Payment }) {
+export async function createDueFromPayment(params: { payment: Payment }, form: FormData) {
   const payment = params.payment;
 
   const enterprise = payment.omie_metadata?.enterprise;
@@ -253,7 +269,15 @@ export async function createDueFromPayment(params: { payment: Payment }) {
     const currentInstallment = getCurrentInstallment(
       offer?.pedido_venda_produto.lista_parcelas.parcela
     );
-    await createPaymentFromOfferPage(enterprise, offerId, client, currentInstallment);
+    await createPaymentFromOfferPage(
+      {
+        omie_enterprise: enterprise,
+        codigo_pedido_omie: offerId,
+        omie_client: client,
+        installment: currentInstallment,
+      },
+      form
+    );
   }
 }
 
