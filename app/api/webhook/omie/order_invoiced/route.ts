@@ -140,7 +140,7 @@ export async function POST(request: Request) {
       })
     ),
     subject: "Cobrança dos produtos BWS",
-    to: "dev.italo.souza@gmail.com",
+    to: client.email
   });
   //enviar uma mensagem no wtp falando que as cobranças foram geradas?
   return Response.json({ ok: true });
