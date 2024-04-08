@@ -11,23 +11,13 @@ async function connect() {
 export type CreateUser = Partial<IUser>;
 
 async function create(data: CreateUser) {
-  try {
     const db = await connect();
     return await db.collection('user').insertOne(data);
-  } catch (error: any) {
-    console.log('[error/user-repo] (create)', error.toString())
-    throw new Error();
-  }
 }
 
 async function findOne(params: Partial<WithId<IUser>>) {
-  try {
     const db = await connect();
     return await db.collection<IUser>('user').findOne(params);
-  } catch (error: any) {
-    console.log('[error/user-repo] (create)', error.toString())
-    throw new Error();
-  }
 }
 
 export const userRepo = {

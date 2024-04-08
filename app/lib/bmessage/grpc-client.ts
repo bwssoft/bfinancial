@@ -34,28 +34,20 @@ export class BMessage extends MailService {
   public async createTextMessage(params: any) {
     const textMessage = promisify(this.textMessage).bind(this);
     return await textMessage(params)
-      .then((res: any) => res)
-      .catch((error: any) => error);
   }
 
   public async createTemplateMessage(params: any) {
     const templateMessage = promisify(this.templateMessage).bind(this);
     return await templateMessage(params)
-      .then((res: any) => res)
-      .catch((error: any) => error);
   }
 
   public async createTemplateEmail(params: any) {
     const templateMessage = promisify(this.html).bind(this);
     return await templateMessage(params)
-      .then((res: any) => res)
-      .catch((error: any) => error);
   }
 
   public async uploadBuffer(params: any) {
     const uploadMediaWtp = promisify(this.uploadMediaWtp).bind(this);
     return await uploadMediaWtp(params)
-      .then((res: any) => res)
-      .catch((error: any) => error);
   }
 }

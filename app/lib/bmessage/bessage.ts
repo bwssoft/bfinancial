@@ -6,11 +6,7 @@ async function createTextMessage(params: {
   phone: string,
   message: string
 }) {
-  try {
     return await bmessage.createTextMessage(params)
-  } catch (e) {
-    return null;
-  }
 }
 
 async function createTemplateEmail(params: {
@@ -18,11 +14,7 @@ async function createTemplateEmail(params: {
   subject: string
   to: string
 }) {
-  try {
     return await bmessage.createTemplateEmail({...params, attachments:[]})
-  } catch (e) {
-    return null;
-  }
 }
 
 async function createTemplateMessage(params: {
@@ -34,11 +26,7 @@ async function createTemplateMessage(params: {
     parameters: ({ type: string, text: string } | { type: string, image: { link: string } })[]
   }[]
 }) {
-  try {
     return await bmessage.createTemplateMessage(params)
-  } catch (e) {
-    return null;
-  }
 }
 
 async function uploadMediaWtp(params: {
