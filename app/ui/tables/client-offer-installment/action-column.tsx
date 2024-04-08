@@ -29,22 +29,23 @@ export function ClientOfferActionColumn({ data }: ClientOfferColumn) {
     try {
       const [day, month, year] = data.data_vencimento.split('/')
 
-
-      const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(
-        form,
-        installment.omie_enterprise!,
-        installment.codigo_pedido_omie!,
-        installment.omie_client!,
-        installment,
-      );
-
       const expirationDate = new Date()
 
       expirationDate.setDate(Number(day))
       expirationDate.setMonth(Number(month))
       expirationDate.setMonth(Number(year))
       
-      await createPaymentFromOfferPageBinded(differenceInSeconds(expirationDate, new Date()));
+      const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(
+        form,
+        installment.omie_enterprise!,
+        installment.codigo_pedido_omie!,
+        installment.omie_client!,
+        installment,
+        differenceInSeconds(expirationDate, new Date())
+      );
+
+
+      await createPaymentFromOfferPageBinded();
 
       toast({
         title: "Sucesso!",
