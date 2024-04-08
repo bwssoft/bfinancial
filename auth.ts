@@ -4,7 +4,7 @@ import NextAuth, { User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
 import { z } from 'zod';
-import { findOne } from './app/lib/mongodb/repositories/user.mongo';
+import { userRepo } from './app/lib/mongodb/repositories/user.mongo';
 import { compareSync } from 'bcrypt';
 
 export const { auth, signIn, signOut } = NextAuth({
@@ -18,7 +18,7 @@ export const { auth, signIn, signOut } = NextAuth({
 
         if (parsedCredentials.success) {
           const { username, password } = parsedCredentials.data;
-          const user = await findOne({ username });
+          const user = await userRepo.findOne({ username });
           if(!user) {
             return null;
           }
