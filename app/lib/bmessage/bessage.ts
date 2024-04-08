@@ -13,6 +13,18 @@ async function createTextMessage(params: {
   }
 }
 
+async function createTemplateEmail(params: {
+  html: string,
+  subject: string
+  to: string
+}) {
+  try {
+    return await bmessage.createTemplateEmail({...params, attachments:[]})
+  } catch (e) {
+    return null;
+  }
+}
+
 async function createTemplateMessage(params: {
   phone: string
   template: string
@@ -41,6 +53,7 @@ async function uploadMediaWtp(params: {
 
 
 export const BMessageClient = {
+  createTemplateEmail,
   createTextMessage,
   createTemplateMessage,
   uploadMediaWtp
