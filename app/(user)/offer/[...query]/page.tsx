@@ -6,10 +6,13 @@ import {
   revalidateInstallmentOffer,
 } from "@/app/lib/actions";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { Alert } from "@/app/ui/alert";
 import { BackButton } from "@/app/ui/back-button";
 import { Badge } from "@/app/ui/badge";
 import { Button } from "@/app/ui/button";
+import { LabelValue } from "@/app/ui/label-value";
 import { PageHeader } from "@/app/ui/navigation/page-header";
+import { Surface, SurfaceHeader } from "@/app/ui/surface";
 import { ClientOfferInstallmentTable } from "@/app/ui/tables/client-offer-installment/table";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 
@@ -75,10 +78,12 @@ export default async function Example({
 
   return (
     <div className="min-h-full">
-      <main className="flex-1 pb-8">
+      <main className="flex-1 pb-8 container">
         {/* Page header */}
         <PageHeader pageTitle="Pedido" description="Visualizar dados do pedido.">
-          {offer.pedido_venda_produto.cabecalho.etapa === '60' && <Badge label="Pedido Faturado" theme='green'  />}
+          {offer.pedido_venda_produto.cabecalho.etapa === "60" && (
+            <Badge label="Pedido Faturado" theme="green" />
+          )}
           <BackButton>
             <span className="flex space-x-2 items-center">
               <ArrowLeftIcon className="h-3 w-3" />
@@ -91,9 +96,54 @@ export default async function Example({
             </form>
           </div>
         </PageHeader>
-        <section>
-          {/* TABELA DE PARCELAS */}
-          <ClientOfferInstallmentTable installments={installments} />
+
+        <Alert
+          title="Uma das cobranças foi gerada com erro"
+          subtitle="Você irá precisar efetuar a cobrança manualmente abaixo."
+          variant="error"
+          className="text-sm my-4"
+        />
+
+        <section className="grid grid-cols-6 gap-2 mt-4">
+          <div className="col-span-4 space-y-2">
+            <Surface>
+              <SurfaceHeader>
+                <h1 className="font-medium">Cliente</h1>
+              </SurfaceHeader>
+
+              <div className="grid grid-cols-2 gap-4 p-4">
+                <LabelValue label="Nome fantasia" value={client?.nome_fantasia} />
+                <LabelValue label="Razão social" value={client?.razao_social} />
+                <LabelValue label="CNPJ/CPF" value={client?.cnpj_cpf} />
+                <LabelValue label="CEP" value={client?.cep} />
+                <LabelValue label="Email (OMIE)" value={client?.email} />
+                <LabelValue
+                  label="Telefone 1 (OMIE)"
+                  value={
+                    client?.telefone1_ddd
+                      ? `(${client?.telefone1_ddd}) ${client?.telefone1_numero}`
+                      : undefined
+                  }
+                />
+              </div>
+            </Surface>
+          </div>
+          <div className="col-span-2">
+            <Surface>
+              <SurfaceHeader>
+                <h1 className="font-medium">Dados adicionais</h1>
+              </SurfaceHeader>
+
+              <div className="grid grid-cols-1 gap-4 p-4">
+                <LabelValue label="Empresa" value={omie_enterprise} />
+                <LabelValue label="Código pedido OMIE" value={codigo_pedido_omie} />
+              </div>
+            </Surface>
+          </div>
+        </section>
+        <section className="space-y-4 mt-8">
+          <h1 className="text-lg font-bold text-gray-900">Parcelas</h1>
+          <ClientOfferInstallmentTable installments={installments} client={client} />
         </section>
       </main>
     </div>
