@@ -45,6 +45,13 @@ export class BMessage extends MailService {
       .catch((error: any) => error);
   }
 
+  public async createTemplateEmail(params: any) {
+    const templateMessage = promisify(this.html).bind(this);
+    return await templateMessage(params)
+      .then((res: any) => res)
+      .catch((error: any) => error);
+  }
+
   public async uploadBuffer(params: any) {
     const uploadMediaWtp = promisify(this.uploadMediaWtp).bind(this);
     return await uploadMediaWtp(params)
