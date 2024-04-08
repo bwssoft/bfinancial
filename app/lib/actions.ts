@@ -130,7 +130,8 @@ export async function createPaymentFromOfferPage(
   omie_enterprise: OmieEnterpriseEnum,
   codigo_pedido_omie: string | null,
   omie_client: OmieClientModel,
-  installment: OmieOfferInstallment
+  installment: OmieOfferInstallment,
+  expiration?: number
 ) {
   if (!omie_enterprise || !codigo_pedido_omie || !omie_client) {
     throw new Error("Empresa, cliente ou pedido inválidos! Tente novamente.");
@@ -153,8 +154,8 @@ export async function createPaymentFromOfferPage(
   const pix = await createPixTransaction({
     payer,
     receiver,
-    price: installment.valor.toString()
-    // price: "1",
+    price: installment.valor.toString(),
+    expiration
   });
 
   if (!pix.status) {

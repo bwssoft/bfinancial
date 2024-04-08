@@ -186,6 +186,7 @@ message PixWithoutRecipientParams {
   double price = 1;
   PayerWithoutRecipient payer = 2;
   ReceiverWithoutRecipient receiver = 3;
+  optional int32 expires = 4;
 }
 
 message PixWithoutRecipientResult {
