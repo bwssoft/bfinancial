@@ -357,3 +357,16 @@ export async function generatePayShareLink(params: { paymentGroupId: string }) {
   const headerInfo = Object.fromEntries(headers().entries());
   return `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}/pay/${params.paymentGroupId}`;
 }
+
+export async function generateOmieInvoice(params: {
+  codigo_pedido: number,
+  codigo_cliente: number,
+  omie_enterprise: OmieEnterpriseEnum
+}) {
+  const { codigo_pedido, omie_enterprise, codigo_cliente } = params
+  OmieOrderService.setSecrets(omie_enterprise)
+  await OmieOrderService.invoice({ nCodPed: codigo_pedido })
+  revalidatePath(
+    `offer/${omie_enterprise}/${codigo_cliente}/${codigo_pedido}`
+  );
+}
