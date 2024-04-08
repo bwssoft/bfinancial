@@ -1,4 +1,4 @@
-import { create } from "../mongodb/repositories/user.mongo";
+import { userRepo } from "../mongodb/repositories/user.mongo";
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 
@@ -32,7 +32,7 @@ export class UserEntity implements Partial<IUser> {
 
   public async save() {
     this.workingObjetc();
-    await create(this);
+    await userRepo.create(this);
   }
 
   public setPassword(password: string) {

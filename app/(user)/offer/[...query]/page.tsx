@@ -7,6 +7,7 @@ import {
 } from "@/app/lib/actions";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { BackButton } from "@/app/ui/back-button";
+import { Badge } from "@/app/ui/badge";
 import { Button } from "@/app/ui/button";
 import { PageHeader } from "@/app/ui/navigation/page-header";
 import { ClientOfferInstallmentTable } from "@/app/ui/tables/client-offer-installment/table";
@@ -77,6 +78,7 @@ export default async function Example({
       <main className="flex-1 pb-8">
         {/* Page header */}
         <PageHeader pageTitle="Pedido" description="Visualizar dados do pedido.">
+          {offer.pedido_venda_produto.cabecalho.etapa === '60' && <Badge label="Pedido Faturado" theme='green'  />}
           <BackButton>
             <span className="flex space-x-2 items-center">
               <ArrowLeftIcon className="h-3 w-3" />
