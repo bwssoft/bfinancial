@@ -38,8 +38,6 @@ export class BwPay extends TransactionService {
   public async createPixWithoutRecipient(params: any) {
     const pixWithoutRecipient = promisify(this.pixWithoutRecipient).bind(this);
     return await pixWithoutRecipient(params)
-      .then((res: any) => res)
-      .catch((error: any) => error);
   }
 
   public async getManyTransactionById(params: { id: string[] }): Promise<{
@@ -49,7 +47,5 @@ export class BwPay extends TransactionService {
   }> {
     const getManyById = promisify(this.getManyById).bind(this);
     return await getManyById(params)
-      .then((res: any) => res)
-      .catch((error: any) => error);
   }
 }

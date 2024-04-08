@@ -10,7 +10,6 @@ import { OmieBaseService } from "./base.omie";
 
 class OrderService extends OmieBaseService {
   async find(codigo_pedido: number) {
-    try {
       const data = this.formatSingleBodyRequest("ConsultarPedido", {
         codigo_pedido,
       });
@@ -19,13 +18,9 @@ class OrderService extends OmieBaseService {
         data
       );
       return response.data;
-    } catch {
-      return null;
-    }
   }
 
   async findAll(params?: OmieSearchParams) {
-    try {
       const data = this.formatBody("ListarPedidos", params);
       const response = await this._httpProvider.post<OmieListOfferResponse>(
         "/produtos/pedido/",
@@ -46,22 +41,15 @@ class OrderService extends OmieBaseService {
         return differenceInSeconds(second, first);
       });
       return response.data;
-    } catch {
-      return null;
-    }
   }
 
   async update(params: OmieOffer) {
-    try {
       const data = this.formatBody("AlterarPedidoVenda", params);
       const response = await this._httpProvider.post<OmieOfferUpdateResponse>(
         "/produtos/pedido/",
         data
       );
       return response.data;
-    } catch {
-      return null;
-    }
   }
 }
 

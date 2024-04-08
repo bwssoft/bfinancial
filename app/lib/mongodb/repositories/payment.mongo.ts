@@ -22,25 +22,15 @@ async function list(params: Filter<Payment> = {}) {
 }
 
 export async function findOne(params: Partial<WithId<Payment>> | any) {
-  try {
     const db = await connect();
     return await db.collection<Payment>('payment').findOne(params);
-  } catch (error: any) {
-    console.log('[error/payment-repo] (findOne)', error.toString())
-    throw new Error();
-  }
 }
 
 export type CreatePayment = Partial<Payment>;
 
 export async function create(data: CreatePayment) {
-  try {
     const db = await connect();
     return await db.collection('payment').insertOne(data);
-  } catch (error: any) {
-    console.log('[error/payment-repo] (create)', error.toString())
-    throw new Error();
-  }
 }
 
 export const paymentRepo = {
