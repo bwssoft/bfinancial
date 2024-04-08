@@ -1,3 +1,4 @@
+import { getCachedOffer } from "@/app/lib/actions"
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi"
 import { paymentRepo } from "@/app/lib/mongodb/repositories/payment.mongo"
 import { OmieOrderService } from "@/app/lib/omie/order.omie"
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
   /**
   * request omie offer (pedido)
   */
-  const offer = await OmieOrderService.find(Number(omie_metadata.codigo_pedido))
+  const offer = await getCachedOffer(omie_metadata.enterprise, parseInt(omie_metadata.codigo_pedido));
   if (!offer) return new Response("No offer with this code", { status: 404 })
 
   if (offer.pedido_venda_produto.cabecalho.etapa !== "60") {
