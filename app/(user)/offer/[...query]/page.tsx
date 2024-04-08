@@ -4,6 +4,7 @@ import {
   getCachedOffer,
   getManyTransactionById,
   revalidateInstallmentOffer,
+  fetchAuditByOmieCode,
 } from "@/app/lib/actions";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { Alert } from "@/app/ui/alert";
@@ -15,7 +16,6 @@ import { PageHeader } from "@/app/ui/navigation/page-header";
 import { Surface, SurfaceHeader } from "@/app/ui/surface";
 import { ClientOfferInstallmentTable } from "@/app/ui/tables/client-offer-installment/table";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
-
 export default async function Example({
   params,
 }: {
@@ -47,13 +47,15 @@ export default async function Example({
     );
   }
 
+  const audit = await fetchAuditByOmieCode(codigo_pedido_omie)
+ 
   const installments = offer.pedido_venda_produto.lista_parcelas?.parcela.map((installent) => {
     const payment = payments.filter(
       (payment) => payment.omie_metadata.numero_parcela === installent.numero_parcela
     );
 
     const transactions_id = payment.map((payment) => payment.bpay_metadata.id);
-
+    
     const bpay_transaction =
       transactions.status && transactions.transactions
         ? transactions?.transactions.filter((transaction) =>
@@ -97,12 +99,12 @@ export default async function Example({
           </div>
         </PageHeader>
 
-        <Alert
+        {audit && <Alert
           title="Uma das cobranças foi gerada com erro"
           subtitle="Você irá precisar efetuar a cobrança manualmente abaixo."
           variant="error"
           className="text-sm my-4"
-        />
+        />}
 
         <section className="grid grid-cols-6 gap-2 mt-4">
           <div className="col-span-4 space-y-2">
