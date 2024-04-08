@@ -79,6 +79,6 @@ export const installmentColumns: ColumnDef<OmieInstallmentTable>[] = [
   {
     header: "Ação",
     accessorKey: "cabecalho.etapa",
-    cell: ({ row }) => <ClientOfferActionColumn data={row.original} />,
+    cell: ({ row }) => <ClientOfferActionColumn data={row.original}/>,
   },
 ];

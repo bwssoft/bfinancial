@@ -5,14 +5,13 @@ import { createPaymentFromOfferPage } from "@/app/lib/actions";
 import Link from "next/link";
 import { Button } from "../../button";
 import { OmieInstallmentTable } from "./columns";
-
+import { differenceInSeconds } from 'date-fns'
 interface ClientOfferColumn {
   data: OmieInstallmentTable;
 }
 
 export function ClientOfferActionColumn({ data }: ClientOfferColumn) {
   const { toast } = useToast();
-
   const installment = data;
 
   const bpay_transaction = data.bpay_transaction;
@@ -28,15 +27,24 @@ export function ClientOfferActionColumn({ data }: ClientOfferColumn) {
 
   async function handleAction(form: FormData) {
     try {
+      const [day, month, year] = data.data_vencimento.split('/')
+
+
       const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(
         form,
         installment.omie_enterprise!,
         installment.codigo_pedido_omie!,
         installment.omie_client!,
-        installment
+        installment,
       );
 
-      await createPaymentFromOfferPageBinded();
+      const expirationDate = new Date()
+
+      expirationDate.setDate(Number(day))
+      expirationDate.setMonth(Number(month))
+      expirationDate.setMonth(Number(year))
+      
+      await createPaymentFromOfferPageBinded(differenceInSeconds(expirationDate, new Date()));
 
       toast({
         title: "Sucesso!",

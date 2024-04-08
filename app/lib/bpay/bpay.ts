@@ -5,16 +5,19 @@ const bwpay = new BwPay()
 export async function createPixTransaction({
   payer,
   receiver,
-  price
+  price,
+  expiration
 }: {
   payer: Payer
   receiver: Receiver
-  price: string
+  price: string,
+  expiration?: number
 }) {
   return await bwpay.createPixWithoutRecipient({
     payer,
     receiver,
-    price
+    price,
+    expiration
   })
 }
 
