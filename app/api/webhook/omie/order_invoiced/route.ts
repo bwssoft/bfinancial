@@ -12,6 +12,7 @@ import QRCodeEmail from "@/app/ui/email-templates/qrcode-pix/qrcode-pix-template
 import { generateQRBuffer } from "@/app/utils/qrCode"
 import { FirebaseGateway } from "@/app/lib/firebase"
 import { nanoid } from "nanoid";
+import { getCachedClient, getCachedOffer } from "@/app/lib/actions"
 
 export async function POST(request: Request) {
   const data: VendaProdutoFaturadaEvent = await request.json()
@@ -24,14 +25,14 @@ export async function POST(request: Request) {
   * Requisitar os dados do pedido omie
   */
   OmieOrderService.setSecrets(omie_enterprise)
-  const order = await OmieOrderService.find(codigo_pedido)
+  const order = await getCachedOffer(omie_enterprise, Number(codigo_pedido))
   if (!order) return new Response("Omie order not found", { status: 404 })
 
   /**
   * Requisitar os dados do do cliente omie relacionado no pedido
   */
   OmieClientService.setSecrets(omie_enterprise)
-  const client = await OmieClientService.find(String(codigo_cliente))
+  const client = await getCachedClient(omie_enterprise, String(codigo_cliente))
   if (!client) return new Response("Omie client not found", { status: 404 })
 
   /**
