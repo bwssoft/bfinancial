@@ -1,5 +1,5 @@
 import {
-  fetchClientById,
+  getCachedClient,
   fetchPayments,
   getCachedOffer,
   getManyTransactionById,
@@ -30,7 +30,7 @@ export default async function Example({
   }
 
   const [client, offer, payments] = await Promise.all([
-    fetchClientById(omie_enterprise, codigo_cliente_omie),
+    getCachedClient(omie_enterprise, codigo_cliente_omie),
     getCachedOffer(omie_enterprise, codigo_pedido_omie),
     fetchPayments({ "omie_metadata.codigo_pedido": codigo_pedido_omie }),
   ]);
