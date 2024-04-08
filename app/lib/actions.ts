@@ -19,6 +19,10 @@ import { OmieOrderService } from "./omie/order.omie";
 
 import { headers } from "next/headers";
 import { Payment } from "./definitions/Payment";
+import { VendaProdutoFaturadaEvent, appHashByEnterpriseEnum } from "../api/webhook/omie/order_invoiced/route";
+import { differenceInSeconds } from "date-fns";
+import { render } from "@react-email/render";
+import QRCodeEmail from "../ui/email-templates/qrcode-pix/qrcode-pix-template";
 
 export async function fetchClients(
   enterprise: OmieEnterpriseEnum,
@@ -67,12 +71,12 @@ export const getCachedClient = unstable_cache(
   }
 );
 
-async function fetchAuditByMetadata<T = any>(params: T ) {
-  return await auditRepo.findOne({ metadata:params })
+async function fetchAuditByMetadata<T = any>(params: T) {
+  return await auditRepo.findOne({ metadata: params })
 }
 
-export async function fetchAuditByOmieCode(code:string){
-  return await fetchAuditByMetadata<{codigo_pedido_omie:string}>({codigo_pedido_omie:code})
+export async function fetchAuditByOmieCode(code: string) {
+  return await fetchAuditByMetadata<{ codigo_pedido_omie: string }>({ codigo_pedido_omie: code })
 }
 
 export async function fetchOfferById(enterprise: OmieEnterpriseEnum, id: number) {
@@ -378,4 +382,140 @@ export async function generateOmieInvoice(params: {
   revalidatePath(
     `offer/${omie_enterprise}/${codigo_cliente}/${codigo_pedido}`
   );
+}
+
+
+export async function aux(params: any) {
+  console.log("in request")
+  try {
+    const data: VendaProdutoFaturadaEvent = params
+    const omie_enterprise: OmieEnterpriseEnum = appHashByEnterpriseEnum[data.appHash];
+
+    const codigo_pedido = data.event.idPedido;
+    const codigo_cliente = data.event.idCliente;
+
+    /**
+     * Requisitar os dados do pedido omie e do cliente omie
+     */
+    OmieOrderService.setSecrets(omie_enterprise);
+    OmieClientService.setSecrets(omie_enterprise);
+    const [order, client] = await Promise.all([
+      getCachedOffer(omie_enterprise, Number(codigo_pedido)),
+      getCachedClient(omie_enterprise, String(codigo_cliente))
+    ])
+    if (!order) return new Response("Omie order not found", { status: 404 });
+    if (!client) return new Response("Omie client not found", { status: 404 });
+
+    /**
+     * Gerar um pix para cada parcela do pedido omie
+     */
+    const installments = order?.pedido_venda_produto.lista_parcelas.parcela;
+    if (!installments.length) return new Response("Omie order without installments", { status: 404 });
+
+    const qrCode = await Promise.all<{ url: string, code: string } & OmieOfferInstallment>(installments.map(async installment => {
+      try {
+        const [day, month, year] = installment.data_vencimento.split("/");
+        const expirationDate = new Date();
+        expirationDate.setDate(Number(day));
+        expirationDate.setMonth(Number(month));
+        expirationDate.setMonth(Number(year));
+
+        const pix = await createPixTransaction({
+          payer: {
+            document: {
+              type: DocumentEnum.CNPJ,
+              value: client.cnpj_cpf,
+            },
+            email: client.email,
+            name: client.nome_fantasia,
+          },
+          receiver: {
+            name: omie_enterprise,
+          },
+          price: installment.valor.toString(),
+          expiration: differenceInSeconds(expirationDate, new Date()),
+        });
+
+        if (!pix.status) {
+          throw new Error();
+        }
+
+        const qrCodeBuffer = await generateQRBuffer(pix.transaction.bb.pixCopyPaste);
+
+        if (!qrCodeBuffer) {
+          throw new Error();
+        }
+
+        const qrCodeurl = await FirebaseGateway.uploadFile({
+          buffer: qrCodeBuffer,
+          name: `qr-code-${nanoid()}`,
+          type: "image/jpeg",
+        });
+
+        if (!qrCodeurl) {
+          throw new Error();
+        }
+
+        await paymentRepo.create({
+          user_uuid: uuidv4(),
+          uuid: uuidv4(),
+          created_at: new Date().toISOString(),
+          price: pix.transaction.amount,
+          omie_metadata: {
+            enterprise: omie_enterprise,
+            codigo_cliente: codigo_cliente,
+            codigo_pedido: String(codigo_pedido),
+            numero_parcela: installment.numero_parcela,
+            data_vencimento: installment.data_vencimento,
+          },
+          bpay_metadata: {
+            id: pix.transaction._id,
+            txid: pix.transaction.bb.txid,
+          },
+          group: `${codigo_pedido}${installment.numero_parcela}`,
+        });
+
+        return { url: qrCodeurl, code: pix.transaction.bb.pixCopyPaste, ...installment }
+
+      } catch (e) {
+        await auditRepo.create({
+          operation: "create-pix",
+          metadata: {
+            codigo_pedido_omie: codigo_pedido,
+          },
+        });
+        throw new Error();
+      }
+    }))
+
+    const clientName =
+      client.pessoa_fisica === "S"
+        ? client.nome_fantasia
+        : `${client.nome_fantasia} (${client.razao_social})`;
+
+    /**
+     * Enviar a cobrança para o email do cliente omie
+     */
+    await BMessageClient.createTemplateEmail({
+      html: render(
+        QRCodeEmail({
+          metadata: {
+            clientName,
+            createdAt: order.pedido_venda_produto.infoCadastro.dInc,
+            total: order.pedido_venda_produto.total_pedido.valor_total_pedido,
+          },
+          installments: qrCode,
+        })
+      ),
+      subject: "Cobrança dos produtos BWS",
+      to: client.email
+    });
+
+    return Response.json({ ok: true });
+  } catch (e) {
+
+    return new Response("Error", { status: 500 })
+  }
+
+
 }
