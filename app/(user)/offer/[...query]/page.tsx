@@ -1,6 +1,7 @@
 import {
   getCachedClient,
   fetchPayments,
+  generateOmieInvoice,
   getCachedOffer,
   getManyTransactionById,
   revalidateInstallmentOffer,
@@ -23,7 +24,8 @@ export default async function Example({
     query: [OmieEnterpriseEnum, string, string];
   };
 }) {
-  const [omie_enterprise, codigo_cliente_omie, codigo_pedido_omie] = params.query;
+  const [omie_enterprise, codigo_cliente_omie, codigo_pedido_omie] =
+    params.query;
 
   if (!omie_enterprise || !codigo_cliente_omie || !codigo_pedido_omie) {
     throw new Error("Lmao");
@@ -47,44 +49,62 @@ export default async function Example({
     );
   }
 
-  const audit = await fetchAuditByOmieCode(codigo_pedido_omie)
- 
-  const installments = offer.pedido_venda_produto.lista_parcelas?.parcela.map((installent) => {
-    const payment = payments.filter(
-      (payment) => payment.omie_metadata.numero_parcela === installent.numero_parcela
-    );
+  const audit = await fetchAuditByOmieCode(codigo_pedido_omie);
 
-    const transactions_id = payment.map((payment) => payment.bpay_metadata.id);
-    
-    const bpay_transaction =
-      transactions.status && transactions.transactions
-        ? transactions?.transactions.filter((transaction) =>
-            transactions_id.includes(transaction._id)
-          )
-        : undefined;
+  const installments = offer.pedido_venda_produto.lista_parcelas?.parcela.map(
+    (installent) => {
+      const payment = payments.filter(
+        (payment) =>
+          payment.omie_metadata.numero_parcela === installent.numero_parcela
+      );
 
-    return {
-      ...installent,
-      bpay_transaction, // ### fazer request no micro serviço bpay para ter acesso a essas trasanções
-      payment,
-      omie_enterprise,
-      codigo_pedido_omie,
-      omie_client: client,
-    };
-  });
+      const transactions_id = payment.map(
+        (payment) => payment.bpay_metadata.id
+      );
+
+      const bpay_transaction =
+        transactions.status && transactions.transactions
+          ? transactions?.transactions.filter((transaction) =>
+              transactions_id.includes(transaction._id)
+            )
+          : undefined;
+
+      return {
+        ...installent,
+        bpay_transaction, // ### fazer request no micro serviço bpay para ter acesso a essas trasanções
+        payment,
+        omie_enterprise,
+        codigo_pedido_omie,
+        omie_client: client,
+      };
+    }
+  );
 
   const revalidateInstallment = revalidateInstallmentOffer.bind(
     null,
     `offer/${omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}`
   );
 
+  const generateOmieInvoiceBinded = generateOmieInvoice.bind(null, {
+    codigo_pedido: Number(codigo_pedido_omie),
+    codigo_cliente: Number(codigo_cliente_omie),
+    omie_enterprise: omie_enterprise,
+  });
+
   return (
     <div className="min-h-full">
       <main className="flex-1 pb-8 container">
         {/* Page header */}
-        <PageHeader pageTitle="Pedido" description="Visualizar dados do pedido.">
-          {offer.pedido_venda_produto.cabecalho.etapa === "60" && (
+        <PageHeader
+          pageTitle="Pedido"
+          description="Visualizar dados do pedido."
+        >
+          {offer.pedido_venda_produto.cabecalho.etapa === "60" ? (
             <Badge label="Pedido Faturado" theme="green" />
+          ) : (
+            <form action={generateOmieInvoiceBinded}>
+              <Button type="submit">Faturar Pedido</Button>
+            </form>
           )}
           <BackButton>
             <span className="flex space-x-2 items-center">
@@ -99,12 +119,14 @@ export default async function Example({
           </div>
         </PageHeader>
 
-        {audit && <Alert
-          title="Uma das cobranças foi gerada com erro"
-          subtitle="Você irá precisar efetuar a cobrança manualmente abaixo."
-          variant="error"
-          className="text-sm my-4"
-        />}
+        {audit && (
+          <Alert
+            title="Uma das cobranças foi gerada com erro"
+            subtitle="Você irá precisar efetuar a cobrança manualmente abaixo."
+            variant="error"
+            className="text-sm my-4"
+          />
+        )}
 
         <section className="grid grid-cols-6 gap-2 mt-4">
           <div className="col-span-4 space-y-2">
@@ -114,7 +136,10 @@ export default async function Example({
               </SurfaceHeader>
 
               <div className="grid grid-cols-2 gap-4 p-4">
-                <LabelValue label="Nome fantasia" value={client?.nome_fantasia} />
+                <LabelValue
+                  label="Nome fantasia"
+                  value={client?.nome_fantasia}
+                />
                 <LabelValue label="Razão social" value={client?.razao_social} />
                 <LabelValue label="CNPJ/CPF" value={client?.cnpj_cpf} />
                 <LabelValue label="CEP" value={client?.cep} />
@@ -138,14 +163,20 @@ export default async function Example({
 
               <div className="grid grid-cols-1 gap-4 p-4">
                 <LabelValue label="Empresa" value={omie_enterprise} />
-                <LabelValue label="Código pedido OMIE" value={codigo_pedido_omie} />
+                <LabelValue
+                  label="Código pedido OMIE"
+                  value={codigo_pedido_omie}
+                />
               </div>
             </Surface>
           </div>
         </section>
         <section className="space-y-4 mt-8">
           <h1 className="text-lg font-bold text-gray-900">Parcelas</h1>
-          <ClientOfferInstallmentTable installments={installments} client={client} />
+          <ClientOfferInstallmentTable
+            installments={installments}
+            client={client}
+          />
         </section>
       </main>
     </div>

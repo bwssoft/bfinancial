@@ -28,7 +28,8 @@ export type OmieCallFunctions =
   | "ConsultarCliente"
   | "ConsultarPedido"
   | "LancarRecebimento"
-  | "ListarContasReceber";
+  | "ListarContasReceber"
+  | "FaturarPedidoVenda";
 
 export type OmieSingleCallFunctions = "ConsultarCliente" | "ConsultarPedido";
 
