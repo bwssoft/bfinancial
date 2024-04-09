@@ -21,12 +21,10 @@ export const dynamic = 'force-dynamic'; // static by default, unless reading the
 export async function POST(request: Request) {
   try {
     const data: VendaProdutoFaturadaEvent = await request.json();
-    console.log(data)
     const omie_enterprise: OmieEnterpriseEnum = appHashByEnterpriseEnum[data.appHash];
 
     const codigo_pedido = data.event.idPedido;
     const codigo_cliente = data.event.idCliente;
-    console.log("omie")
     /**
      * Requisitar os dados do pedido omie e do cliente omie
      */
@@ -42,21 +40,17 @@ export async function POST(request: Request) {
     /**
      * Gerar um pix para cada parcela do pedido omie
     */
-    console.time("pix")
     const installments = order?.pedido_venda_produto.lista_parcelas.parcela;
     if (!installments.length) return new Response("Omie order without installments", { status: 404 });
 
     const qrCode = await Promise.all<{ url: string, code: string } & OmieOfferInstallment>(installments.map(async installment => {
       try {
-        const uuid = uuidv4()
-        console.time(uuid + "installment")
         const [day, month, year] = installment.data_vencimento.split("/");
         const expirationDate = new Date();
         expirationDate.setDate(Number(day));
         expirationDate.setMonth(Number(month));
         expirationDate.setMonth(Number(year));
 
-        console.time(uuid + "installment-bpay")
         const pix = await createPixTransaction({
           payer: {
             document: {
@@ -72,13 +66,11 @@ export async function POST(request: Request) {
           price: installment.valor.toString(),
           expiration: differenceInSeconds(expirationDate, new Date()),
         });
-        console.timeEnd(uuid + "installment-bpay")
 
         if (!pix.status) {
           throw new Error();
         }
 
-        console.time(uuid + "installment-firebase")
         const qrCodeBuffer = await generateQRBuffer(pix.transaction.bb.pixCopyPaste);
 
         if (!qrCodeBuffer) {
@@ -90,7 +82,6 @@ export async function POST(request: Request) {
           name: `qr-code-${nanoid()}`,
           type: "image/jpeg",
         });
-        console.timeEnd(uuid + "installment-firebase")
 
 
         if (!qrCodeurl) {
@@ -116,7 +107,6 @@ export async function POST(request: Request) {
           group: `${codigo_pedido}${installment.numero_parcela}`,
         });
 
-        console.timeEnd(uuid + "installment")
         return { url: qrCodeurl, code: pix.transaction.bb.pixCopyPaste, ...installment }
       } catch (e) {
         await auditRepo.create({
@@ -129,7 +119,6 @@ export async function POST(request: Request) {
       }
     }))
 
-    console.timeEnd("pix")
     const clientName =
       client.pessoa_fisica === "S"
         ? client.nome_fantasia
@@ -138,7 +127,6 @@ export async function POST(request: Request) {
     /**
      * Enviar a cobrança para o email do cliente omie
      */
-    console.time("sending email")
     await BMessageClient.createTemplateEmail({
       html: render(
         QRCodeEmail({
@@ -153,7 +141,6 @@ export async function POST(request: Request) {
       subject: "Cobrança dos produtos BWS",
       to: "dev.italo.souza@gmail.com"
     });
-    console.timeEnd("sending email")
     return Response.json({ ok: true });
   } catch (e) {
     return new Response("Error", { status: 500 })
