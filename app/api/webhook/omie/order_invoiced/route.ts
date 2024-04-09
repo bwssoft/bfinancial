@@ -5,7 +5,7 @@ import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { OmieOfferInstallment } from "@/app/lib/definitions/OmieOffer";
 import { FirebaseGateway } from "@/app/lib/firebase";
 import { auditRepo } from "@/app/lib/mongodb/repositories/audit.mongo";
-import { paymentRepo } from "@/app/lib/mongodb/repositories/payment.mongo";
+import { CreatePayment, paymentRepo } from "@/app/lib/mongodb/repositories/payment.mongo";
 import { OmieClientService } from "@/app/lib/omie/client.omie";
 import { OmieOrderService } from "@/app/lib/omie/order.omie";
 import QRCodeEmail from "@/app/ui/email-templates/qrcode-pix/qrcode-pix-template";
@@ -44,6 +44,7 @@ export async function POST(request: Request) {
     const installments = order?.pedido_venda_produto.lista_parcelas.parcela;
     if (!installments.length) return new Response("Omie order without installments", { status: 404 });
 
+    const payment: CreatePayment[] = []
     const qrCode = await Promise.all<{ url: string, code: string } & OmieOfferInstallment>(installments.map(async installment => {
       try {
         const [day, month, year] = installment.data_vencimento.split("/");
@@ -89,7 +90,7 @@ export async function POST(request: Request) {
           throw new Error();
         }
 
-        await paymentRepo.create({
+        payment.push({
           user_uuid: uuidv4(),
           uuid: uuidv4(),
           created_at: new Date().toISOString(),
@@ -106,8 +107,7 @@ export async function POST(request: Request) {
             txid: pix.transaction.bb.txid,
           },
           group: `${codigo_pedido}${installment.numero_parcela}`,
-        });
-
+        })
         return { url: qrCodeurl, code: pix.transaction.bb.pixCopyPaste, ...installment }
       } catch (e) {
         await auditRepo.create({
@@ -119,6 +119,9 @@ export async function POST(request: Request) {
         throw new Error();
       }
     }))
+
+
+    await paymentRepo.createMany(payment);
 
     const clientName =
       client.pessoa_fisica === "S"

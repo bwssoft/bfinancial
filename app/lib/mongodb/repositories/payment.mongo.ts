@@ -22,19 +22,25 @@ async function list(params: Filter<Payment> = {}) {
 }
 
 export async function findOne(params: Partial<WithId<Payment>> | any) {
-    const db = await connect();
-    return await db.collection<Payment>('payment').findOne(params);
+  const db = await connect();
+  return await db.collection<Payment>('payment').findOne(params);
 }
 
 export type CreatePayment = Partial<Payment>;
 
 export async function create(data: CreatePayment) {
-    const db = await connect();
-    return await db.collection('payment').insertOne(data);
+  const db = await connect();
+  return await db.collection('payment').insertOne(data);
+}
+
+export async function createMany(data: CreatePayment[]) {
+  const db = await connect();
+  return await db.collection('payment').insertMany(data);
 }
 
 export const paymentRepo = {
   list,
   create,
   findOne,
+  createMany
 }
