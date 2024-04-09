@@ -21,6 +21,7 @@ export const dynamic = 'force-dynamic'; // static by default, unless reading the
 export async function POST(request: Request) {
   try {
     const data: VendaProdutoFaturadaEvent = await request.json();
+    console.log(data)
     const omie_enterprise: OmieEnterpriseEnum = appHashByEnterpriseEnum[data.appHash];
 
     const codigo_pedido = data.event.idPedido;
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
 
     /**
      * Gerar um pix para cada parcela do pedido omie
-     */
+    */
     console.log("pix")
     const installments = order?.pedido_venda_produto.lista_parcelas.parcela;
     if (!installments.length) return new Response("Omie order without installments", { status: 404 });
@@ -147,7 +148,6 @@ export async function POST(request: Request) {
     console.log("email sended")
     return Response.json({ ok: true });
   } catch (e) {
-
     return new Response("Error", { status: 500 })
   }
 }
