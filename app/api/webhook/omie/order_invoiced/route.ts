@@ -21,6 +21,7 @@ export const dynamic = 'force-dynamic'; // static by default, unless reading the
 export async function POST(request: Request) {
   try {
     const data: VendaProdutoFaturadaEvent = await request.json();
+    console.log('data', data)
     const omie_enterprise: OmieEnterpriseEnum = appHashByEnterpriseEnum[data.appHash];
 
     const codigo_pedido = data.event.idPedido;
