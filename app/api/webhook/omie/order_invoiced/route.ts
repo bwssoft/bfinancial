@@ -1,26 +1,34 @@
+import { getCachedClient, getCachedOffer } from "@/app/lib/actions";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { OmieClientService } from "@/app/lib/omie/client.omie";
+import { OmieOrderService } from "@/app/lib/omie/order.omie";
 import { sampleQueue } from "@/app/workers/webhook";
 
 export async function POST(request: Request) {
   const data: VendaProdutoFaturadaEvent = await request.json();
-  // try {
-  //   const data: VendaProdutoFaturadaEvent = await request.json();
-  //   const omie_enterprise: OmieEnterpriseEnum = appHashByEnterpriseEnum[data.appHash];
+  try {
+    const data: VendaProdutoFaturadaEvent = await request.json();
+    const omie_enterprise: OmieEnterpriseEnum = appHashByEnterpriseEnum[data.appHash];
 
-  //   const codigo_pedido = data.event.idPedido;
-  //   const codigo_cliente = data.event.idCliente;
+    const codigo_pedido = data.event.idPedido;
+    const codigo_cliente = data.event.idCliente;
 
-  //   /**
-  //    * Requisitar os dados do pedido omie e do cliente omie
-  //    */
-  //   OmieOrderService.setSecrets(omie_enterprise);
-  //   OmieClientService.setSecrets(omie_enterprise);
-  //   const [order, client] = await Promise.all([
-  //     getCachedOffer(omie_enterprise, Number(codigo_pedido)),
-  //     getCachedClient(omie_enterprise, String(codigo_cliente))
-  //   ])
-  //   if (!order) return new Response("Omie order not found", { status: 404 });
-  //   if (!client) return new Response("Omie client not found", { status: 404 });
+    /**
+     * Requisitar os dados do pedido omie e do cliente omie
+     */
+    OmieOrderService.setSecrets(omie_enterprise);
+    OmieClientService.setSecrets(omie_enterprise);
+    const [order, client] = await Promise.all([
+      getCachedOffer(omie_enterprise, Number(codigo_pedido)),
+      getCachedClient(omie_enterprise, String(codigo_cliente))
+    ])
+    if (!order) return new Response("Omie order not found", { status: 404 });
+    if (!client) return new Response("Omie client not found", { status: 404 });
+    await sampleQueue.add('someJob', { data, order, client });
+
+  } catch (e) {
+
+  }
 
   //   /**
   //    * Gerar um pix para cada parcela do pedido omie
@@ -133,7 +141,6 @@ export async function POST(request: Request) {
   //   return new Response("Error", { status: 500 })
   // }
 
-  await sampleQueue.add('someJob', data);
   return Response.json({ ok: true });
 }
 

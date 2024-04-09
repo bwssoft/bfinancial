@@ -8,9 +8,9 @@ import { getCurrentInstallment } from "../utils/get-current-installment";
 import { generateQRBuffer } from "../utils/qrCode";
 import { BMessageClient } from "./bmessage/bessage";
 import { DocumentEnum, createPixTransaction, getTransactionById } from "./bpay/bpay";
-import { OmieCredentials, OmieEnterpriseEnum } from "./definitions/OmieApi";
+import { OmieCredentials, OmieEnterpriseEnum, OmieResponse } from "./definitions/OmieApi";
 import { OmieClientListParams, OmieClientModel } from "./definitions/OmieClient";
-import { OmieListOfferParams, OmieOfferInstallment } from "./definitions/OmieOffer";
+import { OmieListOfferParams, OmieOffer, OmieOfferInstallment } from "./definitions/OmieOffer";
 import { FirebaseGateway } from "./firebase";
 import { noteRepo } from "./mongodb/repositories/note.mongo";
 import { auditRepo } from "./mongodb/repositories/audit.mongo";
@@ -385,27 +385,18 @@ export async function generateOmieInvoice(params: {
 }
 
 
-export async function afterInvoice(params: any) {
-  console.info("1")
+export async function afterInvoice(params: {
+  data: VendaProdutoFaturadaEvent,
+  order: OmieResponse & {
+    pedido_venda_produto: OmieOffer;
+  },
+  client: OmieClientModel
+}) {
   try {
-    const data: VendaProdutoFaturadaEvent = params
+    const { data, order, client } = params
     const omie_enterprise: OmieEnterpriseEnum = appHashByEnterpriseEnum[data.appHash];
-
     const codigo_pedido = data.event.idPedido;
     const codigo_cliente = data.event.idCliente;
-
-    /**
-     * Requisitar os dados do pedido omie e do cliente omie
-     */
-    OmieOrderService.setSecrets(omie_enterprise);
-    OmieClientService.setSecrets(omie_enterprise);
-    const [order, client] = await Promise.all([
-      getCachedOffer(omie_enterprise, Number(codigo_pedido)),
-      getCachedClient(omie_enterprise, String(codigo_cliente))
-    ])
-    if (!order) return { text: "Omie order not found", status: 404 };
-    if (!client) return { text: "Omie client not found", status: 404 };
-    console.info("2")
 
     /**
      * Gerar um pix para cada parcela do pedido omie
@@ -491,7 +482,7 @@ export async function afterInvoice(params: any) {
         throw new Error();
       }
     }))
-    console.info("3")
+    console.info(qrCode)
 
     const clientName =
       client.pessoa_fisica === "S"
