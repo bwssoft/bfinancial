@@ -1,6 +1,6 @@
 import { Worker, Queue } from 'bullmq';
 import Redis from 'ioredis';
-import { aux } from '../lib/actions';
+import { afterInvoice } from '../lib/actions';
 
 
 const connection = new Redis(
@@ -23,9 +23,8 @@ const worker = new Worker(
   'sampleQueue', // this is the queue name, the first string parameter we provided for Queue()
   async (job) => {
     const data = job?.data;
-    await aux(data)
+    await afterInvoice(data)
     console.log('Task executed successfully');
-
   },
   {
     connection,

@@ -385,8 +385,8 @@ export async function generateOmieInvoice(params: {
 }
 
 
-export async function aux(params: any) {
-  console.log("in request")
+export async function afterInvoice(params: any) {
+  console.info("1")
   try {
     const data: VendaProdutoFaturadaEvent = params
     const omie_enterprise: OmieEnterpriseEnum = appHashByEnterpriseEnum[data.appHash];
@@ -403,16 +403,20 @@ export async function aux(params: any) {
       getCachedOffer(omie_enterprise, Number(codigo_pedido)),
       getCachedClient(omie_enterprise, String(codigo_cliente))
     ])
-    if (!order) return new Response("Omie order not found", { status: 404 });
-    if (!client) return new Response("Omie client not found", { status: 404 });
+    if (!order) return { text: "Omie order not found", status: 404 };
+    if (!client) return { text: "Omie client not found", status: 404 };
+    console.info("2")
 
     /**
      * Gerar um pix para cada parcela do pedido omie
      */
     const installments = order?.pedido_venda_produto.lista_parcelas.parcela;
-    if (!installments.length) return new Response("Omie order without installments", { status: 404 });
+    if (!installments.length) return { text: "Omie order without installments", status: 404 };
 
-    const qrCode = await Promise.all<{ url: string, code: string } & OmieOfferInstallment>(installments.map(async installment => {
+    const qrCode = await Promise.all<{
+      url: string,
+      code: string
+    } & OmieOfferInstallment>(installments.map(async installment => {
       try {
         const [day, month, year] = installment.data_vencimento.split("/");
         const expirationDate = new Date();
@@ -487,6 +491,7 @@ export async function aux(params: any) {
         throw new Error();
       }
     }))
+    console.info("3")
 
     const clientName =
       client.pessoa_fisica === "S"
@@ -510,12 +515,11 @@ export async function aux(params: any) {
       subject: "Cobrança dos produtos BWS",
       to: client.email
     });
+    console.info("4")
 
-    return Response.json({ ok: true });
+    return { ok: true }
   } catch (e) {
-
-    return new Response("Error", { status: 500 })
+    return { text: "Error", status: 500 }
   }
-
 
 }
