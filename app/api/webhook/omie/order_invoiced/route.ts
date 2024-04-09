@@ -120,7 +120,6 @@ export async function POST(request: Request) {
       }
     }))
 
-
     await paymentRepo.createMany(payment);
 
     const clientName =
