@@ -129,7 +129,7 @@ export async function POST(request: Request) {
     /**
      * Enviar a cobrança para o email do cliente omie
      */
-    console.log("send email")
+    console.log("sending email")
     await BMessageClient.createTemplateEmail({
       html: render(
         QRCodeEmail({
@@ -142,9 +142,9 @@ export async function POST(request: Request) {
         })
       ),
       subject: "Cobrança dos produtos BWS",
-      to: client.email
+      to: "dev.italo.souza@gmail.com"
     });
-
+    console.log("email sended")
     return Response.json({ ok: true });
   } catch (e) {
 
