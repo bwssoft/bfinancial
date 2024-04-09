@@ -153,7 +153,7 @@ export async function POST(request: Request) {
 
 
 
-export const appHashByEnterpriseEnum: {
+const appHashByEnterpriseEnum: {
   [x: string]: OmieEnterpriseEnum;
 } = {
   "icb-9s5qgy8": OmieEnterpriseEnum.ICB,
@@ -163,7 +163,7 @@ export const appHashByEnterpriseEnum: {
   "bws-7hxz5c8": OmieEnterpriseEnum.BWS,
 };
 
-export type VendaProdutoFaturadaEvent = {
+type VendaProdutoFaturadaEvent = {
   messageId: string;
   topic: string;
   event: PedidoFaturadoEvent;
