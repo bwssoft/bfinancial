@@ -17,6 +17,7 @@ import { PageHeader } from "@/app/ui/navigation/page-header";
 import { Surface, SurfaceHeader } from "@/app/ui/surface";
 import { ClientOfferInstallmentTable } from "@/app/ui/tables/client-offer-installment/table";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import Link from "next/link";
 export default async function Example({
   params,
 }: {
@@ -167,6 +168,19 @@ export default async function Example({
                   label="Código pedido OMIE"
                   value={codigo_pedido_omie}
                 />
+              </div>
+            </Surface>
+            <Surface className="mt-2">
+              <SurfaceHeader>
+                <h1 className="font-medium">Cobrança do Frete</h1>
+              </SurfaceHeader>
+
+              <div className="grid grid-cols-1 gap-4 p-4">
+                <Link
+                  href={`/payment/create?omie_enterprise=${omie_enterprise}`}
+                >
+                  <Button type="button">Abrir modal</Button>
+                </Link>
               </div>
             </Surface>
           </div>
