@@ -399,6 +399,28 @@ export async function createDueFromPaymentShipping(params: { payment: Payment },
   }
 }
 
+export async function sendDueFromForm(params: {
+  numero_parcela: string;
+  data_vencimento: string;
+  pix_copia_e_cola: string;
+  payment_group: string;
+}, formData: FormData) {
+  const {
+    numero_parcela,
+    data_vencimento,
+    pix_copia_e_cola,
+    payment_group
+  } = params
+  const _formData = Object.fromEntries(formData.entries()) as any;
+
+  return await sendDue({
+    telefone: _formData.contact_phone,
+    pix_copia_e_cola,
+    payment_group,
+    numero_parcela,
+    data_vencimento
+  })
+} //usado para botão de "enviar cobrança" da tela de payment [uuid]
 export async function sendDue(params: {
   numero_parcela: string;
   telefone: string;
@@ -466,6 +488,18 @@ export async function sendDue(params: {
   return result;
 }
 
+export async function sendShippingDueFromForm(params: {
+  pix_copia_e_cola: string;
+  payment_group: string;
+}, formData: FormData) {
+  const { pix_copia_e_cola, payment_group } = params
+  const _formData = Object.fromEntries(formData.entries()) as any;
+  return await sendShippingDue({
+    telefone: _formData.contact_phone,
+    pix_copia_e_cola,
+    payment_group,
+  })
+} //usado para botão de "enviar cobrança" da tela de payment/shipping [uuid]
 export async function sendShippingDue(params: {
   telefone: string;
   pix_copia_e_cola: string;
