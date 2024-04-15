@@ -16,7 +16,7 @@ export async function POST(request: Request) {
    * request payment entity associated with txid from bb pix in our repository
   */
   const payment = await paymentRepo.findOne({ "bpay_metadata.txid": pix.txid })
-  if (!payment) return new Response("No payment with this code", { status: 404 })
+  if (!payment) return new Response("No payment with this code", { status: 500, statusText: "No payment with this code" })
 
   /**
   * set omie secrets on service with enterprise associated with payment entity
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   * request omie offer (pedido)
   */
   const offer = await getCachedOffer(omie_metadata.enterprise, parseInt(omie_metadata.codigo_pedido));
-  if (!offer) return new Response("No offer with this code", { status: 404 })
+  if (!offer) return new Response("No offer with this code", { status: 500, statusText: "No offer with this code" })
 
   if (offer.pedido_venda_produto.cabecalho.etapa !== "60") {
     /**
@@ -78,7 +78,8 @@ export async function POST(request: Request) {
   if (!receive_orders) return new Response(
     "No receive offer with this code",
     {
-      status: 404
+      status: 500,
+      statusText: "No receive offer with this code"
     }
   )
 
@@ -93,7 +94,8 @@ export async function POST(request: Request) {
   if (!current_receive_order) return new Response(
     "No receive offer linked",
     {
-      status: 404
+      status: 500,
+      statusText: "No receive offer linked"
     }
   )
 
