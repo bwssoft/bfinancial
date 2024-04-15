@@ -34,15 +34,23 @@ export default async function Example({
 
   const [client, offer, payments] = await Promise.all([
     getCachedClient(omie_enterprise, codigo_cliente_omie),
-    getCachedOffer(omie_enterprise, codigo_pedido_omie),
+    getCachedOffer(omie_enterprise, Number(codigo_pedido_omie)),
     fetchPayments({ "omie_metadata.codigo_pedido": codigo_pedido_omie }),
   ]);
+
+  if (!offer || !client) {
+    return (
+      <div>
+        <h2>no offer</h2>
+      </div>
+    );
+  }
 
   const transactions = await getManyTransactionById({
     id: payments.map((pay) => pay.bpay_metadata.id),
   });
 
-  if (!offer || !client) {
+  if (!transactions.status) {
     return (
       <div>
         <h2>no offer</h2>
@@ -81,6 +89,28 @@ export default async function Example({
     }
   );
 
+  const shipping = transactions?.transactions
+    ?.filter((transaction) => {
+      const payment = payments.filter(
+        (payment) => String(payment.group) === String(codigo_pedido_omie)
+      );
+
+      const transactions_id = payment.map(
+        (payment) => payment.bpay_metadata.id
+      );
+
+      return transactions_id.includes(transaction._id);
+    })
+    .map((transaction) => {
+      const payment = payments.filter(
+        (payment) => String(payment.group) === String(codigo_pedido_omie)
+      );
+      return {
+        ...transaction,
+        payment,
+      };
+    });
+
   const revalidateInstallment = revalidateInstallmentOffer.bind(
     null,
     `offer/${omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}`
@@ -91,6 +121,10 @@ export default async function Example({
     codigo_cliente: Number(codigo_cliente_omie),
     omie_enterprise: omie_enterprise,
   });
+
+  const generateDetachedDueURL = () => {
+    return `/payment/create?omie_enterprise=${omie_enterprise}&codigo_pedido_omie=${codigo_pedido_omie}&codigo_cliente_omie=${codigo_cliente_omie}`;
+  };
 
   return (
     <div className="min-h-full">
@@ -176,11 +210,26 @@ export default async function Example({
               </SurfaceHeader>
 
               <div className="grid grid-cols-1 gap-4 p-4">
-                <Link
-                  href={`/payment/create?omie_enterprise=${omie_enterprise}`}
-                >
-                  <Button type="button">Abrir modal</Button>
-                </Link>
+                {shipping?.length ? (
+                  <div className="flex justify-between">
+                    {shipping.some((el) => el.finish === true) ? (
+                      <Badge size="sm" label={"Paga"} theme={"green"} />
+                    ) : (
+                      <Badge size="sm" label={"Processando"} theme={"yellow"} />
+                    )}
+                    <Link
+                      href={`/payment/shipping/${shipping?.[0].payment?.[0].group}`}
+                    >
+                      <Button size="sm" variant="outline">
+                        Ver transação
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <Link href={generateDetachedDueURL()}>
+                    <Button type="button">Abrir modal</Button>
+                  </Link>
+                )}
               </div>
             </Surface>
           </div>
