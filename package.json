@@ -3,11 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev && npm run worker",
+    "dev": "next dev",
     "build": "next build",
-    "start": "next start && npm run worker",
+    "start": "next start",
     "lint": "next lint",
-    "worker": "dotenv -e .env.local -- npx tsx ./app/workers/webhook.ts",
     "bpay-grpc-types": "proto-loader-gen-types --keepCase=true --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=./app/lib/bpay/types ./app/lib/bpay/payment.proto",
     "bmessage-grpc-types": "proto-loader-gen-types --keepCase=true --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=./app/lib/bmessage/types ./app/lib/bmessage/bmessage.proto"
   },
