@@ -5,7 +5,7 @@ import {
   getCachedClient,
   getManyTransactionById,
   revalidatePaymentPage,
-  sendDue,
+  sendDueFromForm,
 } from "@/app/lib/actions";
 import { BackButton } from "@/app/ui/back-button";
 import { Button } from "@/app/ui/button";
@@ -45,10 +45,11 @@ export default async function PaymentDetailsPage({
     ? await generateQR(currentTransaction?.bb.pixCopyPaste as string)
     : undefined;
 
-  const createTemplateMessageBinded = sendDue.bind(null, {
-    telefone: "5527999697185",
-    numero_parcela: paymentData?.omie_metadata?.numero_parcela.toString(),
-    data_vencimento: paymentData?.omie_metadata?.data_vencimento.toString(),
+  const createTemplateMessageBinded = sendDueFromForm.bind(null, {
+    numero_parcela:
+      paymentData?.omie_metadata?.numero_parcela?.toString() as string,
+    data_vencimento:
+      paymentData?.omie_metadata?.data_vencimento?.toString() as string,
     pix_copia_e_cola: currentTransaction?.bb.pixCopyPaste!,
     payment_group: paymentData.group,
   });
@@ -58,7 +59,10 @@ export default async function PaymentDetailsPage({
     paymentData.omie_metadata.codigo_cliente.toString()
   );
 
-  const revalidatePaymentPageBinded = revalidatePaymentPage.bind(null, `/payment/${params.uuid}`);
+  const revalidatePaymentPageBinded = revalidatePaymentPage.bind(
+    null,
+    `/payment/${params.uuid}`
+  );
 
   return (
     <div className="min-h-full">
@@ -101,7 +105,10 @@ export default async function PaymentDetailsPage({
               </div>
               <div className="grid grid-cols-2 p-4 gap-2 gap-y-4">
                 {/* <LabelValue label="Protocolo" value={currentPayment?.uuid} /> */}
-                <LabelValue label="Valor total" value={`R$${paymentData?.price.toString()}`} />
+                <LabelValue
+                  label="Valor total"
+                  value={`R$${paymentData?.price.toString()}`}
+                />
                 <LabelValue
                   label="(OMIE) Cód. cliente"
                   value={paymentData?.omie_metadata.codigo_cliente?.toString()}
@@ -123,7 +130,10 @@ export default async function PaymentDetailsPage({
             <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
               <div className="divide-y divide-gray-200">
                 <div className="p-4">
-                  <h2 id="notes-title" className="text-lg font-medium text-gray-900">
+                  <h2
+                    id="notes-title"
+                    className="text-lg font-medium text-gray-900"
+                  >
                     Anotações
                   </h2>
                 </div>
@@ -157,12 +167,16 @@ export default async function PaymentDetailsPage({
             transaction={currentTransaction}
             qrCodeUrl={currentTransactionQrcode}
             action={createTemplateMessageBinded}
+            client={client}
           />
 
           <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
             <div className="divide-y divide-gray-200">
               <div className="p-4">
-                <h2 id="notes-title" className="text-lg font-medium text-gray-900">
+                <h2
+                  id="notes-title"
+                  className="text-lg font-medium text-gray-900"
+                >
                   Histórico de pix
                 </h2>
               </div>

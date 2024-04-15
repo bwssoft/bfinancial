@@ -5,7 +5,7 @@ import {
   getCachedClient,
   getManyTransactionById,
   revalidatePaymentPage,
-  sendShippingDue,
+  sendShippingDueFromForm,
 } from "@/app/lib/actions";
 import { BackButton } from "@/app/ui/back-button";
 import { Button } from "@/app/ui/button";
@@ -45,8 +45,7 @@ export default async function PaymentDetailsPage({
     ? await generateQR(currentTransaction?.bb.pixCopyPaste as string)
     : undefined;
 
-  const createTemplateMessageBinded = sendShippingDue.bind(null, {
-    telefone: "5527999697185",
+  const createTemplateMessageBinded = sendShippingDueFromForm.bind(null, {
     pix_copia_e_cola: currentTransaction?.bb.pixCopyPaste!,
     payment_group: paymentData.group,
   });
@@ -156,6 +155,7 @@ export default async function PaymentDetailsPage({
             transaction={currentTransaction}
             qrCodeUrl={currentTransactionQrcode}
             action={createTemplateMessageBinded}
+            client={client}
           />
 
           <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
