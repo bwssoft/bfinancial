@@ -11,6 +11,7 @@ export async function POST(request: Request) {
   */
   const data: { pix: Pix[] } = await request.json()
   const [pix] = data.pix
+  console.log("data pix", data)
 
   /**
    * request payment entity associated with txid from bb pix in our repository
