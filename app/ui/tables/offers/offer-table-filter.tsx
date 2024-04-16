@@ -38,11 +38,14 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
   const [orderStep, setOrderStep] = React.useState<string | undefined>(
     searchParams.get("etapa") ?? undefined
   );
-  const [orderId, setOrderId] = React.useState<string | undefined>(
-    searchParams.get("codigo_pedido") ?? undefined
-  );
+  // const [orderId, setOrderId] = React.useState<string | undefined>(
+  //   searchParams.get("codigo_pedido") ?? undefined
+  // );
   const [period, setPeriod] = React.useState<string | undefined>(
     searchParams.get("periodo") ?? undefined
+  );
+  const [offerNumber, setOfferNumber] = React.useState<string | undefined>(
+    searchParams.get("numero_pedido") ?? undefined
   );
 
   const pathname = usePathname();
@@ -53,8 +56,9 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
       omie_enterprise: enterprise,
       codigo_cliente_omie: client?.codigo_cliente_omie,
       etapa: orderStep,
-      codigo_pedido: orderId,
+      // codigo_pedido: orderId,
       periodo: period,
+      numero_pedido: offerNumber
     });
     router.push(`${pathname}?${params}`);
   };
@@ -137,11 +141,18 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
           </PopoverTrigger>
           <PopoverContent className="w-80">
             <form action={onAction} className="grid grid-flow-row gap-4 rounded-md">
-              <Input
+              {/* <Input
                 label="Código do pedido"
                 placeholder="Código do pedido"
                 defaultValue={searchParams.get("codigo_pedido") ?? undefined}
                 onChange={(e) => setOrderId(e.target.value)}
+              /> */}
+
+              <Input
+                label="Número do pedido"
+                placeholder="Número do pedido"
+                defaultValue={searchParams.get("numero_pedido") ?? undefined}
+                onChange={(e) => setOfferNumber(e.target.value)}
               />
 
               <Autocomplete
@@ -205,12 +216,23 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
           />
         )}
 
-        {searchParams.get("codigo_pedido") && (
+        {/* {searchParams.get("codigo_pedido") && (
           <Badge
             label="Codigo pedido"
             isRemoved
             onClick={() => {
               setOrderId(undefined);
+              onAction();
+            }}
+          />
+        )} */}
+
+        {searchParams.get("numero_pedido") && (
+          <Badge
+            label="Número pedido"
+            isRemoved
+            onClick={() => {
+              setOfferNumber(undefined);
               onAction();
             }}
           />

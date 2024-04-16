@@ -58,6 +58,14 @@ export const getCachedOffer = unstable_cache(
   }
 );
 
+export const getCachedOfferByNumber = unstable_cache(
+  async (enterprise: OmieEnterpriseEnum, id: number) => await fetchOfferByNumber(enterprise, id),
+  ["omie-offer-list"],
+  {
+    revalidate: 90,
+  }
+);
+
 export const getCachedClient = unstable_cache(
   async (enterprise: OmieEnterpriseEnum, id: string) => await fetchClientById(enterprise, id),
   ["omie-find-client"],
@@ -76,7 +84,12 @@ export async function fetchAuditByOmieCode(code: string) {
 
 export async function fetchOfferById(enterprise: OmieEnterpriseEnum, id: number) {
   OmieOrderService.setSecrets(enterprise);
-  return await OmieOrderService.find(id);
+  return await OmieOrderService.find({ codigo_pedido: id });
+}
+
+export async function fetchOfferByNumber(enterprise: OmieEnterpriseEnum, id: number) {
+  OmieOrderService.setSecrets(enterprise);
+  return await OmieOrderService.find({ numero_pedido: id });
 }
 
 export async function fetchPayments(params?: Filter<Payment>) {
