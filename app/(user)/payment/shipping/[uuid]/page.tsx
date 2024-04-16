@@ -1,11 +1,11 @@
 import {
-  createDueFromPayment,
+  createDueFromPaymentShipping,
   fetchNote,
   fetchPaymentByGroup,
   getCachedClient,
   getManyTransactionById,
   revalidatePaymentPage,
-  sendDueFromForm,
+  sendShippingDueFromForm,
 } from "@/app/lib/actions";
 import { BackButton } from "@/app/ui/back-button";
 import { Button } from "@/app/ui/button";
@@ -14,11 +14,11 @@ import { LabelValue } from "@/app/ui/label-value";
 import { generateQR } from "@/app/utils/qrCode";
 import { auth } from "@/auth";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
-import { CurrentTransaction } from "./current-transaction";
-import { GenerateShare } from "./generate-share";
-import { NewTransactionForm } from "./new-transaction-form";
-import { NoteCard } from "./note-card";
-import { TransactionFeed } from "./transaction-feed";
+import { GenerateShare } from "../../[uuid]/generate-share";
+import { NoteCard } from "../../[uuid]/note-card";
+import { TransactionFeed } from "../../[uuid]/transaction-feed";
+import { CurrentTransaction } from "../../[uuid]/current-transaction";
+import { NewTransactionForm } from "../../[uuid]/new-transaction-form";
 
 export default async function PaymentDetailsPage({
   params,
@@ -45,11 +45,7 @@ export default async function PaymentDetailsPage({
     ? await generateQR(currentTransaction?.bb.pixCopyPaste as string)
     : undefined;
 
-  const createTemplateMessageBinded = sendDueFromForm.bind(null, {
-    numero_parcela:
-      paymentData?.omie_metadata?.numero_parcela?.toString() as string,
-    data_vencimento:
-      paymentData?.omie_metadata?.data_vencimento?.toString() as string,
+  const createTemplateMessageBinded = sendShippingDueFromForm.bind(null, {
     pix_copia_e_cola: currentTransaction?.bb.pixCopyPaste!,
     payment_group: paymentData.group,
   });
@@ -61,7 +57,7 @@ export default async function PaymentDetailsPage({
 
   const revalidatePaymentPageBinded = revalidatePaymentPage.bind(
     null,
-    `/payment/${params.uuid}`
+    `/payment/shipping/${params.uuid}`
   );
 
   return (
@@ -73,7 +69,7 @@ export default async function PaymentDetailsPage({
             Voltar
           </BackButton>
           <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
-            Visualizando um pagamento
+            Visualizando um pagamento de frete
           </h1>
         </div>
 
@@ -88,7 +84,7 @@ export default async function PaymentDetailsPage({
             <NewTransactionForm
               client={client}
               payment={paymentData}
-              action={createDueFromPayment}
+              action={createDueFromPaymentShipping}
             />
           )}
         </div>
@@ -110,16 +106,8 @@ export default async function PaymentDetailsPage({
                   value={`R$${paymentData?.price.toString()}`}
                 />
                 <LabelValue
-                  label="(OMIE) Cód. cliente"
-                  value={paymentData?.omie_metadata.codigo_cliente?.toString()}
-                />
-                <LabelValue
-                  label="(OMIE) Cód. pediddo"
-                  value={paymentData?.omie_metadata.codigo_pedido?.toString()}
-                />
-                <LabelValue
-                  label="(OMIE) N. parcela"
-                  value={paymentData?.omie_metadata.numero_parcela?.toString()}
+                  label="(OMIE) Nome do cliente"
+                  value={client.nome_fantasia}
                 />
               </div>
             </div>

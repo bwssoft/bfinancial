@@ -12,7 +12,11 @@ interface NewTransactionFormProps {
   action: (params: { payment: Payment }, form: FormData) => Promise<void>;
 }
 
-export function NewTransactionForm({ client, payment, action }: NewTransactionFormProps) {
+export function NewTransactionForm({
+  client,
+  payment,
+  action,
+}: NewTransactionFormProps) {
   const { toast } = useToast();
 
   async function handleAction(form: FormData) {
@@ -45,7 +49,7 @@ export function NewTransactionForm({ client, payment, action }: NewTransactionFo
         <PopoverTrigger>
           <Button type="button">Efetuar nova cobrança</Button>
         </PopoverTrigger>
-        <PopoverContent className="w-96 space-y-4 mx-4">
+        <PopoverContent className="w-96 space-y-4">
           <DueCreateForm client={client} action={handleAction} />
         </PopoverContent>
       </Popover>

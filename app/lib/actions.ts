@@ -51,7 +51,7 @@ export const listCachedOffers = unstable_cache(
 );
 
 export const getCachedOffer = unstable_cache(
-  async (enterprise, id) => await fetchOfferById(enterprise, id),
+  async (enterprise: OmieEnterpriseEnum, id: number) => await fetchOfferById(enterprise, id),
   ["omie-offer-list"],
   {
     revalidate: 90,
@@ -59,7 +59,7 @@ export const getCachedOffer = unstable_cache(
 );
 
 export const getCachedClient = unstable_cache(
-  async (enterprise, id) => await fetchClientById(enterprise, id),
+  async (enterprise: OmieEnterpriseEnum, id: string) => await fetchClientById(enterprise, id),
   ["omie-find-client"],
   {
     revalidate: 10800,
@@ -219,6 +219,88 @@ export async function createPaymentFromOfferPage(
   return payment;
 }
 
+interface createDetachedPaymentFromOfferPageParams {
+  codigo_pedido_omie: string | null;
+  cnpj_cpf: string | null;
+  nome_fantasia: string | null;
+  codigo_cliente_omie: string | null;
+}
+
+export async function createDetachedPaymentFromOfferPage(
+  params: createDetachedPaymentFromOfferPageParams,
+  form: FormData
+) {
+  const {
+    codigo_pedido_omie,
+    cnpj_cpf,
+    nome_fantasia,
+    codigo_cliente_omie
+  } = params;
+
+  const formData = Object.fromEntries(form.entries()) as any;
+
+  if (
+    !formData.omie_enterprise ||
+    !codigo_pedido_omie ||
+    !cnpj_cpf ||
+    !nome_fantasia ||
+    !codigo_cliente_omie
+  ) {
+    throw new Error("Empresa, cliente ou pedido inválidos! Tente novamente.");
+  }
+
+  const payer = {
+    document: {
+      type: DocumentEnum.CNPJ,
+      value: cnpj_cpf,
+    },
+    email: formData.contact_email,
+    name: nome_fantasia,
+  };
+
+  const receiver = {
+    name: formData.omie_enterprise,
+  };
+
+  const pix = await createPixTransaction({
+    payer,
+    receiver,
+    price: formData.price,
+  });
+
+  if (!pix.status) {
+    throw new Error("error on bpay microservice");
+  }
+
+  const data: CreatePayment = {
+    user_uuid: uuidv4(),
+    uuid: uuidv4(),
+    created_at: new Date().toISOString(),
+    price: pix.transaction.amount,
+    is_detached: true,
+    omie_metadata: {
+      enterprise: formData.omie_enterprise,
+      codigo_cliente: Number(codigo_cliente_omie),
+      codigo_pedido: codigo_pedido_omie,
+    },
+    bpay_metadata: {
+      id: pix.transaction._id,
+      txid: pix.transaction.bb.txid,
+    },
+    group: `${codigo_pedido_omie}`,
+  };
+
+  const payment = await paymentRepo.create(data);
+  // revalidatePath(
+  //   `offer/${formData.omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}`
+  // );
+  await sendShippingDue({
+    pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
+    telefone: formData.contact_phone,
+    payment_group: data.group!,
+  });
+}
+
 export async function getTransactionByPaymentId(id: string) {
   return;
 }
@@ -289,6 +371,56 @@ export async function createDueFromPayment(params: { payment: Payment }, form: F
   }
 }
 
+export async function createDueFromPaymentShipping(params: { payment: Payment }, form: FormData) {
+  const payment = params.payment;
+
+  const enterprise = payment.omie_metadata?.enterprise;
+  const clientId = payment.omie_metadata?.codigo_cliente;
+  const offerId = payment.omie_metadata?.codigo_pedido;
+
+
+  const [offer, client] = await Promise.all([
+    getCachedOffer(enterprise, parseInt(offerId)),
+    fetchClientById(enterprise, clientId.toString()),
+  ]);
+
+  if (offer && client) {
+    form.set("omie_enterprise", enterprise)
+    form.set("price", String(payment.price))
+    await createDetachedPaymentFromOfferPage(
+      {
+        codigo_pedido_omie: String(offer.pedido_venda_produto.cabecalho.codigo_pedido),
+        cnpj_cpf: client.cnpj_cpf,
+        nome_fantasia: client.nome_fantasia,
+        codigo_cliente_omie: String(client.codigo_cliente_omie)
+      },
+      form
+    );
+  }
+}
+
+export async function sendDueFromForm(params: {
+  numero_parcela: string;
+  data_vencimento: string;
+  pix_copia_e_cola: string;
+  payment_group: string;
+}, formData: FormData) {
+  const {
+    numero_parcela,
+    data_vencimento,
+    pix_copia_e_cola,
+    payment_group
+  } = params
+  const _formData = Object.fromEntries(formData.entries()) as any;
+
+  return await sendDue({
+    telefone: _formData.contact_phone,
+    pix_copia_e_cola,
+    payment_group,
+    numero_parcela,
+    data_vencimento
+  })
+} //usado para botão de "enviar cobrança" da tela de payment [uuid]
 export async function sendDue(params: {
   numero_parcela: string;
   telefone: string;
@@ -342,7 +474,76 @@ export async function sendDue(params: {
           },
           {
             type: "text",
-            text: `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}/${params.payment_group}`,
+            text: `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}/pay/${params.payment_group}`,
+          },
+          {
+            type: "text",
+            text: params.pix_copia_e_cola,
+          },
+        ],
+      },
+    ],
+  });
+
+  return result;
+}
+
+export async function sendShippingDueFromForm(params: {
+  pix_copia_e_cola: string;
+  payment_group: string;
+}, formData: FormData) {
+  const { pix_copia_e_cola, payment_group } = params
+  const _formData = Object.fromEntries(formData.entries()) as any;
+  return await sendShippingDue({
+    telefone: _formData.contact_phone,
+    pix_copia_e_cola,
+    payment_group,
+  })
+} //usado para botão de "enviar cobrança" da tela de payment/shipping [uuid]
+export async function sendShippingDue(params: {
+  telefone: string;
+  pix_copia_e_cola: string;
+  payment_group: string;
+}) {
+  const headerInfo = Object.fromEntries(headers().entries());
+  const buffer = await generateQRBuffer(params.pix_copia_e_cola);
+
+  if (!buffer) {
+    throw new Error("Não foi possível gerar o QR Code para continuar.");
+  }
+
+  const link = await FirebaseGateway.uploadFile({
+    buffer,
+    name: `qr-code-${nanoid()}`,
+    type: "image/jpeg",
+  });
+
+  if (!link) {
+    throw new Error("Não foi possível gerar o QR Code e salvá-lo.");
+  }
+
+  const result = await BMessageClient.createTemplateMessage({
+    phone: params.telefone,
+    code: "pt_BR",
+    template: "cobranca_bfinancial_frete",
+    components: [
+      {
+        type: "header",
+        parameters: [
+          {
+            type: "image",
+            image: {
+              link,
+            },
+          },
+        ],
+      },
+      {
+        type: "body",
+        parameters: [
+          {
+            type: "text",
+            text: `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}/pay/${params.payment_group}`,
           },
           {
             type: "text",

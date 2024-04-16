@@ -146,7 +146,7 @@ export async function POST(request: Request) {
     });
     return Response.json({ ok: true });
   } catch (e) {
-    console.error("error on invoiced", e)
+    console.error("Error on omie order invoiced", e)
     return new Response("Error", { status: 500 })
   }
 }
