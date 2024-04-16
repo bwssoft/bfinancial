@@ -25,21 +25,21 @@ export default async function OfferPage({ searchParams }: OfferPageParams) {
       return null;
     }
 
-    if (codigo_pedido) {
-      const offer = await getCachedOffer(omie_enterprise, parseInt(codigo_pedido));
+    // // if (codigo_pedido) {
+    // //   const offer = await getCachedOffer(omie_enterprise, parseInt(codigo_pedido));
 
-      if (offer?.pedido_venda_produto) {
-        return {
-          pagina: 1,
-          pedido_venda_produto: [offer?.pedido_venda_produto],
-          registros: 1,
-          total_de_paginas: 1,
-          total_de_registros: 1,
-        };
-      }
+    // //   if (offer?.pedido_venda_produto) {
+    // //     return {
+    // //       pagina: 1,
+    // //       pedido_venda_produto: [offer?.pedido_venda_produto],
+    // //       registros: 1,
+    // //       total_de_paginas: 1,
+    // //       total_de_registros: 1,
+    // //     };
+    // //   }
 
-      return null;
-    }
+    // //   return null;
+    // // }
 
     if (numero_pedido) {
       const offer = await getCachedOfferByNumber(

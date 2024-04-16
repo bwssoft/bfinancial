@@ -38,9 +38,9 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
   const [orderStep, setOrderStep] = React.useState<string | undefined>(
     searchParams.get("etapa") ?? undefined
   );
-  const [orderId, setOrderId] = React.useState<string | undefined>(
-    searchParams.get("codigo_pedido") ?? undefined
-  );
+  // const [orderId, setOrderId] = React.useState<string | undefined>(
+  //   searchParams.get("codigo_pedido") ?? undefined
+  // );
   const [period, setPeriod] = React.useState<string | undefined>(
     searchParams.get("periodo") ?? undefined
   );
@@ -56,7 +56,7 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
       omie_enterprise: enterprise,
       codigo_cliente_omie: client?.codigo_cliente_omie,
       etapa: orderStep,
-      codigo_pedido: orderId,
+      // codigo_pedido: orderId,
       periodo: period,
       numero_pedido: offerNumber
     });
@@ -141,12 +141,12 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
           </PopoverTrigger>
           <PopoverContent className="w-80">
             <form action={onAction} className="grid grid-flow-row gap-4 rounded-md">
-              <Input
+              {/* <Input
                 label="Código do pedido"
                 placeholder="Código do pedido"
                 defaultValue={searchParams.get("codigo_pedido") ?? undefined}
                 onChange={(e) => setOrderId(e.target.value)}
-              />
+              /> */}
 
               <Input
                 label="Número do pedido"
@@ -216,7 +216,7 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
           />
         )}
 
-        {searchParams.get("codigo_pedido") && (
+        {/* {searchParams.get("codigo_pedido") && (
           <Badge
             label="Codigo pedido"
             isRemoved
@@ -225,7 +225,7 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
               onAction();
             }}
           />
-        )}
+        )} */}
 
         {searchParams.get("numero_pedido") && (
           <Badge
