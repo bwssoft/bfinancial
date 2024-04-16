@@ -11,10 +11,8 @@ import {
 import { OmieBaseService } from "./base.omie";
 
 class OrderService extends OmieBaseService {
-  async find(codigo_pedido: number) {
-    const data = this.formatSingleBodyRequest("ConsultarPedido", {
-      codigo_pedido,
-    });
+  async find(params: { codigo_pedido?: number, numero_pedido?: number }) {
+    const data = this.formatSingleBodyRequest("ConsultarPedido", params);
     const response = await this._httpProvider.post<OmieFindOfferResponse>(
       "/produtos/pedido/",
       data
