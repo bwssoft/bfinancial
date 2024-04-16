@@ -44,6 +44,9 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
   const [period, setPeriod] = React.useState<string | undefined>(
     searchParams.get("periodo") ?? undefined
   );
+  const [offerNumber, setOfferNumber] = React.useState<string | undefined>(
+    searchParams.get("numero_pedido") ?? undefined
+  );
 
   const pathname = usePathname();
   const router = useRouter();
@@ -55,6 +58,7 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
       etapa: orderStep,
       codigo_pedido: orderId,
       periodo: period,
+      numero_pedido: offerNumber
     });
     router.push(`${pathname}?${params}`);
   };
@@ -144,6 +148,13 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
                 onChange={(e) => setOrderId(e.target.value)}
               />
 
+              <Input
+                label="Número do pedido"
+                placeholder="Número do pedido"
+                defaultValue={searchParams.get("numero_pedido") ?? undefined}
+                onChange={(e) => setOfferNumber(e.target.value)}
+              />
+
               <Autocomplete
                 label="Etapa do pedido"
                 placeholder="Etapa"
@@ -211,6 +222,17 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
             isRemoved
             onClick={() => {
               setOrderId(undefined);
+              onAction();
+            }}
+          />
+        )}
+
+        {searchParams.get("numero_pedido") && (
+          <Badge
+            label="Número pedido"
+            isRemoved
+            onClick={() => {
+              setOfferNumber(undefined);
               onAction();
             }}
           />
