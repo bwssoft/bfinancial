@@ -92,6 +92,8 @@ export async function POST(request: Request) {
     Number(a.numero_parcela.split('/')[0]) === Number(omie_metadata.numero_parcela)
   )
 
+  console.log('current_receive_order', current_receive_order)
+
   if (!current_receive_order) return new Response(
     "No receive offer linked",
     {
