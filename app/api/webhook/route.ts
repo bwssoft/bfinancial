@@ -92,8 +92,6 @@ export async function POST(request: Request) {
     Number(a.numero_parcela.split('/')[0]) === Number(omie_metadata.numero_parcela)
   )
 
-  console.log('current_receive_order', current_receive_order)
-
   if (!current_receive_order) return new Response(
     "No receive offer linked",
     {
@@ -103,19 +101,21 @@ export async function POST(request: Request) {
   )
 
   /**
-  * 
+  * check omie receive order status is different of "RECEBIDO" and then update the omie receive order
   */
-  await OmieReceiveOrdersService.post({
-    codigo_lancamento: current_receive_order.codigo_lancamento_omie,
-    codigo_conta_corrente: current_receive_order.id_conta_corrente,
-    valor: payment.price,
-    data: new Date().toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
-    }),
-    observacao: "Baixa realizada automaticamente pelo sistema BFinancial"
-  })
+  if (current_receive_order.status_titulo !== "RECEBIDO") {
+    await OmieReceiveOrdersService.post({
+      codigo_lancamento: current_receive_order.codigo_lancamento_omie,
+      codigo_conta_corrente: current_receive_order.id_conta_corrente,
+      valor: payment.price,
+      data: new Date().toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      }),
+      observacao: "Baixa realizada automaticamente pelo sistema BFinancial"
+    })
+  }
 
   /**
   *  notify bpay microservice with the dara received from bb webhook

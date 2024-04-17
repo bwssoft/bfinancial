@@ -6,6 +6,7 @@ export interface OmieReceiveOrder {
   nCodPedido: number;
   numero_documento: string;
   numero_parcela: string;
+  status_titulo: "RECEBIDO"
 }
 
 export type OmieListReceiveOrderParams = OmieSearchParams & {
