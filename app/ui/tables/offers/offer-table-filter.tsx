@@ -27,7 +27,7 @@ import { enterprises } from "../clients/filter";
 
 interface OfferFilterProps {
   client?: OmieClientModel;
-  onClientChange: (client: OmieClientModel) => void;
+  onClientChange: (client: OmieClientModel | undefined) => void;
 }
 
 export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
@@ -105,7 +105,13 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
             }))}
             onChange={(newValue) => {
               const option = newValue as AutocompleteResponse<string>;
+              const params = formatSearchParams({
+                omie_enterprise: option?.value,
+              });
               setEnterprise(option?.value as OmieEnterpriseEnum);
+              onClientChange(undefined);
+              setClients([]);
+              router.push(`${pathname}?${params}`);
             }}
           />
         </div>
@@ -216,17 +222,6 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
             }}
           />
         )}
-
-        {/* {searchParams.get("codigo_pedido") && (
-          <Badge
-            label="Codigo pedido"
-            isRemoved
-            onClick={() => {
-              setOrderId(undefined);
-              onAction();
-            }}
-          />
-        )} */}
 
         {searchParams.get("numero_pedido") && (
           <Badge

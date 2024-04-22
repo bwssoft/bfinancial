@@ -30,7 +30,7 @@ export function OfferTable({
   const [client, setClient] = React.useState<OmieClientModel>();
 
   const onClientChange = React.useCallback(
-    (client: OmieClientModel) => setClient(client),
+    (client: OmieClientModel | undefined) => setClient(client),
     []
   );
   const onOfferChange = React.useCallback(() => client, [offers]);
