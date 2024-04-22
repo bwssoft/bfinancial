@@ -6,7 +6,7 @@ import { createDetachedPaymentFromOfferPage } from "@/app/lib/actions";
 import { toast } from "@/app/hook/use-toast";
 
 export function DueDetachedForm(props: {
-  omie_enterprise?: OmieEnterpriseEnum;
+  omie_enterprise: OmieEnterpriseEnum;
   contact_email: string;
   contact_phone: string;
   codigo_pedido_omie: string;
@@ -28,6 +28,7 @@ export function DueDetachedForm(props: {
     try {
       const createPaymentFromOfferPageBinded =
         createDetachedPaymentFromOfferPage.bind(null, {
+          omie_enterprise: omie_enterprise,
           codigo_pedido_omie: codigo_pedido_omie,
           cnpj_cpf: cnpj_cpf,
           codigo_cliente_omie: codigo_cliente_omie,
@@ -56,28 +57,6 @@ export function DueDetachedForm(props: {
       className="space-y-8 overflow-y-auto max-h-full scroll-slim p-2 border-4 border-transparent py-4"
     >
       <section className="space-y-4">
-        <fieldset>
-          <label
-            htmlFor="omie_enterprise"
-            className="block text-sm font-medium leading-6 text-gray-900"
-          >
-            Empresa
-          </label>
-          <select
-            id="omie_enterprise"
-            name="omie_enterprise"
-            className="mt-1 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-cyan-600 sm:text-sm sm:leading-6"
-            defaultValue={omie_enterprise}
-          >
-            <option value="default">Selecione uma empresa</option>
-            <option value="WFC">WFC Technology</option>
-            <option value="BWS">BWS IoT</option>
-            <option value="ICB">ICB</option>
-            <option value="ICBFILIAL">ICB Filial</option>
-            <option value="MGC">MGC</option>
-          </select>
-        </fieldset>
-
         <fieldset>
           <div>
             <label
