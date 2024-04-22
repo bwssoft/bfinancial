@@ -239,6 +239,7 @@ export default async function Example({
           <ClientOfferInstallmentTable
             installments={installments}
             client={client}
+            isInvoiced={offer.pedido_venda_produto.cabecalho.etapa === "60"}
           />
         </section>
       </main>

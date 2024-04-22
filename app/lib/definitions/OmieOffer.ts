@@ -58,6 +58,9 @@ export type OmieOfferInstallment = {
   percentual: number;
   quantidade_dias: number;
   valor: number;
+  parcela_adiantamento?: string //'S' | 'N'
+  categoria_adiantamento?: string
+  conta_corrente_adiantamento?: string
 };
 
 export type OmieOffer = {

@@ -40,10 +40,17 @@ export type OmieInstallmentTable = OmieOfferInstallment & {
 
 export interface GetInstallmentColumnsParams {
   client: OmieClientModel;
+  isInvoiced: boolean;
+  paymentCreated: {
+    active: boolean;
+    installment: OmieInstallmentTable | undefined;
+  };
 }
 
 export function getInstallmentColumns({
   client,
+  paymentCreated,
+  isInvoiced,
 }: GetInstallmentColumnsParams): ColumnDef<OmieInstallmentTable>[] {
   return [
     { header: "Índice", accessorKey: "numero_parcela" },
@@ -84,7 +91,14 @@ export function getInstallmentColumns({
     {
       header: "Ação",
       accessorKey: "cabecalho.etapa",
-      cell: ({ row }) => <ClientOfferActionColumn data={row.original} client={client} />,
+      cell: ({ row }) => (
+        <ClientOfferActionColumn
+          data={row.original}
+          client={client}
+          paymentCreated={paymentCreated}
+          isInvoiced={isInvoiced}
+        />
+      ),
     },
   ];
 }

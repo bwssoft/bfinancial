@@ -8,25 +8,55 @@ import Link from "next/link";
 import { Button } from "../../button";
 import { DueCreateForm } from "../../form/due-create/due-create";
 import { Popover, PopoverContent, PopoverTrigger } from "../../popover";
-import { OmieInstallmentTable } from "./columns";
+import { GetInstallmentColumnsParams, OmieInstallmentTable } from "./columns";
+
 interface ClientOfferColumn {
   data: OmieInstallmentTable;
   client: OmieClientModel;
+  isInvoiced: boolean;
+  paymentCreated: GetInstallmentColumnsParams["paymentCreated"];
 }
 
-export function ClientOfferActionColumn({ data, client }: ClientOfferColumn) {
+export function ClientOfferActionColumn({
+  data,
+  client,
+  isInvoiced,
+  paymentCreated,
+}: ClientOfferColumn) {
   const { toast } = useToast();
   const installment = data;
-
   const bpay_transaction = data.bpay_transaction;
-  if (bpay_transaction?.length) {
-    return (
-      <Link href={`/payment/${installment.payment?.[0].group}`}>
-        <Button size="sm" variant="outline">
-          Ver transação
+
+  if (paymentCreated.active && !isInvoiced) {
+    if (
+      bpay_transaction?.length &&
+      Number(installment.numero_parcela) ===
+        Number(paymentCreated.installment?.numero_parcela)
+    ) {
+      return (
+        <Link href={`/payment/${installment.payment?.[0].group}`}>
+          <Button size="sm" variant="outline">
+            Ver transação
+          </Button>
+        </Link>
+      );
+    } else {
+      return (
+        <Button type="button" size="sm" variant="ghost">
+          Já existe um adiantamento desse pedido.
         </Button>
-      </Link>
-    );
+      );
+    }
+  } else if (paymentCreated.active && isInvoiced) {
+    if (bpay_transaction?.length) {
+      return (
+        <Link href={`/payment/${installment.payment?.[0].group}`}>
+          <Button size="sm" variant="outline">
+            Ver transação
+          </Button>
+        </Link>
+      );
+    }
   }
 
   async function handleAction(form: FormData) {
@@ -39,13 +69,16 @@ export function ClientOfferActionColumn({ data, client }: ClientOfferColumn) {
       expirationDate.setMonth(Number(month));
       expirationDate.setMonth(Number(year));
 
-      const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(null, {
-        omie_enterprise: installment.omie_enterprise!,
-        codigo_pedido_omie: installment.codigo_pedido_omie!,
-        omie_client: installment.omie_client!,
-        installment,
-        expiration: differenceInSeconds(expirationDate, new Date()),
-      });
+      const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(
+        null,
+        {
+          omie_enterprise: installment.omie_enterprise!,
+          codigo_pedido_omie: installment.codigo_pedido_omie!,
+          omie_client: installment.omie_client!,
+          installment,
+          expiration: differenceInSeconds(expirationDate, new Date()),
+        }
+      );
 
       await createPaymentFromOfferPageBinded(form);
 

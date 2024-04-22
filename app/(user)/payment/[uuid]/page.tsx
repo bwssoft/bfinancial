@@ -114,7 +114,7 @@ export default async function PaymentDetailsPage({
                   value={paymentData?.omie_metadata.codigo_cliente?.toString()}
                 />
                 <LabelValue
-                  label="(OMIE) Cód. pediddo"
+                  label="(OMIE) Cód. pedido"
                   value={paymentData?.omie_metadata.codigo_pedido?.toString()}
                 />
                 <LabelValue
