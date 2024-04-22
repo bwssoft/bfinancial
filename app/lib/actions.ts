@@ -237,6 +237,7 @@ interface createDetachedPaymentFromOfferPageParams {
   cnpj_cpf: string | null;
   nome_fantasia: string | null;
   codigo_cliente_omie: string | null;
+  omie_enterprise: string | null;
 }
 
 export async function createDetachedPaymentFromOfferPage(
@@ -247,13 +248,14 @@ export async function createDetachedPaymentFromOfferPage(
     codigo_pedido_omie,
     cnpj_cpf,
     nome_fantasia,
-    codigo_cliente_omie
+    codigo_cliente_omie,
+    omie_enterprise
   } = params;
 
   const formData = Object.fromEntries(form.entries()) as any;
 
   if (
-    !formData.omie_enterprise ||
+    !omie_enterprise ||
     !codigo_pedido_omie ||
     !cnpj_cpf ||
     !nome_fantasia ||
@@ -272,7 +274,7 @@ export async function createDetachedPaymentFromOfferPage(
   };
 
   const receiver = {
-    name: formData.omie_enterprise,
+    name: omie_enterprise,
   };
 
   const pix = await createPixTransaction({
@@ -292,7 +294,7 @@ export async function createDetachedPaymentFromOfferPage(
     price: pix.transaction.amount,
     is_detached: true,
     omie_metadata: {
-      enterprise: formData.omie_enterprise,
+      enterprise: OmieEnterpriseEnum[omie_enterprise as keyof typeof OmieEnterpriseEnum],
       codigo_cliente: Number(codigo_cliente_omie),
       codigo_pedido: codigo_pedido_omie,
     },
@@ -305,7 +307,7 @@ export async function createDetachedPaymentFromOfferPage(
 
   const payment = await paymentRepo.create(data);
   // revalidatePath(
-  //   `offer/${formData.omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}`
+  //   `offer/${omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}`
   // );
   await sendShippingDue({
     pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
@@ -398,14 +400,14 @@ export async function createDueFromPaymentShipping(params: { payment: Payment },
   ]);
 
   if (offer && client) {
-    form.set("omie_enterprise", enterprise)
     form.set("price", String(payment.price))
     await createDetachedPaymentFromOfferPage(
       {
         codigo_pedido_omie: String(offer.pedido_venda_produto.cabecalho.codigo_pedido),
         cnpj_cpf: client.cnpj_cpf,
         nome_fantasia: client.nome_fantasia,
-        codigo_cliente_omie: String(client.codigo_cliente_omie)
+        codigo_cliente_omie: String(client.codigo_cliente_omie),
+        omie_enterprise: enterprise
       },
       form
     );
