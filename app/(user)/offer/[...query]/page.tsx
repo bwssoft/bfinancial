@@ -167,7 +167,7 @@ export default async function Example({
           <div className="col-span-4 space-y-2">
             <Surface>
               <SurfaceHeader>
-                <h1 className="font-medium">Cliente</h1>
+                <h1 className="font-medium">Cliente Omie</h1>
               </SurfaceHeader>
 
               <div className="grid grid-cols-2 gap-4 p-4">
@@ -178,9 +178,9 @@ export default async function Example({
                 <LabelValue label="Razão social" value={client?.razao_social} />
                 <LabelValue label="CNPJ/CPF" value={client?.cnpj_cpf} />
                 <LabelValue label="CEP" value={client?.cep} />
-                <LabelValue label="Email (OMIE)" value={client?.email} />
+                <LabelValue label="Email" value={client?.email} />
                 <LabelValue
-                  label="Telefone 1 (OMIE)"
+                  label="Telefone 1"
                   value={
                     client?.telefone1_ddd
                       ? `(${client?.telefone1_ddd}) ${client?.telefone1_numero}`
@@ -193,14 +193,22 @@ export default async function Example({
           <div className="col-span-2">
             <Surface>
               <SurfaceHeader>
-                <h1 className="font-medium">Dados adicionais</h1>
+                <h1 className="font-medium">Dados Empresa Omie</h1>
               </SurfaceHeader>
 
-              <div className="grid grid-cols-1 gap-4 p-4">
+              <div className="grid grid-cols-2 gap-4 p-4">
                 <LabelValue label="Empresa" value={omie_enterprise} />
                 <LabelValue
-                  label="Código pedido OMIE"
-                  value={codigo_pedido_omie}
+                  label="Número do pedido"
+                  value={offer.pedido_venda_produto.cabecalho.numero_pedido}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 p-4">
+                <LabelValue label="Código pedido" value={codigo_pedido_omie} />
+                <LabelValue
+                  label="Código cliente"
+                  value={codigo_cliente_omie}
                 />
               </div>
             </Surface>

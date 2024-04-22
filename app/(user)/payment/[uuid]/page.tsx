@@ -3,6 +3,7 @@ import {
   fetchNote,
   fetchPaymentByGroup,
   getCachedClient,
+  getCachedOffer,
   getManyTransactionById,
   revalidatePaymentPage,
   sendDueFromForm,
@@ -54,10 +55,16 @@ export default async function PaymentDetailsPage({
     payment_group: paymentData.group,
   });
 
-  const client = await getCachedClient(
-    paymentData.omie_metadata.enterprise,
-    paymentData.omie_metadata.codigo_cliente.toString()
-  );
+  const [client, offer] = await Promise.all([
+    getCachedClient(
+      paymentData.omie_metadata.enterprise,
+      paymentData.omie_metadata.codigo_cliente.toString()
+    ),
+    getCachedOffer(
+      paymentData.omie_metadata.enterprise,
+      Number(paymentData.omie_metadata.codigo_pedido)
+    ),
+  ]);
 
   const revalidatePaymentPageBinded = revalidatePaymentPage.bind(
     null,
@@ -104,22 +111,29 @@ export default async function PaymentDetailsPage({
                 </div>
               </div>
               <div className="grid grid-cols-2 p-4 gap-2 gap-y-4">
-                {/* <LabelValue label="Protocolo" value={currentPayment?.uuid} /> */}
                 <LabelValue
-                  label="Valor total"
+                  label="Nome Fantasia do cliente"
+                  value={client.nome_fantasia}
+                />
+                <LabelValue
+                  label="Documento do cliente"
+                  value={client.cnpj_cpf}
+                />
+                <LabelValue
+                  label="Número do pedido"
+                  value={offer.pedido_venda_produto.cabecalho.numero_pedido}
+                />
+                <LabelValue
+                  label="Número da parcela"
+                  value={paymentData?.omie_metadata.numero_parcela?.toString()}
+                />
+                <LabelValue
+                  label="Valor a ser cobrado"
                   value={`R$${paymentData?.price.toString()}`}
                 />
                 <LabelValue
-                  label="(OMIE) Cód. cliente"
-                  value={paymentData?.omie_metadata.codigo_cliente?.toString()}
-                />
-                <LabelValue
-                  label="(OMIE) Cód. pedido"
-                  value={paymentData?.omie_metadata.codigo_pedido?.toString()}
-                />
-                <LabelValue
-                  label="(OMIE) N. parcela"
-                  value={paymentData?.omie_metadata.numero_parcela?.toString()}
+                  label="Empresa a ser receber"
+                  value={paymentData.omie_metadata.enterprise}
                 />
               </div>
             </div>
