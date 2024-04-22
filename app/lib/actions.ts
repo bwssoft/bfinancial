@@ -10,7 +10,7 @@ import { BMessageClient } from "./bmessage/bessage";
 import { DocumentEnum, createPixTransaction, getTransactionById } from "./bpay/bpay";
 import { OmieCredentials, OmieEnterpriseEnum, OmieResponse } from "./definitions/OmieApi";
 import { OmieClientListParams, OmieClientModel } from "./definitions/OmieClient";
-import { OmieListOfferParams, OmieOffer, OmieOfferInstallment } from "./definitions/OmieOffer";
+import { OmieListOfferParams, OmieListOfferResponse, OmieOfferInstallment } from "./definitions/OmieOffer";
 import { FirebaseGateway } from "./firebase";
 import { noteRepo } from "./mongodb/repositories/note.mongo";
 import { auditRepo } from "./mongodb/repositories/audit.mongo";
@@ -41,13 +41,20 @@ export async function fetchOffers(
   enterprise: OmieEnterpriseEnum,
   data?: Omit<OmieListOfferParams, "apenas_importado_api">
 ) {
-  OmieOrderService.setSecrets(enterprise);
-  return await OmieOrderService.findAll(data);
+  try {
+    OmieOrderService.setSecrets(enterprise);
+    return await OmieOrderService.findAll(data);
+  } catch (e) {
+    return { pedido_venda_produto: [] } as unknown as OmieListOfferResponse
+  }
 }
 
 export const listCachedOffers = unstable_cache(
   async (enterprise, data) => await fetchOffers(enterprise, data),
-  ["omie-offers"]
+  ["omie-offers"],
+  {
+    revalidate: 90,
+  }
 );
 
 export const getCachedOffer = unstable_cache(
