@@ -17,9 +17,7 @@ export type OmieOfferTable = OmieOffer & {
 };
 
 export const orderOfferColumns: ColumnDef<OmieOfferTable>[] = [
-  // { header: "Código do pedido", accessorKey: "cabecalho.codigo_pedido" },
   { header: "Número do pedido", accessorKey: "cabecalho.numero_pedido" },
-  // { header: "Código Cliente", accessorKey: "cabecalho.codigo_cliente" },
   {
     header: "Parcela",
     cell: ({ row }) => {

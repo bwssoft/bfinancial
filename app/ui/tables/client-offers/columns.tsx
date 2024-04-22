@@ -11,13 +11,37 @@ type OfferStatusBadges = {
 };
 
 const offerStatusBadges: OfferStatusBadges = {
+  "10": {
+    label: "(10) Proposta/Orçamento",
+    color: "gray",
+  },
+  "20": {
+    label: "(20) Separar estoque",
+    color: "gray",
+  },
+  "30": {
+    label: "30",
+    color: "gray",
+  },
+  "40": {
+    label: "40",
+    color: "gray",
+  },
+  "50": {
+    label: "(50) Faturar",
+    color: "gray",
+  },
   "60": {
-    label: "60",
-    color: "yellow",
+    label: "(60) Faturado",
+    color: "gray",
   },
   "70": {
-    label: "Concluido",
-    color: "green",
+    label: "(70) Entrega",
+    color: "gray",
+  },
+  "80": {
+    label: "(80) Pedido/Aprovação Financeira",
+    color: "gray",
   },
 };
 
@@ -26,8 +50,7 @@ export type OmieOfferTable = OmieOffer & {
 };
 
 export const clientOfferColumns: ColumnDef<OmieOfferTable>[] = [
-  { header: "Código do pedido", accessorKey: "cabecalho.codigo_pedido" },
-  { header: "Cliente", accessorKey: "client.nome_fantasia" },
+  { header: "Número do pedido", accessorKey: "cabecalho.numero_pedido" },
   {
     header: "Parcela",
     cell: ({ row }) => {
@@ -45,10 +68,12 @@ export const clientOfferColumns: ColumnDef<OmieOfferTable>[] = [
     accessorKey: "cabecalho.etapa",
     cell: ({ row }) => {
       const status = row.original.cabecalho.etapa;
+      console.log("status", status);
       const label = offerStatusBadges[status]?.label;
       const theme = offerStatusBadges[status]?.color;
 
       return <Badge size="sm" label={label} theme={theme} />;
     },
   },
+  { header: "Data de previsão", accessorKey: "cabecalho.data_previsao" },
 ];

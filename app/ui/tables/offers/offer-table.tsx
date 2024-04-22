@@ -81,8 +81,8 @@ export function OfferTable({
       mobileKeyExtractor={(data) => data.cabecalho.codigo_pedido.toString()}
       mobileDisplayValue={(data) => (
         <div className="flex flex-col">
-          <small className="text-gray-500">Código do pedido</small>
-          {data.cabecalho.codigo_pedido}
+          <small className="text-gray-500">Número do pedido</small>
+          {data.cabecalho.numero_pedido}
         </div>
       )}
       onRowPress={handleRowPress}

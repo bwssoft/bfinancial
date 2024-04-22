@@ -19,7 +19,10 @@ import { Label } from "@/app/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/app/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "@/app/ui/toggle-group";
 import { formatSearchParams } from "@/app/utils/format-search-params";
-import { ChevronDownIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 import { enterprises } from "../clients/filter";
 
 interface OfferFilterProps {
@@ -31,16 +34,14 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
   const searchParams = useSearchParams();
 
   const [clients, setClients] = React.useState<OmieClientModel[]>([]);
-  const [enterprise, setEnterprise] = React.useState<OmieEnterpriseEnum | undefined>(
-    (searchParams.get("omie_enterprise") as OmieEnterpriseEnum) ?? undefined
-  );
+  const [enterprise, setEnterprise] = React.useState<
+    OmieEnterpriseEnum | undefined
+  >((searchParams.get("omie_enterprise") as OmieEnterpriseEnum) ?? undefined);
 
   const [orderStep, setOrderStep] = React.useState<string | undefined>(
     searchParams.get("etapa") ?? undefined
   );
-  // const [orderId, setOrderId] = React.useState<string | undefined>(
-  //   searchParams.get("codigo_pedido") ?? undefined
-  // );
+
   const [period, setPeriod] = React.useState<string | undefined>(
     searchParams.get("periodo") ?? undefined
   );
@@ -56,9 +57,8 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
       omie_enterprise: enterprise,
       codigo_cliente_omie: client?.codigo_cliente_omie,
       etapa: orderStep,
-      // codigo_pedido: orderId,
       periodo: period,
-      numero_pedido: offerNumber
+      numero_pedido: offerNumber,
     });
     router.push(`${pathname}?${params}`);
   };
@@ -86,9 +86,9 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
   function formatPeriod(value: string) {
     const pastDays = parseInt(value);
     const date = subDays(new Date(), pastDays);
-    if(value){
+    if (value) {
       setPeriod(format(date, "dd/MM/yyyy"));
-    }else{
+    } else {
       setPeriod(undefined);
     }
   }
@@ -112,7 +112,11 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
 
         <div className="flex flex-col">
           <Label>Periodo de tempo</Label>
-          <ToggleGroup type="single" variant="outline" onValueChange={formatPeriod}>
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            onValueChange={formatPeriod}
+          >
             <ToggleGroupItem value="15" className="w-24">
               15 dias
             </ToggleGroupItem>
@@ -140,14 +144,10 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80">
-            <form action={onAction} className="grid grid-flow-row gap-4 rounded-md">
-              {/* <Input
-                label="Código do pedido"
-                placeholder="Código do pedido"
-                defaultValue={searchParams.get("codigo_pedido") ?? undefined}
-                onChange={(e) => setOrderId(e.target.value)}
-              /> */}
-
+            <form
+              action={onAction}
+              className="grid grid-flow-row gap-4 rounded-md"
+            >
               <Input
                 label="Número do pedido"
                 placeholder="Número do pedido"
@@ -182,7 +182,8 @@ export function OfferTableFilter({ client, onClientChange }: OfferFilterProps) {
                 }))}
                 onInputChange={handleClientsSearch}
                 onChange={(newValue) => {
-                  const option = newValue as AutocompleteResponse<OmieClientModel>;
+                  const option =
+                    newValue as AutocompleteResponse<OmieClientModel>;
                   onClientChange(option.value);
                 }}
               />
