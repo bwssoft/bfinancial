@@ -342,7 +342,7 @@ export async function revalidateInstallmentOffer(pathname: string) {
 }
 
 export async function revalidatePaymentPage(pathname: string) {
-  revalidatePath(pathname);
+  redirect(pathname);
 }
 
 export async function fetchNote(payment: string) {
