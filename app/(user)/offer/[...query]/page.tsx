@@ -139,9 +139,10 @@ export default async function Example({
           {offer.pedido_venda_produto.cabecalho.etapa === "60" ? (
             <Badge label="Pedido Faturado" theme="green" />
           ) : (
-            <form action={generateOmieInvoiceBinded}>
-              <Button type="submit">Faturar Pedido</Button>
-            </form>
+            // <form action={generateOmieInvoiceBinded}>
+            //   <Button type="submit">Faturar Pedido</Button>
+            // </form>
+            <></>
           )}
           <BackButton>
             <span className="flex space-x-2 items-center">
