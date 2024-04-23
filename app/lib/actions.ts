@@ -18,6 +18,7 @@ import { CreatePayment, paymentRepo } from "./mongodb/repositories/payment.mongo
 import { OmieOrderService } from "./omie/order.omie";
 import { headers } from "next/headers";
 import { Payment } from "./definitions/Payment";
+import { RedirectType, redirect } from "next/navigation";
 
 export async function fetchClients(
   enterprise: OmieEnterpriseEnum,
@@ -312,15 +313,20 @@ export async function createDetachedPaymentFromOfferPage(
     group: `${codigo_pedido_omie}`,
   };
 
-  const payment = await paymentRepo.create(data);
-  // revalidatePath(
-  //   `offer/${omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}`
-  // );
+  await paymentRepo.create(data);
+
   await sendShippingDue({
     pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
     telefone: formData.contact_phone,
     payment_group: data.group!,
   });
+
+  revalidatePath(
+    `offer/${omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}?modalIsOpen=true`
+  );
+  redirect(
+    `/offer/${omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}?modalIsOpen=false`
+  )
 }
 
 export async function getTransactionByPaymentId(id: string) {
