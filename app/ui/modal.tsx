@@ -10,11 +10,13 @@ export function Modal({
   panelClassName,
   panelContainerClassname,
   title,
+  onClose,
 }: {
   children: React.ReactNode;
   panelClassName?: string;
   panelContainerClassname?: string;
   title?: string;
+  onClose: (value: boolean) => void;
 }) {
   const cancelButtonRef = useRef(null);
   const router = useRouter();
@@ -24,7 +26,7 @@ export function Modal({
         as="div"
         className="relative z-50"
         initialFocus={cancelButtonRef}
-        onClose={router.back}
+        onClose={onClose}
       >
         <Transition.Child
           as={Fragment}
