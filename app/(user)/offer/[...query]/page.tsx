@@ -118,11 +118,11 @@ export default async function Example({
     `offer/${omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}`
   );
 
-  const generateOmieInvoiceBinded = generateOmieInvoice.bind(null, {
-    codigo_pedido: Number(codigo_pedido_omie),
-    codigo_cliente: Number(codigo_cliente_omie),
-    omie_enterprise: omie_enterprise,
-  });
+  // const generateOmieInvoiceBinded = generateOmieInvoice.bind(null, {
+  //   codigo_pedido: Number(codigo_pedido_omie),
+  //   codigo_cliente: Number(codigo_cliente_omie),
+  //   omie_enterprise: omie_enterprise,
+  // });
 
   const openModal = () => {
     return `/offer/${omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}?modalIsOpen=true`;

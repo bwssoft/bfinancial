@@ -52,7 +52,7 @@ export async function fetchOffers(
 
 export const listCachedOffers = unstable_cache(
   async (enterprise, data) => await fetchOffers(enterprise, data),
-  ["omie-offers"],
+  ["listCachedOffers"],
   {
     revalidate: 90,
   }
@@ -60,7 +60,7 @@ export const listCachedOffers = unstable_cache(
 
 export const getCachedOffer = unstable_cache(
   async (enterprise: OmieEnterpriseEnum, id: number) => await fetchOfferById(enterprise, id),
-  ["omie-offer-list"],
+  ["getCachedOffer"],
   {
     revalidate: 90,
   }
@@ -68,7 +68,7 @@ export const getCachedOffer = unstable_cache(
 
 export const getCachedOfferByNumber = unstable_cache(
   async (enterprise: OmieEnterpriseEnum, id: number) => await fetchOfferByNumber(enterprise, id),
-  ["omie-offer-list"],
+  ["getCachedOfferByNumber"],
   {
     revalidate: 90,
   }
@@ -76,7 +76,7 @@ export const getCachedOfferByNumber = unstable_cache(
 
 export const getCachedClient = unstable_cache(
   async (enterprise: OmieEnterpriseEnum, id: string) => await fetchClientById(enterprise, id),
-  ["omie-find-client"],
+  ["getCachedClient"],
   {
     revalidate: 10800,
   }
