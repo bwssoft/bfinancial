@@ -13,11 +13,13 @@ import { BackButton } from "@/app/ui/back-button";
 import { Badge } from "@/app/ui/badge";
 import { Button } from "@/app/ui/button";
 import { LabelValue } from "@/app/ui/label-value";
+import { DueDetachedModal } from "@/app/ui/modal/due-detached";
 import { PageHeader } from "@/app/ui/navigation/page-header";
 import { Surface, SurfaceHeader } from "@/app/ui/surface";
 import { ClientOfferInstallmentTable } from "@/app/ui/tables/client-offer-installment/table";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
+
 export default async function Example({
   params,
 }: {
@@ -122,8 +124,8 @@ export default async function Example({
     omie_enterprise: omie_enterprise,
   });
 
-  const generateDetachedDueURL = () => {
-    return `/payment/create?omie_enterprise=${omie_enterprise}&codigo_pedido_omie=${codigo_pedido_omie}&codigo_cliente_omie=${codigo_cliente_omie}`;
+  const openModal = () => {
+    return `/offer/${omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}?modalIsOpen=true`;
   };
 
   return (
@@ -234,7 +236,7 @@ export default async function Example({
                     </Link>
                   </div>
                 ) : (
-                  <Link href={generateDetachedDueURL()}>
+                  <Link href={openModal()}>
                     <Button type="button">Abrir modal</Button>
                   </Link>
                 )}
@@ -251,6 +253,12 @@ export default async function Example({
           />
         </section>
       </main>
+      <DueDetachedModal
+        client={client}
+        codigo_cliente_omie={codigo_cliente_omie}
+        codigo_pedido_omie={codigo_pedido_omie}
+        omie_enterprise={OmieEnterpriseEnum[omie_enterprise]}
+      />
     </div>
   );
 }
