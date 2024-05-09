@@ -3,22 +3,26 @@ import { OmieClientService } from "@/app/lib/omie/client.omie";
 import { Filter } from "mongodb";
 import { nanoid } from "nanoid";
 import { revalidatePath, unstable_cache } from "next/cache";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { getCurrentInstallment } from "../utils/get-current-installment";
 import { generateQRBuffer } from "../utils/qrCode";
 import { BMessageClient } from "./bmessage/bessage";
 import { DocumentEnum, createPixTransaction, getTransactionById } from "./bpay/bpay";
-import { OmieCredentials, OmieEnterpriseEnum, OmieResponse } from "./definitions/OmieApi";
+import { OmieCredentials, OmieEnterpriseEnum } from "./definitions/OmieApi";
 import { OmieClientListParams, OmieClientModel } from "./definitions/OmieClient";
-import { OmieListOfferParams, OmieListOfferResponse, OmieOfferInstallment } from "./definitions/OmieOffer";
+import {
+  OmieListOfferParams,
+  OmieListOfferResponse,
+  OmieOfferInstallment,
+} from "./definitions/OmieOffer";
+import { Payment } from "./definitions/Payment";
 import { FirebaseGateway } from "./firebase";
-import { noteRepo } from "./mongodb/repositories/note.mongo";
 import { auditRepo } from "./mongodb/repositories/audit.mongo";
+import { noteRepo } from "./mongodb/repositories/note.mongo";
 import { CreatePayment, paymentRepo } from "./mongodb/repositories/payment.mongo";
 import { OmieOrderService } from "./omie/order.omie";
-import { headers } from "next/headers";
-import { Payment } from "./definitions/Payment";
-import { RedirectType, redirect } from "next/navigation";
 
 export async function fetchClients(
   enterprise: OmieEnterpriseEnum,
@@ -46,7 +50,7 @@ export async function fetchOffers(
     OmieOrderService.setSecrets(enterprise);
     return await OmieOrderService.findAll(data);
   } catch (e) {
-    return { pedido_venda_produto: [] } as unknown as OmieListOfferResponse
+    return { pedido_venda_produto: [] } as unknown as OmieListOfferResponse;
   }
 }
 
@@ -83,11 +87,11 @@ export const getCachedClient = unstable_cache(
 );
 
 async function fetchAuditByMetadata<T = any>(params: T) {
-  return await auditRepo.findOne({ metadata: params })
+  return await auditRepo.findOne({ metadata: params });
 }
 
 export async function fetchAuditByOmieCode(code: string) {
-  return await fetchAuditByMetadata<{ codigo_pedido_omie: string }>({ codigo_pedido_omie: code })
+  return await fetchAuditByMetadata<{ codigo_pedido_omie: string }>({ codigo_pedido_omie: code });
 }
 
 export async function fetchOfferById(enterprise: OmieEnterpriseEnum, id: number) {
@@ -200,7 +204,7 @@ export async function createPaymentFromOfferPage(
     payer,
     receiver,
     price: installment.valor.toString(),
-    expiration,
+    expires: expiration,
   });
 
   if (!pix.status) {
@@ -252,13 +256,8 @@ export async function createDetachedPaymentFromOfferPage(
   params: createDetachedPaymentFromOfferPageParams,
   form: FormData
 ) {
-  const {
-    codigo_pedido_omie,
-    cnpj_cpf,
-    nome_fantasia,
-    codigo_cliente_omie,
-    omie_enterprise
-  } = params;
+  const { codigo_pedido_omie, cnpj_cpf, nome_fantasia, codigo_cliente_omie, omie_enterprise } =
+    params;
 
   const formData = Object.fromEntries(form.entries()) as any;
 
@@ -326,7 +325,7 @@ export async function createDetachedPaymentFromOfferPage(
   );
   redirect(
     `/offer/${omie_enterprise}/${codigo_cliente_omie}/${codigo_pedido_omie}?modalIsOpen=false`
-  )
+  );
 }
 
 export async function getTransactionByPaymentId(id: string) {
@@ -372,7 +371,7 @@ export async function createTextMessage(params: { phone: string; message: string
 }
 
 export async function createDueFromPayment(params: { payment: Payment }, form: FormData) {
-  const payment = params.payment;
+  const { payment } = params;
 
   const enterprise = payment.omie_metadata?.enterprise;
   const clientId = payment.omie_metadata?.codigo_cliente;
@@ -384,9 +383,7 @@ export async function createDueFromPayment(params: { payment: Payment }, form: F
   ]);
 
   if (offer && client) {
-    const currentInstallment = getCurrentInstallment(
-      offer?.pedido_venda_produto.lista_parcelas.parcela
-    );
+    const currentInstallment = getCurrentInstallment(payment, offer?.pedido_venda_produto);
     await createPaymentFromOfferPage(
       {
         omie_enterprise: enterprise,
@@ -406,39 +403,36 @@ export async function createDueFromPaymentShipping(params: { payment: Payment },
   const clientId = payment.omie_metadata?.codigo_cliente;
   const offerId = payment.omie_metadata?.codigo_pedido;
 
-
   const [offer, client] = await Promise.all([
     getCachedOffer(enterprise, parseInt(offerId)),
     fetchClientById(enterprise, clientId.toString()),
   ]);
 
   if (offer && client) {
-    form.set("price", String(payment.price))
+    form.set("price", String(payment.price));
     await createDetachedPaymentFromOfferPage(
       {
         codigo_pedido_omie: String(offer.pedido_venda_produto.cabecalho.codigo_pedido),
         cnpj_cpf: client.cnpj_cpf,
         nome_fantasia: client.nome_fantasia,
         codigo_cliente_omie: String(client.codigo_cliente_omie),
-        omie_enterprise: enterprise
+        omie_enterprise: enterprise,
       },
       form
     );
   }
 }
 
-export async function sendDueFromForm(params: {
-  numero_parcela: string;
-  data_vencimento: string;
-  pix_copia_e_cola: string;
-  payment_group: string;
-}, formData: FormData) {
-  const {
-    numero_parcela,
-    data_vencimento,
-    pix_copia_e_cola,
-    payment_group
-  } = params
+export async function sendDueFromForm(
+  params: {
+    numero_parcela: string;
+    data_vencimento: string;
+    pix_copia_e_cola: string;
+    payment_group: string;
+  },
+  formData: FormData
+) {
+  const { numero_parcela, data_vencimento, pix_copia_e_cola, payment_group } = params;
   const _formData = Object.fromEntries(formData.entries()) as any;
 
   return await sendDue({
@@ -446,8 +440,8 @@ export async function sendDueFromForm(params: {
     pix_copia_e_cola,
     payment_group,
     numero_parcela,
-    data_vencimento
-  })
+    data_vencimento,
+  });
 } //usado para botão de "enviar cobrança" da tela de payment [uuid]
 export async function sendDue(params: {
   numero_parcela: string;
@@ -516,17 +510,20 @@ export async function sendDue(params: {
   return result;
 }
 
-export async function sendShippingDueFromForm(params: {
-  pix_copia_e_cola: string;
-  payment_group: string;
-}, formData: FormData) {
-  const { pix_copia_e_cola, payment_group } = params
+export async function sendShippingDueFromForm(
+  params: {
+    pix_copia_e_cola: string;
+    payment_group: string;
+  },
+  formData: FormData
+) {
+  const { pix_copia_e_cola, payment_group } = params;
   const _formData = Object.fromEntries(formData.entries()) as any;
   return await sendShippingDue({
     telefone: _formData.contact_phone,
     pix_copia_e_cola,
     payment_group,
-  })
+  });
 } //usado para botão de "enviar cobrança" da tela de payment/shipping [uuid]
 export async function sendShippingDue(params: {
   telefone: string;
@@ -596,16 +593,12 @@ export async function generatePayShareLink(params: { paymentGroupId: string }) {
 }
 
 export async function generateOmieInvoice(params: {
-  codigo_pedido: number,
-  codigo_cliente: number,
-  omie_enterprise: OmieEnterpriseEnum
+  codigo_pedido: number;
+  codigo_cliente: number;
+  omie_enterprise: OmieEnterpriseEnum;
 }) {
-  const { codigo_pedido, omie_enterprise, codigo_cliente } = params
-  OmieOrderService.setSecrets(omie_enterprise)
-  await OmieOrderService.invoice({ nCodPed: codigo_pedido })
-  revalidatePath(
-    `offer/${omie_enterprise}/${codigo_cliente}/${codigo_pedido}`
-  );
+  const { codigo_pedido, omie_enterprise, codigo_cliente } = params;
+  OmieOrderService.setSecrets(omie_enterprise);
+  await OmieOrderService.invoice({ nCodPed: codigo_pedido });
+  revalidatePath(`offer/${omie_enterprise}/${codigo_cliente}/${codigo_pedido}`);
 }
-
-

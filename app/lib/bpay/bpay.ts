@@ -6,18 +6,18 @@ export async function createPixTransaction({
   payer,
   receiver,
   price,
-  expiration
+  expires
 }: {
   payer: Payer
   receiver: Receiver
   price: string,
-  expiration?: number
+  expires?: number
 }) {
   return await bwpay.createPixWithoutRecipient({
     payer,
     receiver,
     price,
-    expiration
+    expires
   })
 }
 
