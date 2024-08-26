@@ -1,11 +1,11 @@
 "use client";
 import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
-import { DueDetachedForm } from "../form/due-detached";
+import { DueShipmentForm } from "../form/due-shipment";
 import { Modal } from "../modal";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { useSearchParams } from "next/navigation";
 
-export function DueDetachedModal(params: {
+export function DueShipmentModal(params: {
   client: OmieClientModel;
   omie_enterprise: OmieEnterpriseEnum;
   codigo_cliente_omie: string;
@@ -23,7 +23,7 @@ export function DueDetachedModal(params: {
 
   return isOpen ? (
     <Modal title="Cobrar Frete" onClose={closeModal}>
-      <DueDetachedForm
+      <DueShipmentForm
         contact_phone={`${client.telefone1_ddd}${client.telefone1_numero}`}
         contact_email={client.email}
         omie_enterprise={omie_enterprise}

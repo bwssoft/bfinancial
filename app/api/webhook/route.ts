@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     /**
     * request omie offer (pedido)
     */
-    const offer = await getCachedOffer(omie_metadata.enterprise, parseInt(omie_metadata.codigo_pedido));
+    const offer = await getCachedOffer(omie_metadata.enterprise, parseInt(omie_metadata.codigo_pedido!));
     if (!offer) return new Response("No offer with this code", { status: 500, statusText: "No offer with this code" })
 
     if (offer.pedido_venda_produto.cabecalho.etapa !== "60") {

@@ -5,7 +5,7 @@ type Cents = number
 export type OmieMetadata = {
   enterprise: OmieEnterpriseEnum;
   codigo_cliente: number;
-  codigo_pedido: string;
+  codigo_pedido?: string; //opcional por que quando for um pagamento de frete, não existe parcela
   numero_parcela?: number; //opcional por que quando for um pagamento de frete, não existe parcela
   data_vencimento?: string //opcional por que quando for um pagamento de frete, não existe parcela
 }

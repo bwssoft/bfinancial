@@ -13,7 +13,7 @@ import { BackButton } from "@/app/ui/back-button";
 import { Badge } from "@/app/ui/badge";
 import { Button } from "@/app/ui/button";
 import { LabelValue } from "@/app/ui/label-value";
-import { DueDetachedModal } from "@/app/ui/modal/due-detached";
+import { DueShipmentModal } from "@/app/ui/modal/due-shipment";
 import { PageHeader } from "@/app/ui/navigation/page-header";
 import { Surface, SurfaceHeader } from "@/app/ui/surface";
 import { ClientOfferInstallmentTable } from "@/app/ui/tables/client-offer-installment/table";
@@ -229,7 +229,7 @@ export default async function Example({
                       <Badge size="sm" label={"Processando"} theme={"yellow"} />
                     )}
                     <Link
-                      href={`/payment/shipping/${shipping?.[0].payment?.[0].group}`}
+                      href={`/payment/shipment/${shipping?.[0].payment?.[0].group}`}
                     >
                       <Button size="sm" variant="outline">
                         Ver transação
@@ -254,7 +254,7 @@ export default async function Example({
           />
         </section>
       </main>
-      <DueDetachedModal
+      <DueShipmentModal
         client={client}
         codigo_cliente_omie={codigo_cliente_omie}
         codigo_pedido_omie={codigo_pedido_omie}

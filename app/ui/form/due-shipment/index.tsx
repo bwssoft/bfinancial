@@ -5,7 +5,7 @@ import { EnvelopeIcon } from "@heroicons/react/20/solid";
 import { createDetachedPaymentFromOfferPage } from "@/app/lib/actions";
 import { toast } from "@/app/hook/use-toast";
 
-export function DueDetachedForm(props: {
+export function DueShipmentForm(props: {
   omie_enterprise: OmieEnterpriseEnum;
   contact_email: string;
   contact_phone: string;
