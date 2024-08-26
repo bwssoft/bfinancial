@@ -45,7 +45,7 @@ export const paymentColumns: ColumnDef<Payment>[] = [
     header: "Código Pedido Omie",
     accessorKey: "omie_metadata",
     cell: (cell) => (
-      <span>{cell.row.original.omie_metadata.codigo_pedido}</span>
+      <span>{cell.row.original.omie_metadata.codigo_pedido ?? "--"}</span>
     ),
   },
   { header: "Valor", accessorKey: "price" },
