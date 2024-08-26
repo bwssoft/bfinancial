@@ -1,6 +1,7 @@
 import { PageHeader } from "@/app/ui/navigation/page-header";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { DueDetachedShipmentForm } from "@/app/ui/form/due-detached-shipment";
+import { createDetachedShipmentPayment } from "@/app/lib/actions";
 
 export default async function Example({
   searchParams,
@@ -17,7 +18,7 @@ export default async function Example({
         ></PageHeader>
 
         <section>
-          <DueDetachedShipmentForm />
+          <DueDetachedShipmentForm action={createDetachedShipmentPayment} />
         </section>
       </main>
     </>

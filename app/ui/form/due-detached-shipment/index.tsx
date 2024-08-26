@@ -8,9 +8,21 @@ import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
 import { Label } from "../../label";
 import { Input } from "../../input";
 import { Alert } from "../../alert";
-import { createDetachedShipmentPayment } from "@/app/lib/actions";
 
-export function DueDetachedShipmentForm() {
+interface Props {
+  action: (
+    input: {
+      cnpj_cpf: string;
+      codigo_cliente_omie: string;
+      nome_fantasia: string;
+      omie_enterprise: string;
+      group: string;
+    },
+    form: FormData
+  ) => Promise<void>;
+}
+export function DueDetachedShipmentForm(props: Props) {
+  const { action } = props;
   const {
     handleChangeEnterprise,
     handleChangeClient,
@@ -39,7 +51,7 @@ export function DueDetachedShipmentForm() {
         return;
       }
       const group = crypto.randomUUID();
-      const binded = createDetachedShipmentPayment.bind(null, {
+      const binded = action.bind(null, {
         cnpj_cpf: client.cnpj_cpf,
         codigo_cliente_omie: String(client.codigo_cliente_omie),
         nome_fantasia: client.nome_fantasia,
