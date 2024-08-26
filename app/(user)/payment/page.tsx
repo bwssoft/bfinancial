@@ -1,18 +1,28 @@
 import { fetchPayments } from "@/app/lib/actions";
-import Link from "next/link";
 import { PaymentTable } from "@/app/ui/tables/payments";
 import { PageHeader } from "@/app/ui/navigation/page-header";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { Payment } from "@/app/lib/definitions/Payment";
+import { Filter } from "mongodb";
 
 export default async function Example({
   searchParams,
 }: {
-  searchParams: { omie_enterprise: OmieEnterpriseEnum };
+  searchParams: {
+    omie_enterprise?: OmieEnterpriseEnum;
+    codigo_cliente_omie?: string;
+  };
 }) {
-  const { omie_enterprise } = searchParams;
-  const payments = !omie_enterprise
-    ? []
-    : await fetchPayments({ "omie_metadata.enterprise": omie_enterprise });
+  const { omie_enterprise, codigo_cliente_omie } = searchParams;
+  console.log("aaaaa");
+  const query: Filter<Payment> = {};
+
+  if (omie_enterprise) query["omie_metadata.enterprise"] = omie_enterprise;
+  if (codigo_cliente_omie)
+    query["omie_metadata.codigo_cliente"] = codigo_cliente_omie;
+
+  console.log("query", query);
+  const payments = !omie_enterprise ? [] : await fetchPayments(query);
 
   return (
     <>

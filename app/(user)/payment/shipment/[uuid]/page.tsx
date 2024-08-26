@@ -64,7 +64,7 @@ export default async function PaymentDetailsPage({
 
   const revalidatePaymentPageBinded = revalidatePaymentPage.bind(
     null,
-    `/payment/shipping/${params.uuid}`
+    `/payment/shipment/${params.uuid}`
   );
 
   return (

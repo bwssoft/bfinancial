@@ -9,6 +9,7 @@ import {
   UserCircleIcon,
   XMarkIcon,
   ArrowLeftEndOnRectangleIcon,
+  CubeIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Link from "next/link";
@@ -18,6 +19,11 @@ import { signOut } from "@/auth";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
+  {
+    name: "Cobrança Frete Avulso",
+    href: "/payment/form/detached-shipment/create",
+    icon: CubeIcon,
+  },
   { name: "Pagamentos", href: "/payment", icon: BanknotesIcon },
   {
     name: "Propostas",
@@ -42,7 +48,7 @@ export function SideBar() {
       if (href === "/" && pathname !== "/") {
         return false;
       }
-      return pathname.includes(href);
+      return pathname === href;
     },
     [pathname]
   );

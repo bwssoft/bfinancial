@@ -328,6 +328,98 @@ export async function createDetachedPaymentFromOfferPage(
   );
 }
 
+interface createDetachedShipmentPaymentParams {
+  cnpj_cpf: string | null;
+  nome_fantasia: string | null;
+  codigo_cliente_omie: string | null;
+  omie_enterprise: string | null;
+  group: string | null
+}
+
+export async function createDetachedShipmentPayment(
+  input: createDetachedShipmentPaymentParams,
+  form: FormData
+) {
+  const {
+    cnpj_cpf,
+    nome_fantasia,
+    codigo_cliente_omie,
+    omie_enterprise,
+    group
+  } = input
+
+  const {
+    contact_email,
+    contact_phone,
+    price
+  } = Object.fromEntries(form.entries()) as unknown as {
+    contact_email: string | null
+    contact_phone: string | null
+    price: string | null
+  };
+
+  if (
+    !group ||
+    !cnpj_cpf ||
+    !nome_fantasia ||
+    !codigo_cliente_omie ||
+    !omie_enterprise ||
+    !contact_email ||
+    !contact_phone ||
+    !price
+  ) {
+    throw new Error("Empresa, cliente ou pedido inválidos! Tente novamente.");
+  }
+
+  const payer = {
+    document: {
+      type: DocumentEnum.CNPJ,
+      value: cnpj_cpf,
+    },
+    email: contact_email,
+    name: nome_fantasia,
+  };
+
+  const receiver = {
+    name: omie_enterprise,
+  };
+
+  const pix = await createPixTransaction({
+    payer,
+    receiver,
+    price,
+  });
+
+  if (!pix.status) {
+    throw new Error("error on bpay microservice");
+  }
+
+  const data: CreatePayment = {
+    user_uuid: uuidv4(),
+    uuid: uuidv4(),
+    created_at: new Date().toISOString(),
+    price: pix.transaction.amount,
+    is_detached: true,
+    omie_metadata: {
+      enterprise: OmieEnterpriseEnum[omie_enterprise as keyof typeof OmieEnterpriseEnum],
+      codigo_cliente: Number(codigo_cliente_omie),
+    },
+    bpay_metadata: {
+      id: pix.transaction._id,
+      txid: pix.transaction.bb.txid,
+    },
+    group,
+  };
+
+  await paymentRepo.create(data);
+
+  await sendShippingDue({
+    pix_copia_e_cola: pix.transaction.bb.pixCopyPaste,
+    telefone: contact_phone,
+    payment_group: data.group!,
+  });
+}
+
 export async function getTransactionByPaymentId(id: string) {
   return;
 }
@@ -375,7 +467,7 @@ export async function createDueFromPayment(params: { payment: Payment }, form: F
 
   const enterprise = payment.omie_metadata?.enterprise;
   const clientId = payment.omie_metadata?.codigo_cliente;
-  const offerId = payment.omie_metadata?.codigo_pedido;
+  const offerId = payment.omie_metadata.codigo_pedido!;
 
   const [offer, client] = await Promise.all([
     getCachedOffer(enterprise, parseInt(offerId)),
@@ -401,7 +493,7 @@ export async function createDueFromPaymentShipping(params: { payment: Payment },
 
   const enterprise = payment.omie_metadata?.enterprise;
   const clientId = payment.omie_metadata?.codigo_cliente;
-  const offerId = payment.omie_metadata?.codigo_pedido;
+  const offerId = payment.omie_metadata.codigo_pedido!;
 
   const [offer, client] = await Promise.all([
     getCachedOffer(enterprise, parseInt(offerId)),
@@ -417,6 +509,31 @@ export async function createDueFromPaymentShipping(params: { payment: Payment },
         nome_fantasia: client.nome_fantasia,
         codigo_cliente_omie: String(client.codigo_cliente_omie),
         omie_enterprise: enterprise,
+      },
+      form
+    );
+  }
+}
+
+export async function createDueFromDetachedPaymentShipping(params: { payment: Payment }, form: FormData) {
+  const payment = params.payment;
+
+  const enterprise = payment.omie_metadata?.enterprise;
+  const clientId = payment.omie_metadata?.codigo_cliente;
+
+  const [client] = await Promise.all([
+    fetchClientById(enterprise, clientId.toString()),
+  ]);
+
+  if (client) {
+    form.set("price", String(payment.price));
+    await createDetachedShipmentPayment(
+      {
+        cnpj_cpf: client.cnpj_cpf,
+        nome_fantasia: client.nome_fantasia,
+        codigo_cliente_omie: String(client.codigo_cliente_omie),
+        omie_enterprise: enterprise,
+        group: payment.group
       },
       form
     );
@@ -524,7 +641,7 @@ export async function sendShippingDueFromForm(
     pix_copia_e_cola,
     payment_group,
   });
-} //usado para botão de "enviar cobrança" da tela de payment/shipping [uuid]
+} //usado para botão de "enviar cobrança" da tela de payment/shipment [uuid]
 export async function sendShippingDue(params: {
   telefone: string;
   pix_copia_e_cola: string;
