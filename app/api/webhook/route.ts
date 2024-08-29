@@ -51,7 +51,9 @@ export async function POST(request: Request) {
           return {
             ...parcela,
             parcela_adiantamento: "S",
-            categoria_adiantamento: "1.01.01",
+            categoria_adiantamento: categoriaAdiantamentoCod[
+              OmieEnterpriseEnum[omie_metadata.enterprise]
+            ],
             conta_corrente_adiantamento: nCodCCByEnterprise[
               OmieEnterpriseEnum[omie_metadata.enterprise]
             ],
@@ -135,6 +137,16 @@ const nCodCCByEnterprise = {
   MGC: '8482817541', // descrição: adiantamento
   BWS: '4475468992', // descrição: adiantamento
   ICBFILIAL: '8476221978', //descrição: adiantamento //nao é possivel por que não esta com o cnpj da priscila vinculado e a aplicação no bb não está em produção
+}
+
+const categoriaAdiantamentoCod = {
+  BWS: "1.01.01", // - Receita Bruta de Vendas
+  MGC: "1.01.01", // - Clientes - Venda de Mercadoria Fabricadas
+  WFC: "1.01.03", // - Clientes - Revenda de Mercadoria
+  ICB: "1.01.01",
+  // 1.01.01 - Venda de Mercadoria Adquirida/ Recebida de Terceiros
+  // 1.01.99 - Contrato comodato
+  ICBFILIAL: "1.01.01" // - Receita Bruta de Vendas
 }
 
 interface Pix {
