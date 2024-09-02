@@ -46,14 +46,19 @@ export async function POST(request: Request) {
       delete _offer.det
 
       _offer.cabecalho.origem_pedido = "API"
+      const codigo_cenario_impostos = offer.pedido_venda_produto.cabecalho.codigo_cenario_impostos
+      const categoria_adiantamento = categoriaAdiantamentoCod[
+        OmieEnterpriseEnum[omie_metadata.enterprise]
+      ]
+      const codigo_imposto = cCodImposto[codigo_cenario_impostos as keyof typeof cCodImposto]
       const parcela = _offer.lista_parcelas.parcela.map(parcela => {
         if (parcela.numero_parcela === omie_metadata.numero_parcela) {
           return {
             ...parcela,
             parcela_adiantamento: "S",
-            categoria_adiantamento: categoriaAdiantamentoCod[
-              OmieEnterpriseEnum[omie_metadata.enterprise]
-            ],
+            categoria_adiantamento: categoria_adiantamento
+            [codigo_imposto as keyof typeof categoria_adiantamento],
+
             conta_corrente_adiantamento: nCodCCByEnterprise[
               OmieEnterpriseEnum[omie_metadata.enterprise]
             ],
@@ -140,13 +145,56 @@ const nCodCCByEnterprise = {
 }
 
 const categoriaAdiantamentoCod = {
-  BWS: "1.01.01", // - Receita Bruta de Vendas
-  MGC: "1.01.01", // - Clientes - Venda de Mercadoria Fabricadas
-  WFC: "1.01.03", // - Clientes - Revenda de Mercadoria
-  ICB: "1.01.01",
-  // 1.01.01 - Venda de Mercadoria Adquirida/ Recebida de Terceiros
-  // 1.01.99 - Contrato comodato
-  ICBFILIAL: "1.01.01" // - Receita Bruta de Vendas
+  BWS: {
+    PADRAO: "1.01.01" // - Receita Bruta de Vendas
+  },
+  MGC: {
+    VENDA: "1.01.01" // - Clientes - Venda de Mercadoria Fabricadas
+  },
+  WFC: {
+    VENDA: "1.01.03" // - Clientes - Revenda de Mercadoria
+  },
+  ICB: {
+    VENDA: "1.01.01", // 1.01.01 - Venda de Mercadoria Adquirida/ Recebida de Terceiros
+    LOCACAO: "1.01.99", // 1.01.99 - Contrato comodato
+  },
+  ICBFILIAL: {
+    VENDA: "1.01.01" // - Receita Bruta de Vendas
+  }
+}
+
+// https://app.omie.com.br/api/v1/geral/cenarios/#ListarCenarios
+const cCodImposto = {
+  "405942591": "PADRAO", // ICB Padrao
+  "6129600798": "PADRAO", // ICB Novo Cenário Fiscal 21/03/2022 16:09:31
+  "6228264146": "VENDA", // ICB LOCAÇÃO
+  "6227022961": "LOCALCAO", //ICB LOCACAÇÃO
+
+
+  "2229186822": "PADRAO", // BWS Padrao
+  "2237530857": "PADRAO", // BWS Amostra
+  "4005317491": "PADRAO", // BWS 6949-5949
+  "4007096027": "PADRAO", // BWS 6912-5912
+
+
+  "2237648028": "PADRAO", // MGC Padrao 
+  "2418257925": "PADRAO", // MGC 5102-6102/ VENDA
+  "5999803867": "PADRAO", // MGC 5908- 6908/ LOCAÇÃO
+  "5999808436": "PADRAO", // MGC 5916- 6916/ RETORNO
+  "8100014320": "PADRAO", // MGC 5911-6911 AMOSTRA
+  "8100014411": "PADRAO", // MGC 5910- 6910/ BRINDE, DOAÇÃO
+  "8152824796": "PADRAO", // MGC 5912 - 6912 Demosntração
+
+  "2226509434": "PADRAO", // WFC Padrao
+  "2237549913": "PADRAO", // WFC Allcom
+  // "2418257925": "PADRAO", // WFC 5102-6102/ VENDA
+  "3303681841": "PADRAO", // WFC Amostra
+  // "5999803867": "PADRAO", // WFC 5908- 6908/ LOCAÇÃO
+  // "5999808436": "PADRAO", // WFC 5916- 6916/ RETORNO
+
+  "8397806596": "PADRAO", // ICBFILIAL PADRAO
+  "8397806643": "PADRAO", // ICBFILIAL 6908 -5908/ LOCAÇÃO
+  "8475883884": "PADRAO" // ICBFILIAL 6916/5916
 }
 
 interface Pix {
