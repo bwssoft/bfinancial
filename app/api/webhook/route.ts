@@ -149,17 +149,17 @@ const categoriaAdiantamentoCod = {
     PADRAO: "1.01.01" // - Receita Bruta de Vendas
   },
   MGC: {
-    VENDA: "1.01.01" // - Clientes - Venda de Mercadoria Fabricadas
+    PADRAO: "1.01.01" // - Clientes - Venda de Mercadoria Fabricadas
   },
   WFC: {
-    VENDA: "1.01.03" // - Clientes - Revenda de Mercadoria
+    PADRAO: "1.01.03" // - Clientes - Revenda de Mercadoria
   },
   ICB: {
     VENDA: "1.01.01", // 1.01.01 - Venda de Mercadoria Adquirida/ Recebida de Terceiros
     LOCACAO: "1.01.99", // 1.01.99 - Contrato comodato
   },
   ICBFILIAL: {
-    VENDA: "1.01.01" // - Receita Bruta de Vendas
+    PADRAO: "1.01.01" // - Receita Bruta de Vendas
   }
 }
 
