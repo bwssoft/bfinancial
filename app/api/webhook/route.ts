@@ -168,7 +168,7 @@ const cCodImposto = {
   "405942591": "PADRAO", // ICB Padrao
   "6129600798": "PADRAO", // ICB Novo Cenário Fiscal 21/03/2022 16:09:31
   "6228264146": "VENDA", // ICB LOCAÇÃO
-  "6227022961": "LOCALCAO", //ICB LOCACAÇÃO
+  "6227022961": "LOCACAO", //ICB LOCACAÇÃO
 
 
   "2229186822": "PADRAO", // BWS Padrao
