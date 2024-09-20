@@ -5,6 +5,7 @@ import { Button } from "@/app/ui/button";
 import { FormGroup } from "@/app/ui/form-group";
 import { Input } from "@/app/ui/input";
 import { Label } from "@/app/ui/label";
+import { PhoneInput } from "../../phone-input";
 
 export interface DueCreateFormProps {
   client: OmieClientModel;
@@ -25,9 +26,10 @@ export function DueCreateForm({ client, action }: DueCreateFormProps) {
       </FormGroup>
       <FormGroup>
         <Label>Telefone</Label>
-        <Input
+
+        <PhoneInput
           name="contact_phone"
-          defaultValue={
+          value={
             client?.telefone1_ddd
               ? `${client?.telefone1_ddd}${client?.telefone1_numero}`
               : undefined

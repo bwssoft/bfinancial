@@ -1,9 +1,12 @@
 "use client";
-import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
-import { Button } from "../../button";
-import { EnvelopeIcon } from "@heroicons/react/20/solid";
-import { createDetachedPaymentFromOfferPage } from "@/app/lib/actions";
 import { toast } from "@/app/hook/use-toast";
+import { createDetachedPaymentFromOfferPage } from "@/app/lib/actions";
+import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
+import { EnvelopeIcon } from "@heroicons/react/20/solid";
+import { Button } from "../../button";
+import { FormGroup } from "../../form-group";
+import { Label } from "../../label";
+import { PhoneInput } from "../../phone-input";
 
 export function DueShipmentForm(props: {
   omie_enterprise: OmieEnterpriseEnum;
@@ -26,14 +29,13 @@ export function DueShipmentForm(props: {
 
   async function handleAction(form: FormData) {
     try {
-      const createPaymentFromOfferPageBinded =
-        createDetachedPaymentFromOfferPage.bind(null, {
-          omie_enterprise: omie_enterprise,
-          codigo_pedido_omie: codigo_pedido_omie,
-          cnpj_cpf: cnpj_cpf,
-          codigo_cliente_omie: codigo_cliente_omie,
-          nome_fantasia: nome_fantasia,
-        });
+      const createPaymentFromOfferPageBinded = createDetachedPaymentFromOfferPage.bind(null, {
+        omie_enterprise: omie_enterprise,
+        codigo_pedido_omie: codigo_pedido_omie,
+        cnpj_cpf: cnpj_cpf,
+        codigo_cliente_omie: codigo_cliente_omie,
+        nome_fantasia: nome_fantasia,
+      });
 
       await createPaymentFromOfferPageBinded(form);
 
@@ -57,39 +59,10 @@ export function DueShipmentForm(props: {
       className="space-y-8 overflow-y-auto max-h-full scroll-slim p-2 border-4 border-transparent py-4"
     >
       <section className="space-y-4">
-        <fieldset>
-          <div>
-            <label
-              htmlFor="contact_phone"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Telefone do cliente
-            </label>
-            <div className="relative mt-2 rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 flex items-center">
-                <label htmlFor="country" className="sr-only">
-                  Country
-                </label>
-                <select
-                  id="country"
-                  name="country"
-                  autoComplete="country"
-                  className="h-full rounded-md border-0 bg-transparent py-0 pl-3 pr-7 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-600 sm:text-sm"
-                >
-                  <option selected={true}>BR</option>
-                </select>
-              </div>
-              <input
-                type="text"
-                name="contact_phone"
-                id="contact_phone"
-                defaultValue={contact_phone}
-                className="block w-full rounded-md border-0 py-1.5 pl-16 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-cyan-600 sm:text-sm sm:leading-6"
-                placeholder="(11) 9 9954-6543"
-              />
-            </div>
-          </div>
-        </fieldset>
+        <FormGroup>
+          <Label>Telefone do cliente</Label>
+          <PhoneInput name="contact_phone" value={contact_phone} />
+        </FormGroup>
 
         <fieldset>
           <div>
@@ -101,10 +74,7 @@ export function DueShipmentForm(props: {
             </label>
             <div className="relative mt-2 rounded-md shadow-sm">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <EnvelopeIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
+                <EnvelopeIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
               </div>
               <input
                 type="email"
@@ -120,10 +90,7 @@ export function DueShipmentForm(props: {
 
         <fieldset>
           <div>
-            <label
-              htmlFor="price"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
+            <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900">
               Valor
             </label>
             <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-600">
