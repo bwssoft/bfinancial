@@ -1,38 +1,52 @@
+import { auth } from "@/auth";
+
 import {
   createDueFromDetachedPaymentShipping,
   fetchNote,
   fetchPaymentByGroup,
   getCachedClient,
   getManyTransactionById,
-  revalidatePaymentPage,
   sendShippingDueFromForm,
 } from "@/app/lib/actions";
+import { Payment } from "@/app/lib/definitions/Payment";
 import { BackButton } from "@/app/ui/back-button";
 import { Button } from "@/app/ui/button";
 import { NoteCreateFrom } from "@/app/ui/form/note-create";
 import { LabelValue } from "@/app/ui/label-value";
 import { generateQR } from "@/app/utils/qrCode";
-import { auth } from "@/auth";
-import { ArrowLeftIcon } from "@heroicons/react/20/solid";
-import { GenerateShare } from "../../[uuid]/generate-share";
-import { NoteCard } from "../../[uuid]/note-card";
-import { TransactionFeed } from "../../[uuid]/transaction-feed";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { CurrentTransaction } from "../../[uuid]/current-transaction";
 import { NewTransactionForm } from "../../[uuid]/new-transaction-form";
+import { NoteCard } from "../../[uuid]/note-card";
+import { TransactionFeed } from "../../[uuid]/transaction-feed";
 
-export default async function PaymentDetailsPage({
-  params,
-}: {
+interface DetachedShipmentDetailsParams {
   params: {
     uuid: string;
   };
-}) {
-  const data = await auth();
+}
+
+export default async function DetachedShipmentDetails({ params }: DetachedShipmentDetailsParams) {
+  const user = await auth();
+
+  async function fetchOmieClient(paymentData: Payment) {
+    if (paymentData?.omie_metadata.enterprise && paymentData?.omie_metadata.codigo_cliente) {
+      return await Promise.all([
+        getCachedClient(
+          paymentData.omie_metadata.enterprise,
+          paymentData.omie_metadata.codigo_cliente.toString()
+        ),
+      ]);
+    }
+
+    return [];
+  }
 
   const [comments, payment] = await Promise.all([
     fetchNote(params.uuid),
     fetchPaymentByGroup(params.uuid),
   ]);
+
   const { transactions } = await getManyTransactionById({
     id: payment?.map((pay) => pay.bpay_metadata.id),
   });
@@ -47,23 +61,13 @@ export default async function PaymentDetailsPage({
 
   const createTemplateMessageBinded = sendShippingDueFromForm.bind(null, {
     pix_copia_e_cola: currentTransaction?.bb.pixCopyPaste!,
-    payment_group: paymentData.group,
+    payment_group: paymentData?.group,
   });
 
-  const [client] = await Promise.all([
-    getCachedClient(
-      paymentData.omie_metadata.enterprise,
-      paymentData.omie_metadata.codigo_cliente.toString()
-    ),
-  ]);
-
-  const revalidatePaymentPageBinded = revalidatePaymentPage.bind(
-    null,
-    `/payment/detached-shipment/${params.uuid}`
-  );
+  const [client] = await fetchOmieClient(paymentData);
 
   return (
-    <div className="min-h-full">
+    <main className="min-h-full">
       <header className="mb-4 flex w-full items-center justify-between">
         <div>
           <BackButton>
@@ -76,9 +80,7 @@ export default async function PaymentDetailsPage({
         </div>
 
         <div className="inline-flex items-center gap-2">
-          <GenerateShare paymentGroupId={paymentData.group} />
-
-          <form action={revalidatePaymentPageBinded}>
+          <form>
             <Button type="submit">Revalidar</Button>
           </form>
 
@@ -102,14 +104,8 @@ export default async function PaymentDetailsPage({
                 </div>
               </div>
               <div className="grid grid-cols-2 p-4 gap-2 gap-y-4">
-                <LabelValue
-                  label="Nome Fantasia do cliente"
-                  value={client.nome_fantasia}
-                />
-                <LabelValue
-                  label="Documento do cliente"
-                  value={client.cnpj_cpf}
-                />
+                <LabelValue label="Nome Fantasia do cliente" value={client.nome_fantasia} />
+                <LabelValue label="Documento do cliente" value={client.cnpj_cpf} />
                 <LabelValue
                   label="Valor a ser cobrado"
                   value={`R$${paymentData?.price.toString()}`}
@@ -127,15 +123,16 @@ export default async function PaymentDetailsPage({
             <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
               <div className="divide-y divide-gray-200">
                 <div className="p-4">
-                  <h2
-                    id="notes-title"
-                    className="text-lg font-medium text-gray-900"
-                  >
+                  <h2 id="notes-title" className="text-lg font-medium text-gray-900">
                     Anotações
                   </h2>
                 </div>
                 <div className="p-4">
                   <ul role="list">
+                    <li className="hidden last:flex text-sm h-32 items-center text-gray-500 justify-center">
+                      Nenhuma anotação inserido
+                    </li>
+
                     {comments.map((comment) => (
                       <NoteCard key={comment.uuid} note={comment} />
                     ))}
@@ -147,8 +144,8 @@ export default async function PaymentDetailsPage({
                   <div className="min-w-0 flex-1">
                     <NoteCreateFrom
                       user={{
-                        id: data?.user.uuid!,
-                        name: data?.user.name!,
+                        id: user?.user.uuid!,
+                        name: user?.user.name!,
                       }}
                       uuid={params.uuid}
                     />
@@ -170,10 +167,7 @@ export default async function PaymentDetailsPage({
           <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
             <div className="divide-y divide-gray-200">
               <div className="p-4">
-                <h2
-                  id="notes-title"
-                  className="text-lg font-medium text-gray-900"
-                >
+                <h2 id="notes-title" className="text-lg font-medium text-gray-900">
                   Histórico de pix
                 </h2>
               </div>
@@ -184,6 +178,6 @@ export default async function PaymentDetailsPage({
           </div>
         </section>
       </div>
-    </div>
+    </main>
   );
 }

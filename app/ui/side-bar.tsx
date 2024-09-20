@@ -1,19 +1,19 @@
 "use client";
-import { Fragment, useCallback, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
+  ArrowLeftEndOnRectangleIcon,
   BanknotesIcon,
   Cog6ToothIcon,
+  CubeIcon,
   DocumentDuplicateIcon,
   HomeIcon,
   UserCircleIcon,
   XMarkIcon,
-  ArrowLeftEndOnRectangleIcon,
-  CubeIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Fragment, useCallback, useState } from "react";
 
 import { signOut } from "@/auth";
 
@@ -21,7 +21,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
   {
     name: "Cobrança Frete Avulso",
-    href: "/payment/form/detached-shipment/create",
+    href: "/payment/detached-shipment",
     icon: CubeIcon,
   },
   { name: "Pagamentos", href: "/payment", icon: BanknotesIcon },
@@ -56,11 +56,7 @@ export function SideBar() {
   return (
     <div>
       <Transition.Root show={sidebarOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-40 lg:hidden"
-          onClose={setSidebarOpen}
-        >
+        <Dialog as="div" className="relative z-40 lg:hidden" onClose={setSidebarOpen}>
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -100,21 +96,14 @@ export function SideBar() {
                       onClick={() => setSidebarOpen(false)}
                     >
                       <span className="sr-only">Close sidebar</span>
-                      <XMarkIcon
-                        className="h-6 w-6 text-white"
-                        aria-hidden="true"
-                      />
+                      <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
                     </button>
                   </div>
                 </Transition.Child>
                 {/* Sidebar component, swap this element with another sidebar if you like */}
                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
                   <div className="flex h-16 shrink-0 items-center">
-                    <img
-                      className="h-8 w-auto"
-                      src="/logotipo.png"
-                      alt="Your Company"
-                    />
+                    <img className="h-8 w-auto" src="/logotipo.png" alt="Your Company" />
                   </div>
                   <nav className="flex flex-1 flex-col">
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -172,11 +161,7 @@ export function SideBar() {
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center">
-            <img
-              className="h-8 w-auto"
-              src="/logotipo.png"
-              alt="Your Company"
-            />
+            <img className="h-8 w-auto" src="/logotipo.png" alt="Your Company" />
           </div>
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
