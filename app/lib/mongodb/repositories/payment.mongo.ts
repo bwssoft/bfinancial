@@ -1,6 +1,6 @@
-import { Collection, Filter, FindCursor, WithId } from "mongodb";
-import clientPromise from "../config";
+import { Collection, Filter, WithId } from "mongodb";
 import { Payment } from "../../definitions/Payment";
+import clientPromise from "../config";
 
 async function connect() {
   const client = await clientPromise;
@@ -13,7 +13,9 @@ async function list(params: Filter<Payment> = {}) {
     const db = await connect();
 
     const payments: Collection<Payment> = db.collection("payment");
-    const data = await payments.find(params).toArray();
+    const data = await payments.find(params).sort({
+      "created_at": -1,
+    }).toArray();
     return data as Payment[]
   } catch (error: any) {
     console.log('[error/payment-repo] (list)', error.toString())
