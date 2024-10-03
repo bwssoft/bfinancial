@@ -1,13 +1,14 @@
 "use client";
-import { Button } from "../../button";
 import { toast } from "@/app/hook/use-toast";
+import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
+import { Alert } from "../../alert";
 import { Autocomplete, AutocompleteResponse } from "../../autocomplete";
+import { Button } from "../../button";
+import { Input } from "../../input";
+import { Label } from "../../label";
+import { PhoneInput } from "../../phone-input";
 import { enterprises } from "../../tables/clients/filter";
 import { useDetachedShipment } from "./use-detached-shipment";
-import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
-import { Label } from "../../label";
-import { Input } from "../../input";
-import { Alert } from "../../alert";
 
 interface Props {
   action: (
@@ -105,9 +106,7 @@ export function DueDetachedShipmentForm(props: Props) {
               }))}
               onInputChange={handleSearchClients}
               onChange={(newValue) =>
-                handleChangeClient(
-                  newValue as AutocompleteResponse<OmieClientModel>
-                )
+                handleChangeClient(newValue as AutocompleteResponse<OmieClientModel>)
               }
             />
           </div>
@@ -115,10 +114,7 @@ export function DueDetachedShipmentForm(props: Props) {
 
         <fieldset>
           <div>
-            <label
-              htmlFor="price"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
+            <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900">
               Valor
             </label>
             <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-cyan-600 bg-white">
@@ -145,23 +141,20 @@ export function DueDetachedShipmentForm(props: Props) {
         <fieldset>
           <Label>Email</Label>
           <Input name="contact_email" defaultValue={client?.email} />
-          <Alert
-            title="Lembre de verificar o email"
-            variant="warning"
-            className="py-2 mt-2"
-          />
+          <Alert title="Lembre de verificar o email" variant="warning" className="py-2 mt-2" />
         </fieldset>
 
         <fieldset>
           <Label>Telefone</Label>
-          <Input
+          <PhoneInput
             name="contact_phone"
-            defaultValue={
+            value={
               client?.telefone1_ddd
                 ? `${client?.telefone1_ddd}${client?.telefone1_numero}`
                 : undefined
             }
           />
+
           <Alert
             title="Lembre de verificar o número de telefone"
             variant="warning"
