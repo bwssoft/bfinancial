@@ -43,7 +43,7 @@ export function useDetachedShipment() {
       pagina: 1,
       registros_por_pagina: 20,
       clientesFiltro: {
-        nome_fantasia: query,
+        cnpj_cpf: query,
       },
     });
 
