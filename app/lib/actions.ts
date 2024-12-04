@@ -584,47 +584,47 @@ export async function sendDue(params: {
     throw new Error("Não foi possível gerar o QR Code e salvá-lo.");
   }
 
-  const result = await BMessageClient.createTemplateMessage({
-    phone: params.telefone,
-    code: "pt_BR",
-    template: "cobranca_bfinancial",
-    components: [
-      {
-        type: "header",
-        parameters: [
-          {
-            type: "image",
-            image: {
-              link,
-            },
-          },
-        ],
-      },
-      {
-        type: "body",
-        parameters: [
-          {
-            type: "text",
-            text: params.numero_parcela,
-          },
-          {
-            type: "text",
-            text: params.data_vencimento,
-          },
-          {
-            type: "text",
-            text: `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}/pay/${params.payment_group}`,
-          },
-          {
-            type: "text",
-            text: params.pix_copia_e_cola,
-          },
-        ],
-      },
-    ],
-  });
+  // const result = await BMessageClient.createTemplateMessage({
+  //   phone: params.telefone,
+  //   code: "pt_BR",
+  //   template: "cobranca_bfinancial",
+  //   components: [
+  //     {
+  //       type: "header",
+  //       parameters: [
+  //         {
+  //           type: "image",
+  //           image: {
+  //             link,
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "body",
+  //       parameters: [
+  //         {
+  //           type: "text",
+  //           text: params.numero_parcela,
+  //         },
+  //         {
+  //           type: "text",
+  //           text: params.data_vencimento,
+  //         },
+  //         {
+  //           type: "text",
+  //           text: `${headerInfo["x-forwarded-proto"]}://${headerInfo.host}/pay/${params.payment_group}`,
+  //         },
+  //         {
+  //           type: "text",
+  //           text: params.pix_copia_e_cola,
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // });
 
-  return result;
+  return;
 }
 
 export async function sendShippingDueFromForm(
