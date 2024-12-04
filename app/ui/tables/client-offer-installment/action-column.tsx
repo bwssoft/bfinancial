@@ -66,8 +66,8 @@ export function ClientOfferActionColumn({
       const expirationDate = new Date();
 
       expirationDate.setDate(Number(day));
-      expirationDate.setMonth(Number(month));
-      expirationDate.setMonth(Number(year));
+      expirationDate.setMonth(Number(month) - 1);
+      expirationDate.setFullYear(Number(year));
 
       const createPaymentFromOfferPageBinded = createPaymentFromOfferPage.bind(
         null,
@@ -76,7 +76,7 @@ export function ClientOfferActionColumn({
           codigo_pedido_omie: installment.codigo_pedido_omie!,
           omie_client: installment.omie_client!,
           installment,
-          expiration: differenceInSeconds(expirationDate, new Date()),
+          expiration: 86400 * 2, //differenceInSeconds(expirationDate, new Date())
         }
       );
 
