@@ -83,7 +83,7 @@ export const ComboboxSingleTriggerImpl = ({
 		>
 			<div
 				className={cn(
-					'flex h-9 items-center border border-gray-300 group-focus-within:ring-2 group-focus-within:ring-indigo-500 w-full rounded-md',
+					'flex h-9 items-center bg-white border border-gray-300 group-focus-within:ring-2 group-focus-within:ring-indigo-500 w-full rounded-md',
 					error && 'border-red-500',
 				)}
 			>

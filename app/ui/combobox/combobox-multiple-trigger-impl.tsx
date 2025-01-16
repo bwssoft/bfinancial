@@ -52,7 +52,7 @@ export const ComboboxMultipleTriggerImpl = <TData,>({
 	return (
 		<div
 			className={cn(
-				'flex w-full border border-gray-300 rounded-md items-center h-9',
+				'flex w-full bg-white border border-gray-300 rounded-md items-center h-9',
 				isOptionsOpened && 'ring-2 ring-indigo-500',
 				disabled && 'bg-gray-100',
 			)}
