@@ -1,3 +1,4 @@
+"use client"
 import { fetchClients } from "@/app/lib/actions";
 import { OmieEnterpriseEnum } from "@/app/lib/definitions/OmieApi";
 import { OmieClientModel } from "@/app/lib/definitions/OmieClient";
@@ -28,24 +29,23 @@ export function useDetachedShipment() {
     router.push(`${pathname}?${params}`);
   }
 
-  const handleChangeClient = (option: AutocompleteResponse<OmieClientModel>) => {
-    setClient(option.value);
+  const handleChangeClient = (client: OmieClientModel) => {
+    setClient(client);
   }
 
-  const handleSearchClients = useDebouncedCallback((query: string) => {
-    listClients(query);
-  }, 500);
+  const handleSearchClients = listClients
 
   async function listClients(query: string) {
     if (query === "" || !enterprise) return;
 
     const data = await fetchClients(enterprise, {
       pagina: 1,
-      registros_por_pagina: 20,
+      registros_por_pagina: 10000,
       clientesFiltro: {
         cnpj_cpf: query,
       },
     });
+    console.log("🚀 ~ listClients ~ data:", query, enterprise, data)
 
     if (data) {
       setClients(data.clientes_cadastro);

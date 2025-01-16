@@ -9,6 +9,7 @@ import { Label } from "../../label";
 import { PhoneInput } from "../../phone-input";
 import { enterprises } from "../../tables/clients/filter";
 import { useDetachedShipment } from "./use-detached-shipment";
+import { Combobox } from "../../combobox";
 
 interface Props {
   action: (
@@ -97,17 +98,22 @@ export function DueDetachedShipmentForm(props: Props) {
 
         <fieldset>
           <div>
-            <Autocomplete
+            <Combobox 
               label="Cliente"
-              placeholder="Filtrar cliente"
-              options={clients?.map((client) => ({
+              data={clients.map((client) => ({
                 label: client.nome_fantasia,
                 value: client,
               }))}
-              onInputChange={handleSearchClients}
-              onChange={(newValue) =>
-                handleChangeClient(newValue as AutocompleteResponse<OmieClientModel>)
-              }
+              displayValueGetter={(data) => data.label}
+              keyExtractor={(data) => data.value.codigo_cliente_omie.toString()}
+              type="single"
+              keywords={(data) => [data.value.cnpj_cpf]}
+              onSearchChange={handleSearchClients}
+              onChange={(option) => {
+                if (option.length !== 0) {
+                  handleChangeClient(option[0].value)
+                }
+              }}
             />
           </div>
         </fieldset>
