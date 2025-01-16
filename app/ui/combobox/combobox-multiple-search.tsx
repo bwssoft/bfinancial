@@ -66,3 +66,5 @@ export const ComboboxMultipleSearch = React.forwardRef<
 		</div>
 	);
 });
+
+ComboboxMultipleSearch.displayName = "ComboboxMultipleSearch"

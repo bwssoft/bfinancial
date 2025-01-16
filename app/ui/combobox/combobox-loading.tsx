@@ -33,3 +33,5 @@ export const ComboboxLoading = React.forwardRef<
 		</div>
 	);
 });
+
+ComboboxLoading.displayName = "ComboboxLoading"
