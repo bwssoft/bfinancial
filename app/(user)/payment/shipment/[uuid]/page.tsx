@@ -41,7 +41,7 @@ export default async function PaymentDetailsPage({
   const hasFinishedTransactions = transactions?.some((el) => el.finish);
   const paymentData = payment[0];
 
-  const currentTransaction = transactions?.[0] ?? null;
+  const currentTransaction = transactions?.[transactions.length - 1] ?? null;
   const currentTransactionQrcode = currentTransaction
     ? await generateQR(currentTransaction?.bb.pixCopyPaste as string)
     : undefined;

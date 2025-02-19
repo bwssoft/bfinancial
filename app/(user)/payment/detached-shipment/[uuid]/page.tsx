@@ -26,11 +26,16 @@ interface DetachedShipmentDetailsParams {
   };
 }
 
-export default async function DetachedShipmentDetails({ params }: DetachedShipmentDetailsParams) {
+export default async function DetachedShipmentDetails({
+  params,
+}: DetachedShipmentDetailsParams) {
   const user = await auth();
 
   async function fetchOmieClient(paymentData: Payment) {
-    if (paymentData?.omie_metadata.enterprise && paymentData?.omie_metadata.codigo_cliente) {
+    if (
+      paymentData?.omie_metadata.enterprise &&
+      paymentData?.omie_metadata.codigo_cliente
+    ) {
       return await Promise.all([
         getCachedClient(
           paymentData.omie_metadata.enterprise,
@@ -54,7 +59,7 @@ export default async function DetachedShipmentDetails({ params }: DetachedShipme
   const hasFinishedTransactions = transactions?.some((el) => el.finish);
   const paymentData = payment[0];
 
-  const currentTransaction = transactions?.[0] ?? null;
+  const currentTransaction = transactions?.[transactions.length - 1] ?? null;
   const currentTransactionQrcode = currentTransaction
     ? await generateQR(currentTransaction?.bb.pixCopyPaste as string)
     : undefined;
@@ -104,8 +109,14 @@ export default async function DetachedShipmentDetails({ params }: DetachedShipme
                 </div>
               </div>
               <div className="grid grid-cols-2 p-4 gap-2 gap-y-4">
-                <LabelValue label="Nome Fantasia do cliente" value={client.nome_fantasia} />
-                <LabelValue label="Documento do cliente" value={client.cnpj_cpf} />
+                <LabelValue
+                  label="Nome Fantasia do cliente"
+                  value={client.nome_fantasia}
+                />
+                <LabelValue
+                  label="Documento do cliente"
+                  value={client.cnpj_cpf}
+                />
                 <LabelValue
                   label="Valor a ser cobrado"
                   value={`R$${paymentData?.price.toString()}`}
@@ -123,7 +134,10 @@ export default async function DetachedShipmentDetails({ params }: DetachedShipme
             <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
               <div className="divide-y divide-gray-200">
                 <div className="p-4">
-                  <h2 id="notes-title" className="text-lg font-medium text-gray-900">
+                  <h2
+                    id="notes-title"
+                    className="text-lg font-medium text-gray-900"
+                  >
                     Anotações
                   </h2>
                 </div>
@@ -167,7 +181,10 @@ export default async function DetachedShipmentDetails({ params }: DetachedShipme
           <div className="bg-white border shadow-sm sm:overflow-hidden sm:rounded-lg">
             <div className="divide-y divide-gray-200">
               <div className="p-4">
-                <h2 id="notes-title" className="text-lg font-medium text-gray-900">
+                <h2
+                  id="notes-title"
+                  className="text-lg font-medium text-gray-900"
+                >
                   Histórico de pix
                 </h2>
               </div>
