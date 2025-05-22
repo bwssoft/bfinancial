@@ -39,4 +39,6 @@ export enum OmieEnterpriseEnum {
   ICB = "ICB",
   ICBFILIAL = "ICBFILIAL",
   WFC = "WFC",
+  HYBRID = "HYBRID",
+  HYBRIDFILIAL = "HYBRIDFILIAL",
 }

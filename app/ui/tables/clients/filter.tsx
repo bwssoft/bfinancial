@@ -18,6 +18,8 @@ export const enterprises: {
   { id: OmieEnterpriseEnum.MGC, name: "MGC" },
   { id: OmieEnterpriseEnum.ICB, name: "ICB" },
   { id: OmieEnterpriseEnum.ICBFILIAL, name: "ICB Filial" },
+  { id: OmieEnterpriseEnum.HYBRID, name: "Hybrid" },
+  { id: OmieEnterpriseEnum.HYBRIDFILIAL, name: "Hybrid Filial" },
 ];
 
 export function ClientTableFilter() {
@@ -30,9 +32,9 @@ export function ClientTableFilter() {
   const onAction = () => {
     const params = formatSearchParams({
       omie_enterprise: enterprise,
-      client_name: client
-    })
-    router.push(`${pathname}?${params}`)
+      client_name: client,
+    });
+    router.push(`${pathname}?${params}`);
   };
 
   return (
