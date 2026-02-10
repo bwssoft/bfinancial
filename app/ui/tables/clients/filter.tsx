@@ -20,6 +20,7 @@ export const enterprises: {
   { id: OmieEnterpriseEnum.ICBFILIAL, name: "ICB Filial" },
   { id: OmieEnterpriseEnum.HYBRID, name: "Hybrid" },
   { id: OmieEnterpriseEnum.HYBRIDFILIAL, name: "Hybrid Filial" },
+  { id: OmieEnterpriseEnum.PRMA, name: "PRMA" },
 ];
 
 export function ClientTableFilter() {

@@ -49,6 +49,10 @@ export const env = EnviromentsSchema.parse({
       key: process.env.OMIE_HYBRIDFILIAL_API_KEY,
       secret: process.env.OMIE_HYBRIDFILIAL_API_SECRET,
     },
+    PRMA: {
+      key: process.env.OMIE_PRMA_API_KEY,
+      secret: process.env.OMIE_PRMA_API_SECRET,
+    },
   },
   OMIE_URL: process.env.NEXT_PUBLIC_OMIE_URL,
   FIREBASE_CONFIG:

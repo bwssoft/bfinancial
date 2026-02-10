@@ -156,6 +156,7 @@ const nCodCCByEnterprise = {
   ICBFILIAL: "8476221978", //descrição: adiantamento //nao é possivel por que não esta com o cnpj da priscila vinculado e a aplicação no bb não está em produção,
   HYBRID: "3775410765",
   HYBRIDFILIAL: "10249812886",
+  PRMA: "", // TODO_PRMA: Eles precisam criar a categoria de adiantamento
 };
 
 // https://app.omie.com.br/developer/api-test/?ENDPOINT=https%3A%2F%2Fapp.omie.com.br%2Fapi%2Fv1%2Fgeral%2Fcategorias%2F&OMIE_CALL=ListarCategorias&PARAMS=%257B%2B%2B%2522pagina%2522%253A%2B1%252C%2B%2B%2522registros_por_pagina%2522%253A%2B50%257D
@@ -181,6 +182,9 @@ const categoriaAdiantamentoCod = {
   },
   HYBRIDFILIAL: {
     PADRAO: "1.01.01", // - Receita Bruta de Vendas
+  },
+  PRMA: {
+    PADRAO: "", // TODO_PRMA: Eles precisam criar a categoria de adiantamento
   },
 };
 
@@ -220,6 +224,9 @@ const cCodImposto = {
 
   "10217979705": "PADRAO", // HYBRIDFILIAL Padrão
   "10217979759": "VENDA", // HYBRIDFILIAL CFOP 5102/6102
+
+  "11095072203": "PADRAO", // PRMA PADRAO
+  "11095073284": "VENDA", // PRMA 5102-6102/ VENDA
 };
 
 interface Pix {

@@ -41,4 +41,5 @@ export enum OmieEnterpriseEnum {
   WFC = "WFC",
   HYBRID = "HYBRID",
   HYBRIDFILIAL = "HYBRIDFILIAL",
+  PRMA = "PRMA",
 }
