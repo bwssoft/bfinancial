@@ -14,6 +14,7 @@ const EnviromentsSchema = z.object({
     ICBFILIAL: SecretSchema,
     HYBRID: SecretSchema,
     HYBRIDFILIAL: SecretSchema,
+    PRMA: SecretSchema
   }),
   OMIE_URL: z.string(),
   FIREBASE_CONFIG: z.any(),
